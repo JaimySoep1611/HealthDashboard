@@ -11,30 +11,46 @@ export function WeightCard({
   latestKg,
   goalKg,
   trend,
+  loggedToday,
 }: {
   latestKg: number | null;
   goalKg: number | null;
   trend: number[];
+  loggedToday: boolean;
 }) {
   const router = useRouter();
   const [value, setValue] = useState(latestKg ? String(latestKg) : "");
-  const [saving, setSaving] = useState(false);
+  const [prevLatestKg, setPrevLatestKg] = useState(latestKg);
+  const [liveLatestKg, setLiveLatestKg] = useState(latestKg);
+  const [liveTrend, setLiveTrend] = useState(trend);
+  const [hasLoggedToday, setHasLoggedToday] = useState(loggedToday);
 
-  async function logWeight(event: React.FormEvent) {
+  if (latestKg !== prevLatestKg) {
+    setPrevLatestKg(latestKg);
+    setLiveLatestKg(latestKg);
+    setLiveTrend(trend);
+    setHasLoggedToday(loggedToday);
+  }
+
+  function logWeight(event: React.FormEvent) {
     event.preventDefault();
     const weightKg = Number(value);
     if (!weightKg || weightKg <= 0) return;
-    setSaving(true);
-    await fetch("/api/health/weight", {
+
+    setLiveLatestKg(weightKg);
+    setLiveTrend((current) =>
+      hasLoggedToday ? [...current.slice(0, -1), weightKg] : [...current, weightKg]
+    );
+    setHasLoggedToday(true);
+
+    fetch("/api/health/weight", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ weightKg }),
-    });
-    setSaving(false);
-    router.refresh();
+    }).then(() => router.refresh());
   }
 
-  const delta = latestKg !== null && goalKg !== null ? latestKg - goalKg : null;
+  const delta = liveLatestKg !== null && goalKg !== null ? liveLatestKg - goalKg : null;
 
   return (
     <div className="stat-card flex flex-col gap-4 p-5">
@@ -48,7 +64,7 @@ export function WeightCard({
         <div className="flex flex-1 flex-col">
           <div className="flex items-baseline gap-1">
             <span className="text-2xl font-semibold tracking-tight">
-              {latestKg !== null ? latestKg : "—"}
+              {liveLatestKg !== null ? liveLatestKg : "—"}
             </span>
             <span className="text-sm text-muted">kg</span>
           </div>
@@ -60,9 +76,9 @@ export function WeightCard({
         </div>
       </div>
 
-      {trend.length > 1 && (
+      {liveTrend.length > 1 && (
         <div style={{ height: 48 }}>
-          <Sparkline id="weight" points={trend} color={WEIGHT_COLOR} height={48} target={goalKg ?? undefined} />
+          <Sparkline id="weight" points={liveTrend} color={WEIGHT_COLOR} height={48} target={goalKg ?? undefined} />
         </div>
       )}
 
@@ -77,11 +93,11 @@ export function WeightCard({
         />
         <button
           type="submit"
-          disabled={saving || !value}
+          disabled={!value}
           className="flex-none rounded-lg px-3 py-1.5 text-xs font-medium text-white transition disabled:opacity-50"
           style={{ backgroundColor: WEIGHT_COLOR }}
         >
-          {saving ? "…" : "Log"}
+          Log
         </button>
       </form>
     </div>

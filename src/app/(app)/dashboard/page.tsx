@@ -2,17 +2,13 @@ import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { startOfDay, startOfWeek, addDays } from "@/lib/dates";
-import { ProgressRing } from "@/components/ProgressRing";
-import { Sparkline } from "@/components/Sparkline";
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatCard } from "@/components/StatCard";
 import { DashboardHero } from "@/components/DashboardHero";
 import { TargetForm } from "@/components/nutrition/target-form";
-import { FoodLogger } from "@/components/nutrition/food-logger";
-import { EntryList } from "@/components/nutrition/entry-list";
+import { FoodLogSection } from "@/components/nutrition/FoodLogSection";
 import { WeeklySchedule } from "@/components/training/weekly-schedule";
 import { ManualStepsForm } from "@/components/steps/manual-steps-form";
-import { WaterCard } from "@/components/health/WaterCard";
 import { WeightCard } from "@/components/health/WeightCard";
 import { FlameIcon, FootprintsIcon, DumbbellIcon, TrophyIcon } from "@/components/icons";
 
@@ -92,7 +88,8 @@ export default async function DashboardPage() {
     Math.max(Math.floor((today.getTime() - weekStart.getTime()) / 86_400_000) + 1, 1),
     7
   );
-  const weekAvgCalories = weekFoodEntries.reduce((sum, e) => sum + e.calories, 0) / daysElapsed;
+  const weekTotalCalories = weekFoodEntries.reduce((sum, e) => sum + e.calories, 0);
+  const weekTotalExcludingToday = weekTotalCalories - totals.calories;
 
   const calorieTrend = Array.from({ length: TREND_DAYS }, (_, index) => {
     const day = addDays(trendRangeStart, index);
@@ -114,6 +111,7 @@ export default async function DashboardPage() {
 
   const latestWeight = weightEntries.length > 0 ? weightEntries[weightEntries.length - 1].weightKg : null;
   const weightTrend = weightEntries.map((entry) => entry.weightKg);
+  const weightLoggedToday = weightEntries.some((entry) => entry.date.getTime() === today.getTime());
 
   return (
     <div className="flex flex-col gap-8">
@@ -130,97 +128,21 @@ export default async function DashboardPage() {
               <TargetForm />
             </div>
           ) : (
-            <>
-              <div className="tile flex flex-col gap-5 p-5 sm:p-6">
-                <div className="flex flex-wrap items-center justify-around gap-x-4 gap-y-6">
-                  <ProgressRing
-                    id="calories"
-                    value={totals.calories}
-                    target={target.calories}
-                    label="kcal"
-                    color="#fb923c"
-                    colorTo="#f97316"
-                    size={112}
-                    stroke={11}
-                  />
-                  <ProgressRing
-                    id="protein"
-                    value={totals.proteinG}
-                    target={target.proteinG}
-                    label="protein g"
-                    color="#4ade80"
-                    colorTo="#16a34a"
-                  />
-                  <ProgressRing
-                    id="carbs"
-                    value={totals.carbsG}
-                    target={target.carbsG}
-                    label="carbs g"
-                    color="#facc15"
-                    colorTo="#ca8a04"
-                  />
-                  <ProgressRing
-                    id="fat"
-                    value={totals.fatG}
-                    target={target.fatG}
-                    label="fat g"
-                    color="#f472b6"
-                    colorTo="#db2777"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-muted">Last {TREND_DAYS} days</p>
-                    <div className="h-14 w-full sm:max-w-xs">
-                      <Sparkline
-                        id="calories-trend"
-                        points={calorieTrend}
-                        color="#fb923c"
-                        target={target.calories}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-start gap-2 sm:items-end sm:pl-4 sm:text-right">
-                    <p className="text-xs text-muted">
-                      Week avg{" "}
-                      <span className="text-foreground">{Math.round(weekAvgCalories)}</span> /{" "}
-                      {target.calories} kcal/day
-                    </p>
-                    <TargetForm
-                      existing={{
-                        calories: target.calories,
-                        proteinG: target.proteinG,
-                        carbsG: target.carbsG,
-                        fatG: target.fatG,
-                        waterTargetMl: target.waterTargetMl,
-                      }}
-                      compact
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />
-                <StatCard
-                  icon={<FlameIcon size={22} />}
-                  color="#14b8a6"
-                  value={todayFoodEntries.length}
-                  label="Meals logged today"
-                />
-              </div>
-
-              <div className="tile p-5 sm:p-6">
-                <h3 className="mb-3 font-medium">Log food</h3>
-                <FoodLogger />
-              </div>
-
-              <div className="tile p-5 sm:p-6">
-                <h3 className="mb-3 font-medium">Today</h3>
-                <EntryList entries={todayFoodEntries.map((e) => ({ ...e, date: e.date.toISOString() }))} />
-              </div>
-            </>
+            <FoodLogSection
+              target={{
+                calories: target.calories,
+                proteinG: target.proteinG,
+                carbsG: target.carbsG,
+                fatG: target.fatG,
+                waterTargetMl: target.waterTargetMl,
+              }}
+              totalWaterMl={totalWaterMl}
+              initialEntries={todayFoodEntries}
+              calorieTrend={calorieTrend}
+              trendDays={TREND_DAYS}
+              weekTotalExcludingToday={weekTotalExcludingToday}
+              daysElapsed={daysElapsed}
+            />
           )}
         </section>
 
@@ -243,7 +165,12 @@ export default async function DashboardPage() {
             />
           </div>
 
-          <WeightCard latestKg={latestWeight} goalKg={profile.goalWeightKg} trend={weightTrend} />
+          <WeightCard
+            latestKg={latestWeight}
+            goalKg={profile.goalWeightKg}
+            trend={weightTrend}
+            loggedToday={weightLoggedToday}
+          />
 
           <WeeklySchedule exercises={exercises} />
 

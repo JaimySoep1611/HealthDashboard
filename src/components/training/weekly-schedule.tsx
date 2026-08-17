@@ -123,22 +123,22 @@ function ExerciseRow({ exercise, onRemove }: { exercise: Exercise; onRemove: () 
   const [kg, setKg] = useState(exercise.log?.kg?.toString() ?? "");
   const [sets, setSets] = useState(exercise.log?.sets?.toString() ?? "");
   const [km, setKm] = useState(exercise.log?.km?.toString() ?? "");
-  const [saving, setSaving] = useState(false);
+  const [liveLog, setLiveLog] = useState(exercise.log);
 
-  async function save() {
-    setSaving(true);
-    await fetch(`/api/training/exercises/${exercise.id}/log`, {
+  function save() {
+    const payload = {
+      kg: kg ? Number(kg) : null,
+      sets: sets ? Number(sets) : null,
+      km: km ? Number(km) : null,
+    };
+    setLiveLog(payload);
+    setEditing(false);
+
+    fetch(`/api/training/exercises/${exercise.id}/log`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        kg: kg ? Number(kg) : null,
-        sets: sets ? Number(sets) : null,
-        km: km ? Number(km) : null,
-      }),
-    });
-    setSaving(false);
-    setEditing(false);
-    router.refresh();
+      body: JSON.stringify(payload),
+    }).then(() => router.refresh());
   }
 
   return (
@@ -183,8 +183,7 @@ function ExerciseRow({ exercise, onRemove }: { exercise: Exercise; onRemove: () 
           )}
           <button
             onClick={save}
-            disabled={saving}
-            className="flex-none rounded-lg bg-navy px-2.5 py-1.5 text-xs font-medium text-white transition hover:bg-navy-light disabled:opacity-50"
+            className="flex-none rounded-lg bg-navy px-2.5 py-1.5 text-xs font-medium text-white transition hover:bg-navy-light"
           >
             Log
           </button>
@@ -194,12 +193,12 @@ function ExerciseRow({ exercise, onRemove }: { exercise: Exercise; onRemove: () 
           <span className="text-foreground">
             {exercise.kind === "weight"
               ? [
-                  exercise.log?.kg != null ? `${exercise.log.kg}kg` : null,
-                  exercise.log?.sets != null ? `${exercise.log.sets} sets` : null,
+                  liveLog?.kg != null ? `${liveLog.kg}kg` : null,
+                  liveLog?.sets != null ? `${liveLog.sets} sets` : null,
                 ]
                   .filter(Boolean)
                   .join(" × ")
-              : `${exercise.log?.km}km`}
+              : `${liveLog?.km}km`}
           </span>
           <button onClick={() => setEditing(true)} className="text-muted hover:text-foreground">
             Edit

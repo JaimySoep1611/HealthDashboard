@@ -9,28 +9,43 @@ const QUICK_ADD = [100, 250, 500];
 
 export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: number }) {
   const router = useRouter();
-  const [pending, setPending] = useState(false);
+  const [prevTotalMl, setPrevTotalMl] = useState(totalMl);
+  const [liveTotal, setLiveTotal] = useState(totalMl);
+  const [addedThisSession, setAddedThisSession] = useState<number[]>([]);
 
-  async function addWater(amountMl: number) {
-    setPending(true);
-    await fetch("/api/health/water", {
+  if (totalMl !== prevTotalMl) {
+    setPrevTotalMl(totalMl);
+    setLiveTotal(totalMl);
+  }
+
+  function addWater(amountMl: number) {
+    setLiveTotal((current) => current + amountMl);
+    setAddedThisSession((current) => [...current, amountMl]);
+
+    fetch("/api/health/water", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amountMl }),
-    });
-    setPending(false);
-    router.refresh();
+    })
+      .then(() => router.refresh())
+      .catch(() => {
+        setLiveTotal((current) => current - amountMl);
+        setAddedThisSession((current) => current.slice(0, -1));
+      });
   }
 
-  async function undo() {
-    setPending(true);
-    await fetch("/api/health/water", { method: "DELETE" });
-    setPending(false);
-    router.refresh();
+  function undo() {
+    const last = addedThisSession[addedThisSession.length - 1];
+    if (last !== undefined) {
+      setLiveTotal((current) => Math.max(0, current - last));
+      setAddedThisSession((current) => current.slice(0, -1));
+    }
+
+    fetch("/api/health/water", { method: "DELETE" }).then(() => router.refresh());
   }
 
-  const ratio = targetMl > 0 ? Math.min(totalMl / targetMl, 1) : 0;
-  const liters = (totalMl / 1000).toFixed(2);
+  const ratio = targetMl > 0 ? Math.min(liveTotal / targetMl, 1) : 0;
+  const liters = (liveTotal / 1000).toFixed(2);
   const targetLiters = (targetMl / 1000).toFixed(1);
 
   return (
@@ -63,8 +78,7 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
           <button
             key={amount}
             onClick={() => addWater(amount)}
-            disabled={pending}
-            className="flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs transition hover:border-cyan-500/60 hover:text-cyan-400 disabled:opacity-50"
+            className="flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs transition hover:border-cyan-500/60 hover:text-cyan-400"
           >
             <PlusIcon size={12} />
             {amount}ml
@@ -72,7 +86,7 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
         ))}
         <button
           onClick={undo}
-          disabled={pending || totalMl === 0}
+          disabled={liveTotal === 0}
           className="ml-auto flex items-center gap-1 rounded-full px-2 py-1.5 text-xs text-muted transition hover:text-foreground disabled:opacity-40"
         >
           <MinusIcon size={12} />

@@ -1,7 +1,3 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-
 type Entry = {
   id: string;
   name: string;
@@ -11,14 +7,7 @@ type Entry = {
   fatG: number;
 };
 
-export function EntryList({ entries }: { entries: Entry[] }) {
-  const router = useRouter();
-
-  async function removeEntry(id: string) {
-    await fetch(`/api/nutrition/entries/${id}`, { method: "DELETE" });
-    router.refresh();
-  }
-
+export function EntryList({ entries, onRemove }: { entries: Entry[]; onRemove: (id: string) => void }) {
   if (entries.length === 0) {
     return <p className="text-sm text-muted">Nothing logged yet today.</p>;
   }
@@ -36,7 +25,7 @@ export function EntryList({ entries }: { entries: Entry[] }) {
             <span>
               P{Math.round(entry.proteinG)} C{Math.round(entry.carbsG)} F{Math.round(entry.fatG)}
             </span>
-            <button onClick={() => removeEntry(entry.id)} className="hover:text-red-400">
+            <button onClick={() => onRemove(entry.id)} className="hover:text-red-400">
               ×
             </button>
           </div>

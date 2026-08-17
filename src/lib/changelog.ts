@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Faster logging",
+    description:
+      "Water, weight, food, and exercise logging now update the screen instantly instead of waiting on a round trip to the server. Also fixed a backend issue that was silently reopening a fresh database connection on every request.",
+  },
+  {
+    date: "2026-08-17",
     title: "Recurring weekly training schedule",
     description:
       "Training is now a repeating schedule instead of a plain checklist: set the day, exercise name, and whether to track kg + sets (power training) or km (running) once — then each week just fill in what you did.",

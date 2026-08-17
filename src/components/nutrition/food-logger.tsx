@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 type AiFoodItem = {
@@ -11,8 +10,7 @@ type AiFoodItem = {
   fatG: number;
 };
 
-export function FoodLogger() {
-  const router = useRouter();
+export function FoodLogger({ onAdd }: { onAdd: (item: AiFoodItem, source: string) => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [description, setDescription] = useState("");
@@ -20,18 +18,6 @@ export function FoodLogger() {
   const [error, setError] = useState<string | null>(null);
   const [items, setItems] = useState<AiFoodItem[]>([]);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  async function logEntry(item: AiFoodItem, source: string) {
-    setSaving(true);
-    await fetch("/api/nutrition/entries", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...item, source }),
-    });
-    setSaving(false);
-    router.refresh();
-  }
 
   async function analyzeDescription(event: React.FormEvent) {
     event.preventDefault();
@@ -152,8 +138,7 @@ export function FoodLogger() {
             <AiItemRow
               key={index}
               item={item}
-              saving={saving}
-              onAdd={() => logEntry(item, photoPreview ? "ai-photo" : "ai-text")}
+              onAdd={() => onAdd(item, photoPreview ? "ai-photo" : "ai-text")}
             />
           ))}
         </div>
@@ -162,15 +147,7 @@ export function FoodLogger() {
   );
 }
 
-function AiItemRow({
-  item,
-  saving,
-  onAdd,
-}: {
-  item: AiFoodItem;
-  saving: boolean;
-  onAdd: () => void;
-}) {
+function AiItemRow({ item, onAdd }: { item: AiFoodItem; onAdd: () => void }) {
   const [added, setAdded] = useState(false);
 
   return (
@@ -187,7 +164,7 @@ function AiItemRow({
           onAdd();
           setAdded(true);
         }}
-        disabled={saving || added}
+        disabled={added}
         className="rounded-lg border border-border px-2 py-1 text-xs hover:border-navy-light disabled:opacity-50"
       >
         {added ? "Added" : "Add"}
