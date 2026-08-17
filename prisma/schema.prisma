@@ -26,17 +26,6 @@ model Profile {
   customFoods       CustomFood[]
   waterEntries      WaterEntry[]
   weightEntries     WeightEntry[]
-  challenge         Challenge?
-}
-
-model Challenge {
-  id        String   @id @default(cuid())
-  profile   Profile  @relation(fields: [profileId], references: [id])
-  profileId String   @unique
-  startDate DateTime
-  // Length of the challenge in days (e.g. 75).
-  days      Int      @default(75)
-  createdAt DateTime @default(now())
 }
 
 model TrainingExercise {

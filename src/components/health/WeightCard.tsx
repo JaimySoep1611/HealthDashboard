@@ -56,7 +56,7 @@ export function WeightCard({
   return (
     <div className="stat-card flex h-full flex-col justify-between gap-3 p-4">
       <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <div
             className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
             style={{ backgroundColor: `${WEIGHT_COLOR}22`, color: WEIGHT_COLOR }}

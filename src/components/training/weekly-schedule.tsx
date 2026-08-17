@@ -170,7 +170,9 @@ export function WeeklySchedule({
 
 function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: () => void }) {
   const router = useRouter();
-  const [editing, setEditing] = useState(!exercise.log);
+  // Always start collapsed, logged or not — a day with several exercises would
+  // otherwise show several expanded input stacks at once and balloon in height.
+  const [editing, setEditing] = useState(false);
   const [kg, setKg] = useState(exercise.log?.kg?.toString() ?? "");
   const [sets, setSets] = useState(exercise.log?.sets?.toString() ?? "");
   const [reps, setReps] = useState(exercise.log?.reps?.toString() ?? "");
@@ -260,20 +262,24 @@ function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: (
       ) : (
         <button
           onClick={() => setEditing(true)}
-          className="w-full rounded-md border border-border py-1 text-[10px] text-foreground transition hover:border-navy-light"
+          className={`w-full rounded-md border py-1 text-[10px] transition hover:border-navy-light ${
+            liveLog ? "border-border text-foreground" : "border-dashed border-border text-muted hover:text-foreground"
+          }`}
         >
-          {exercise.kind === "weight"
-            ? [
-                liveLog?.kg != null ? `${liveLog.kg}kg` : null,
-                liveLog?.sets != null && liveLog?.reps != null
-                  ? `${liveLog.sets}×${liveLog.reps}`
-                  : liveLog?.sets != null
-                    ? `${liveLog.sets} sets`
-                    : null,
-              ]
-                .filter(Boolean)
-                .join(" · ")
-            : `${liveLog?.km}km`}
+          {liveLog
+            ? exercise.kind === "weight"
+              ? [
+                  liveLog.kg != null ? `${liveLog.kg}kg` : null,
+                  liveLog.sets != null && liveLog.reps != null
+                    ? `${liveLog.sets}×${liveLog.reps}`
+                    : liveLog.sets != null
+                      ? `${liveLog.sets} sets`
+                      : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")
+              : `${liveLog.km}km`
+            : "Tap to log"}
         </button>
       )}
     </div>
