@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Schedule editing moved to Edit Goals",
+    description:
+      "Adding or removing training exercises now only happens from \"Edit Goals\" — the dashboard's training schedule is for logging what you did, not changing the plan. Also moved \"Meals logged today\" and \"Exercises logged this week\" up into the header, next to the other quick-glance stats, instead of being buried inside the Food and Training sections.",
+  },
+  {
+    date: "2026-08-17",
     title: "Full-width layout for Training and Achievements",
     description:
       "Weight moved up next to Water and Steps in the header row (banner narrowed to make room). Achievements now sits right below that header row, and the Training schedule and Food section are both full-width instead of squeezed into a half-width column — the training week strip finally has room to breathe.",

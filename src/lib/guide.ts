@@ -35,7 +35,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Training schedule",
         description:
-          "A week strip, Monday through Sunday — scroll sideways to see every day. Set up once: which day, which exercises, and whether to track kg + sets + reps (power training) or km (running). You can add as many exercises to a day as you like (e.g. chest, legs, and back all on Monday) and they permanently repeat on that day going forward. Days with nothing assigned show as \"Rest\". The dot next to a day fills in green once everything for that day is logged; logs reset automatically every Monday.",
+          "A week strip, Monday through Sunday — scroll sideways to see every day. Days with nothing assigned show as \"Rest\", and the dot next to a day fills in green once everything for that day is logged; logs reset automatically every Monday. Tap an exercise here to log kg + sets + reps (power training) or km (running) — to add, remove, or move exercises between days, use \"Edit Goals\" instead.",
       },
     ],
   },

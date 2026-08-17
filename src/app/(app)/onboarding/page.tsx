@@ -51,7 +51,7 @@ export default async function OnboardingPage() {
         </p>
       </div>
 
-      <WeeklySchedule exercises={exercises} />
+      <WeeklySchedule exercises={exercises} editable />
 
       <div className="tile p-6">
         <h3 className="mb-3 font-medium">Daily nutrition &amp; water target</h3>

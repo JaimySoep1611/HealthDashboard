@@ -16,7 +16,7 @@ export function StatCard({
   children?: ReactNode;
 }) {
   return (
-    <div className="stat-card flex w-full max-w-sm items-center gap-4 p-5">
+    <div className="stat-card flex h-full w-full items-center gap-4 p-5">
       <div
         className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl"
         style={{ backgroundColor: `${color}22`, color }}

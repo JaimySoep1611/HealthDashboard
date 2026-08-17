@@ -27,7 +27,15 @@ function useTodayWeekday() {
   return today;
 }
 
-export function WeeklySchedule({ exercises }: { exercises: Exercise[] }) {
+export function WeeklySchedule({
+  exercises,
+  editable,
+}: {
+  exercises: Exercise[];
+  // Adding/removing exercises is only allowed from the "Edit Goals" page —
+  // the dashboard is for logging what you did, not changing the schedule.
+  editable: boolean;
+}) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [weekday, setWeekday] = useState("0");
@@ -106,7 +114,7 @@ export function WeeklySchedule({ exercises }: { exercises: Exercise[] }) {
                     <ExerciseChip
                       key={exercise.id}
                       exercise={exercise}
-                      onRemove={() => removeExercise(exercise.id)}
+                      onRemove={editable ? () => removeExercise(exercise.id) : undefined}
                     />
                   ))}
                 </div>
@@ -116,45 +124,51 @@ export function WeeklySchedule({ exercises }: { exercises: Exercise[] }) {
         })}
       </div>
 
-      <form onSubmit={addExercise} className="flex flex-wrap items-center gap-2 border-t border-border pt-4">
-        <input
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          placeholder="e.g. Bench press"
-          className="min-w-0 flex-1 rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm outline-none focus:border-navy-light"
-        />
-        <select
-          value={weekday}
-          onChange={(event) => setWeekday(event.target.value)}
-          className="rounded-lg border border-border bg-surface-raised px-2 py-2 text-sm outline-none focus:border-navy-light"
-        >
-          {WEEKDAY_LABELS.map((label, index) => (
-            <option key={label} value={index}>
-              {label}
-            </option>
-          ))}
-        </select>
-        <select
-          value={kind}
-          onChange={(event) => setKind(event.target.value as "weight" | "cardio")}
-          className="rounded-lg border border-border bg-surface-raised px-2 py-2 text-sm outline-none focus:border-navy-light"
-        >
-          <option value="weight">Power training (kg)</option>
-          <option value="cardio">Running (km)</option>
-        </select>
-        <button
-          type="submit"
-          disabled={adding || !name.trim()}
-          className="flex-none rounded-lg bg-navy px-3 py-2 text-sm font-medium text-white transition hover:bg-navy-light disabled:opacity-50"
-        >
-          Add
-        </button>
-      </form>
+      {editable ? (
+        <form onSubmit={addExercise} className="flex flex-wrap items-center gap-2 border-t border-border pt-4">
+          <input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="e.g. Bench press"
+            className="min-w-0 flex-1 rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm outline-none focus:border-navy-light"
+          />
+          <select
+            value={weekday}
+            onChange={(event) => setWeekday(event.target.value)}
+            className="rounded-lg border border-border bg-surface-raised px-2 py-2 text-sm outline-none focus:border-navy-light"
+          >
+            {WEEKDAY_LABELS.map((label, index) => (
+              <option key={label} value={index}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={kind}
+            onChange={(event) => setKind(event.target.value as "weight" | "cardio")}
+            className="rounded-lg border border-border bg-surface-raised px-2 py-2 text-sm outline-none focus:border-navy-light"
+          >
+            <option value="weight">Power training (kg)</option>
+            <option value="cardio">Running (km)</option>
+          </select>
+          <button
+            type="submit"
+            disabled={adding || !name.trim()}
+            className="flex-none rounded-lg bg-navy px-3 py-2 text-sm font-medium text-white transition hover:bg-navy-light disabled:opacity-50"
+          >
+            Add
+          </button>
+        </form>
+      ) : (
+        <p className="border-t border-border pt-3 text-xs text-muted">
+          Add or remove exercises from &quot;Edit Goals&quot; in the header.
+        </p>
+      )}
     </div>
   );
 }
 
-function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove: () => void }) {
+function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: () => void }) {
   const router = useRouter();
   const [editing, setEditing] = useState(!exercise.log);
   const [kg, setKg] = useState(exercise.log?.kg?.toString() ?? "");
@@ -190,9 +204,11 @@ function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove: ()
           {exercise.kind === "weight" ? <DumbbellIcon size={11} /> : <FootprintsIcon size={11} />}
         </span>
         <span className="min-w-0 flex-1 truncate text-[11px] font-medium">{exercise.name}</span>
-        <button onClick={onRemove} className="flex-none text-[11px] leading-none text-muted hover:text-red-400">
-          ×
-        </button>
+        {onRemove && (
+          <button onClick={onRemove} className="flex-none text-[11px] leading-none text-muted hover:text-red-400">
+            ×
+          </button>
+        )}
       </div>
 
       {editing ? (

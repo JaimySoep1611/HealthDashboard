@@ -1,14 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ProgressRing } from "@/components/ProgressRing";
 import { Sparkline } from "@/components/Sparkline";
-import { StatCard } from "@/components/StatCard";
-import { FlameIcon } from "@/components/icons";
 import { TargetForm } from "@/components/nutrition/target-form";
 import { FoodLogger } from "@/components/nutrition/food-logger";
 import { EntryList } from "@/components/nutrition/entry-list";
+import { useFoodEntries } from "@/components/nutrition/FoodEntriesContext";
 
 type FoodEntryItem = {
   id: string;
@@ -49,21 +48,19 @@ function sumTotals(entries: FoodEntryItem[]) {
 
 export function FoodLogSection({
   target,
-  initialEntries,
   calorieTrend,
   trendDays,
   weekTotalExcludingToday,
   daysElapsed,
 }: {
   target: Target;
-  initialEntries: FoodEntryItem[];
   calorieTrend: number[];
   trendDays: number;
   weekTotalExcludingToday: number;
   daysElapsed: number;
 }) {
   const router = useRouter();
-  const [entries, setEntries] = useState(initialEntries);
+  const { entries, setEntries } = useFoodEntries();
 
   const totals = useMemo(() => sumTotals(entries), [entries]);
   const liveTrend = calorieTrend.map((value, index) =>
@@ -176,13 +173,6 @@ export function FoodLogSection({
           </div>
         </div>
       </div>
-
-      <StatCard
-        icon={<FlameIcon size={22} />}
-        color="#14b8a6"
-        value={entries.length}
-        label="Meals logged today"
-      />
 
       <div className="tile p-5 sm:p-6">
         <h3 className="mb-3 font-medium">Log food</h3>
