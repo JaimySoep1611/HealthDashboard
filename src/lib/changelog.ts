@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Fixed photo food recognition",
+    description:
+      "Full-size iPhone camera photos were too large to upload and silently failing. Photos are now resized and compressed on your phone before uploading, and a clear error message shows up if something still goes wrong instead of nothing happening.",
+  },
+  {
+    date: "2026-08-17",
     title: "Water & Steps moved to the top, reps added",
     description:
       "Water and Steps are now compact widgets right next to the greeting banner at the top of the page, since they're logged most often. Power training now tracks reps alongside kg and sets.",

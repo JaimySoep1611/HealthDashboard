@@ -10,6 +10,36 @@ type AiFoodItem = {
   fatG: number;
 };
 
+const MAX_UPLOAD_DIMENSION = 1024;
+const UPLOAD_JPEG_QUALITY = 0.82;
+
+function loadImage(dataUrl: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("Could not load image"));
+    img.src = dataUrl;
+  });
+}
+
+async function resizeImageForUpload(dataUrl: string): Promise<{ base64: string; mediaType: string }> {
+  const img = await loadImage(dataUrl);
+  const scale = Math.min(1, MAX_UPLOAD_DIMENSION / Math.max(img.width, img.height));
+  const width = Math.round(img.width * scale);
+  const height = Math.round(img.height * scale);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas not supported");
+  ctx.drawImage(img, 0, 0, width, height);
+
+  const resizedDataUrl = canvas.toDataURL("image/jpeg", UPLOAD_JPEG_QUALITY);
+  const [, base64] = resizedDataUrl.split(",");
+  return { base64, mediaType: "image/jpeg" };
+}
+
 export function FoodLogger({ onAdd }: { onAdd: (item: AiFoodItem, source: string) => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -49,22 +79,30 @@ export function FoodLogger({ onAdd }: { onAdd: (item: AiFoodItem, source: string
     reader.onload = async () => {
       const dataUrl = reader.result as string;
       setPhotoPreview(dataUrl);
-      const [header, base64] = dataUrl.split(",");
-      const mediaType = header.match(/data:(.*);base64/)?.[1] ?? "image/jpeg";
       setLoading(true);
-      const response = await fetch("/api/nutrition/analyze-photo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64: base64, mediaType }),
-      });
-      setLoading(false);
-      if (!response.ok) {
-        setError("Couldn't recognize this photo — try a clearer shot.");
-        return;
+      try {
+        // Camera photos can be several MB straight off an iPhone — well over the
+        // hosting platform's request size limit. Downscale + re-encode as JPEG
+        // client-side so the upload reliably stays small regardless of source size.
+        const { base64, mediaType } = await resizeImageForUpload(dataUrl);
+        const response = await fetch("/api/nutrition/analyze-photo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageBase64: base64, mediaType }),
+        });
+        if (!response.ok) {
+          setError("Couldn't recognize this photo — try a clearer shot.");
+          return;
+        }
+        const data = await response.json();
+        setItems(data.items ?? []);
+      } catch {
+        setError("Couldn't process this photo — try again.");
+      } finally {
+        setLoading(false);
       }
-      const data = await response.json();
-      setItems(data.items ?? []);
     };
+    reader.onerror = () => setError("Couldn't read this photo — try again.");
     reader.readAsDataURL(file);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
