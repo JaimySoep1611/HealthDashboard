@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Color-matched macro advice",
+    description:
+      "Each macro advice line below the food rings is now colored the same as its ring (green for protein, yellow for carbs, pink for fat), so it's obvious at a glance which piece of advice is about which nutrient.",
+  },
+  {
+    date: "2026-08-17",
     title: "Advice for every short macro, and a persistent \"goal met\" state",
     description:
       "Macro advice below the food rings now lists every nutrient you're still short on today (not just the single biggest gap), each with its own food ideas. Also, hitting your water or steps goal now does more than the one-off confetti burst — the card itself turns green with a checkmark and stays that way for the rest of the day, so you can see it's done at a glance without needing to catch the animation.",

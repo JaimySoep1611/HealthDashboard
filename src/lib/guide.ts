@@ -15,7 +15,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Calorie & macro rings",
         description:
-          "Fill up as you log food today, toward the daily targets you set in \"Edit Goals\". The thin line below shows your calories over the last 7 days against your target. Below the rings, a line of advice for each macro (protein, carbs, fat) you're still short on names a few foods to help close the gap — a simple rule based on today's numbers, not AI, so it's instant and always available. Once every macro's covered, it just says so.",
+          "Fill up as you log food today, toward the daily targets you set in \"Edit Goals\". The thin line below shows your calories over the last 7 days against your target. Below the rings, a line of advice for each macro (protein, carbs, fat) you're still short on names a few foods to help close the gap — a simple rule based on today's numbers, not AI, so it's instant and always available. Each line is colored to match its ring (green for protein, yellow for carbs, pink for fat), so it's clear at a glance which advice is for which. Once every macro's covered, it just says so.",
       },
       {
         name: "Log food",
