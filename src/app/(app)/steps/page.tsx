@@ -2,6 +2,7 @@ import { getCurrentProfile } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { addDays, startOfDay } from "@/lib/dates";
 import { ManualStepsForm } from "./manual-steps-form";
+import { TrainingTabs } from "@/components/TrainingTabs";
 
 const DAYS_TO_SHOW = 14;
 
@@ -27,6 +28,8 @@ export default async function StepsPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <TrainingTabs />
+
       <h1 className="text-xl font-semibold">Cardio (Steps)</h1>
 
       <div className="tile flex flex-col gap-2 p-6">

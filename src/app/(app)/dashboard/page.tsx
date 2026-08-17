@@ -31,52 +31,60 @@ export default async function DashboardPage() {
       : 0;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-10">
       <h1 className="text-xl font-semibold">Welcome back, {profile.name}</h1>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <Link href="/training" className="tile flex flex-col gap-4 p-6">
-          <h2 className="font-medium">Power Training</h2>
-          {lastSession ? (
-            <p className="text-sm text-muted">
-              Last session: {lastSession.templateDay?.label ?? "Ad-hoc"} on{" "}
-              {lastSession.date.toLocaleDateString()}
-            </p>
-          ) : (
-            <p className="text-sm text-muted">No sessions logged yet.</p>
-          )}
-          <span className="text-sm text-navy-light">Open →</span>
-        </Link>
+      <section className="flex flex-col gap-4">
+        <h2 className="text-sm font-medium uppercase tracking-wide text-muted">Training</h2>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <Link href="/training" className="tile flex flex-col gap-4 p-6">
+            <h3 className="font-medium">Power Training</h3>
+            {lastSession ? (
+              <p className="text-sm text-muted">
+                Last session: {lastSession.templateDay?.label ?? "Ad-hoc"} on{" "}
+                {lastSession.date.toLocaleDateString()}
+              </p>
+            ) : (
+              <p className="text-sm text-muted">No sessions logged yet.</p>
+            )}
+            <span className="text-sm text-navy-light">Open →</span>
+          </Link>
 
-        <Link href="/nutrition" className="tile flex flex-col items-center gap-4 p-6">
-          <h2 className="self-start font-medium">Nutrition</h2>
-          {target ? (
-            <div className="flex gap-4">
-              <ProgressRing value={todayCalories} target={target.calories} label="kcal today" />
-            </div>
-          ) : (
-            <p className="text-sm text-muted">Set a daily target to start tracking.</p>
-          )}
-          {target && (
-            <p className="text-xs text-muted">
-              Week avg: {Math.round(weekAvgCalories)} / {target.calories} kcal/day
-            </p>
-          )}
-          <span className="text-sm text-navy-light">Open →</span>
-        </Link>
+          <Link href="/steps" className="tile flex flex-col gap-4 p-6">
+            <h3 className="font-medium">Cardio (Steps)</h3>
+            <p className="text-2xl font-semibold">{todaySteps?.steps.toLocaleString() ?? "—"}</p>
+            <p className="text-sm text-muted">steps today</p>
+            <span className="text-sm text-navy-light">Open →</span>
+          </Link>
 
-        <Link href="/steps" className="tile flex flex-col gap-4 p-6">
-          <h2 className="font-medium">Cardio (Steps)</h2>
-          <p className="text-2xl font-semibold">{todaySteps?.steps.toLocaleString() ?? "—"}</p>
-          <p className="text-sm text-muted">steps today</p>
-          <span className="text-sm text-navy-light">Open →</span>
-        </Link>
-
-        <div className="tile flex flex-col gap-4 p-6 opacity-60">
-          <h2 className="font-medium">Achievements</h2>
-          <p className="text-sm text-muted">Coming later — once the trackers feel right.</p>
+          <div className="tile flex flex-col gap-4 p-6 opacity-60">
+            <h3 className="font-medium">Achievements</h3>
+            <p className="text-sm text-muted">Coming later — once the trackers feel right.</p>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-sm font-medium uppercase tracking-wide text-muted">Nutrition</h2>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <Link href="/nutrition" className="tile flex flex-col items-center gap-4 p-6">
+            <h3 className="self-start font-medium">Nutrition</h3>
+            {target ? (
+              <div className="flex gap-4">
+                <ProgressRing value={todayCalories} target={target.calories} label="kcal today" />
+              </div>
+            ) : (
+              <p className="text-sm text-muted">Set a daily target to start tracking.</p>
+            )}
+            {target && (
+              <p className="text-xs text-muted">
+                Week avg: {Math.round(weekAvgCalories)} / {target.calories} kcal/day
+              </p>
+            )}
+            <span className="text-sm text-navy-light">Open →</span>
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { AddDayForm } from "./add-day-form";
 import { ExerciseManager } from "./exercise-manager";
 import { DeleteDayButton } from "./delete-day-button";
+import { TrainingTabs } from "@/components/TrainingTabs";
 
 export default async function TrainingPage() {
   const profile = await getCurrentProfile();
@@ -28,6 +29,8 @@ export default async function TrainingPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <TrainingTabs />
+
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Power Training — {template.name}</h1>
       </div>
