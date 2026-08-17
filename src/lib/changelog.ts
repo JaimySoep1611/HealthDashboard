@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Trimmed the oversized greeting banner",
+    description:
+      "The greeting banner was stretching tall to match Water/Steps stacked next to it, leaving empty space inside it. Water and Steps now sit side by side instead of stacked, so the banner stays its natural size.",
+  },
+  {
+    date: "2026-08-17",
     title: "Milestone gridlines on Trends charts",
     description:
       "Trend charts now show evenly-spaced, round-number milestones on the side (e.g. 500ml/1000ml/1500ml/2000ml toward a 2L water goal) with faint gridlines, instead of just the top/target/bottom value.",
