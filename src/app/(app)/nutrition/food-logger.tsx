@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type SearchResult = {
   code: string;
@@ -21,8 +21,28 @@ type CustomFood = {
   fatG: number;
 };
 
+type AiFoodItem = {
+  name: string;
+  calories: number;
+  proteinG: number;
+  carbsG: number;
+  fatG: number;
+};
+
+type Mode = "search" | "manual" | "describe" | "photo";
+
+const TABS: { mode: Mode; label: string }[] = [
+  { mode: "search", label: "Search food" },
+  { mode: "describe", label: "Describe" },
+  { mode: "photo", label: "Photo" },
+  { mode: "manual", label: "Manual entry" },
+];
+
 export function FoodLogger() {
   const router = useRouter();
+  const [mode, setMode] = useState<Mode>("search");
+
+  // Search tab state
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -30,7 +50,8 @@ export function FoodLogger() {
   const [grams, setGrams] = useState(100);
   const [customFoods, setCustomFoods] = useState<CustomFood[]>([]);
   const [saving, setSaving] = useState(false);
-  const [manual, setManual] = useState(false);
+
+  // Manual tab state
   const [manualValues, setManualValues] = useState({
     name: "",
     calories: 0,
@@ -39,6 +60,19 @@ export function FoodLogger() {
     fatG: 0,
   });
 
+  // Describe tab state
+  const [description, setDescription] = useState("");
+  const [describeLoading, setDescribeLoading] = useState(false);
+  const [describeError, setDescribeError] = useState<string | null>(null);
+  const [describedItems, setDescribedItems] = useState<AiFoodItem[]>([]);
+
+  // Photo tab state
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoLoading, setPhotoLoading] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [photoItems, setPhotoItems] = useState<AiFoodItem[]>([]);
+
   useEffect(() => {
     fetch("/api/nutrition/custom-foods")
       .then((res) => res.json())
@@ -46,7 +80,7 @@ export function FoodLogger() {
   }, []);
 
   useEffect(() => {
-    if (!query.trim() || manual) {
+    if (!query.trim() || mode !== "search") {
       return;
     }
     const timeout = setTimeout(async () => {
@@ -57,7 +91,18 @@ export function FoodLogger() {
       setSearching(false);
     }, 400);
     return () => clearTimeout(timeout);
-  }, [query, manual]);
+  }, [query, mode]);
+
+  async function logEntry(item: AiFoodItem, source: string) {
+    setSaving(true);
+    await fetch("/api/nutrition/entries", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...item, source }),
+    });
+    setSaving(false);
+    router.refresh();
+  }
 
   async function logSelected() {
     if (!selected) return;
@@ -114,24 +159,78 @@ export function FoodLogger() {
     router.refresh();
   }
 
+  async function analyzeDescription(event: React.FormEvent) {
+    event.preventDefault();
+    if (!description.trim()) return;
+    setDescribeLoading(true);
+    setDescribeError(null);
+    setDescribedItems([]);
+    const response = await fetch("/api/nutrition/parse-text", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: description }),
+    });
+    setDescribeLoading(false);
+    if (!response.ok) {
+      setDescribeError("Couldn't analyze that description — try rephrasing.");
+      return;
+    }
+    const data = await response.json();
+    setDescribedItems(data.items ?? []);
+  }
+
+  function handlePhotoSelected(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setPhotoError(null);
+    setPhotoItems([]);
+    const reader = new FileReader();
+    reader.onload = () => setPhotoPreview(reader.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  async function analyzePhoto() {
+    if (!photoPreview) return;
+    const [header, base64] = photoPreview.split(",");
+    const mediaType = header.match(/data:(.*);base64/)?.[1] ?? "image/jpeg";
+    setPhotoLoading(true);
+    setPhotoError(null);
+    const response = await fetch("/api/nutrition/analyze-photo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageBase64: base64, mediaType }),
+    });
+    setPhotoLoading(false);
+    if (!response.ok) {
+      setPhotoError("Couldn't recognize this photo — try a clearer shot.");
+      return;
+    }
+    const data = await response.json();
+    setPhotoItems(data.items ?? []);
+  }
+
+  function resetPhoto() {
+    setPhotoPreview(null);
+    setPhotoItems([]);
+    setPhotoError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-4 text-sm">
-        <button
-          onClick={() => setManual(false)}
-          className={!manual ? "text-navy-light" : "text-muted"}
-        >
-          Search food
-        </button>
-        <button
-          onClick={() => setManual(true)}
-          className={manual ? "text-navy-light" : "text-muted"}
-        >
-          Manual entry
-        </button>
+      <div className="flex flex-wrap gap-4 text-sm">
+        {TABS.map((tab) => (
+          <button
+            key={tab.mode}
+            onClick={() => setMode(tab.mode)}
+            className={mode === tab.mode ? "text-navy-light" : "text-muted"}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {!manual ? (
+      {mode === "search" && (
         <div className="flex flex-col gap-3">
           <input
             value={query}
@@ -200,7 +299,86 @@ export function FoodLogger() {
             </div>
           )}
         </div>
-      ) : (
+      )}
+
+      {mode === "describe" && (
+        <div className="flex flex-col gap-3">
+          <form onSubmit={analyzeDescription} className="flex flex-col gap-2">
+            <textarea
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              placeholder="e.g. two fried eggs, a slice of buttered toast and a black coffee"
+              rows={2}
+              className="resize-none rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm outline-none focus:border-navy-light"
+            />
+            <button
+              type="submit"
+              disabled={describeLoading || !description.trim()}
+              className="self-start rounded-lg bg-navy px-3 py-2 text-sm font-medium text-white transition hover:bg-navy-light disabled:opacity-50"
+            >
+              {describeLoading ? "Analyzing…" : "Analyze"}
+            </button>
+          </form>
+
+          {describeError && <p className="text-sm text-red-400">{describeError}</p>}
+
+          {describedItems.length > 0 && (
+            <AiItemList
+              items={describedItems}
+              saving={saving}
+              onAdd={(item) => logEntry(item, "ai-text")}
+            />
+          )}
+        </div>
+      )}
+
+      {mode === "photo" && (
+        <div className="flex flex-col gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handlePhotoSelected}
+            className="text-sm text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface-raised file:px-3 file:py-1.5 file:text-sm file:text-foreground"
+          />
+
+          {photoPreview && (
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photoPreview}
+                alt="Selected food"
+                className="h-24 w-24 rounded-lg border border-border object-cover"
+              />
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={analyzePhoto}
+                  disabled={photoLoading}
+                  className="rounded-lg bg-navy px-3 py-2 text-sm font-medium text-white transition hover:bg-navy-light disabled:opacity-50"
+                >
+                  {photoLoading ? "Analyzing…" : "Analyze photo"}
+                </button>
+                <button onClick={resetPhoto} className="text-xs text-muted hover:text-foreground">
+                  Clear
+                </button>
+              </div>
+            </div>
+          )}
+
+          {photoError && <p className="text-sm text-red-400">{photoError}</p>}
+
+          {photoItems.length > 0 && (
+            <AiItemList
+              items={photoItems}
+              saving={saving}
+              onAdd={(item) => logEntry(item, "ai-photo")}
+            />
+          )}
+        </div>
+      )}
+
+      {mode === "manual" && (
         <form onSubmit={logManual} className="flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-1 text-xs text-muted">
             Name
@@ -263,6 +441,48 @@ export function FoodLogger() {
           </button>
         </form>
       )}
+    </div>
+  );
+}
+
+function AiItemList({
+  items,
+  saving,
+  onAdd,
+}: {
+  items: AiFoodItem[];
+  saving: boolean;
+  onAdd: (item: AiFoodItem) => void;
+}) {
+  const [added, setAdded] = useState<Set<number>>(new Set());
+
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-xs text-muted">Recognized — tap to add</p>
+      {items.map((item, index) => (
+        <div
+          key={index}
+          className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm"
+        >
+          <div>
+            <span>{item.name}</span>{" "}
+            <span className="text-muted">
+              — {Math.round(item.calories)} kcal · P{Math.round(item.proteinG)} C
+              {Math.round(item.carbsG)} F{Math.round(item.fatG)}
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              onAdd(item);
+              setAdded((prev) => new Set(prev).add(index));
+            }}
+            disabled={saving || added.has(index)}
+            className="rounded-lg border border-border px-2 py-1 text-xs hover:border-navy-light disabled:opacity-50"
+          >
+            {added.has(index) ? "Added" : "Add"}
+          </button>
+        </div>
+      ))}
     </div>
   );
 }
