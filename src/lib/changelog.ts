@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Recurring weekly training schedule",
+    description:
+      "Training is now a repeating schedule instead of a plain checklist: set the day, exercise name, and whether to track kg + sets (power training) or km (running) once — then each week just fill in what you did.",
+  },
+  {
+    date: "2026-08-17",
     title: "Renamed to Soephart & Ligtenberg",
     description:
       "New name and a custom otter logomark in the header, login screen, and browser tab icon.",

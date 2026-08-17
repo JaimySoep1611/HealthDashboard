@@ -23,7 +23,7 @@ async function main() {
     where: { name: { notIn: PROFILE_NAMES } },
     include: {
       _count: {
-        select: { foodEntries: true, stepEntries: true, trainingGoals: true },
+        select: { foodEntries: true, stepEntries: true, trainingExercises: true },
       },
       nutritionTarget: true,
     },
@@ -33,7 +33,7 @@ async function main() {
     const hasData =
       profile._count.foodEntries > 0 ||
       profile._count.stepEntries > 0 ||
-      profile._count.trainingGoals > 0 ||
+      profile._count.trainingExercises > 0 ||
       profile.nutritionTarget !== null;
 
     if (hasData) {

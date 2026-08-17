@@ -38,9 +38,9 @@ export const GUIDE_SECTIONS: GuideSection[] = [
           "Log your weight once a day. The trend line compares your recent weigh-ins to your goal weight, with how far you have left to go.",
       },
       {
-        name: "Training goals",
+        name: "Training schedule",
         description:
-          "Your list of weekly training goals (e.g. \"Push day\"). Check one off once you've done it — the list resets automatically every Monday.",
+          "Set up once: which day, which exercises, and whether to track kg + sets (power training) or km (running). It repeats every week — each week you just fill in what you actually did, which resets automatically every Monday.",
       },
     ],
   },

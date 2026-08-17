@@ -4,19 +4,19 @@ import { prisma } from "@/lib/prisma";
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ goalId: string }> }
+  { params }: { params: Promise<{ exerciseId: string }> }
 ) {
   const profile = await getCurrentProfile();
   if (!profile) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-  const { goalId } = await params;
-  const goal = await prisma.trainingGoal.findUnique({ where: { id: goalId } });
-  if (!goal || goal.profileId !== profile.id) {
+  const { exerciseId } = await params;
+  const exercise = await prisma.trainingExercise.findUnique({ where: { id: exerciseId } });
+  if (!exercise || exercise.profileId !== profile.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  await prisma.goalCompletion.deleteMany({ where: { goalId } });
-  await prisma.trainingGoal.delete({ where: { id: goalId } });
+  await prisma.exerciseLog.deleteMany({ where: { exerciseId } });
+  await prisma.trainingExercise.delete({ where: { id: exerciseId } });
 
   return NextResponse.json({ ok: true });
 }

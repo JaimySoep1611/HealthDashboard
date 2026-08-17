@@ -19,35 +19,42 @@ model Profile {
   onboardedAt  DateTime?
   goalWeightKg Float?
 
-  nutritionTarget  NutritionTarget?
-  trainingGoals    TrainingGoal[]
-  stepEntries      StepEntry[]
-  foodEntries      FoodEntry[]
-  customFoods      CustomFood[]
-  waterEntries     WaterEntry[]
-  weightEntries    WeightEntry[]
+  nutritionTarget   NutritionTarget?
+  trainingExercises TrainingExercise[]
+  stepEntries       StepEntry[]
+  foodEntries       FoodEntry[]
+  customFoods       CustomFood[]
+  waterEntries      WaterEntry[]
+  weightEntries     WeightEntry[]
 }
 
-model TrainingGoal {
+model TrainingExercise {
   id        String   @id @default(cuid())
   profile   Profile  @relation(fields: [profileId], references: [id])
   profileId String
+  // 0 = Monday ... 6 = Sunday
+  weekday   Int
   name      String
+  // "weight" (log kg + sets) | "cardio" (log km)
+  kind      String
   order     Int
   createdAt DateTime @default(now())
 
-  completions GoalCompletion[]
+  logs ExerciseLog[]
 }
 
-model GoalCompletion {
-  id          String       @id @default(cuid())
-  goal        TrainingGoal @relation(fields: [goalId], references: [id])
-  goalId      String
-  // Start (Monday) of the calendar week this completion applies to
-  weekStart   DateTime
-  completedAt DateTime     @default(now())
+model ExerciseLog {
+  id         String           @id @default(cuid())
+  exercise   TrainingExercise @relation(fields: [exerciseId], references: [id])
+  exerciseId String
+  // Start (Monday) of the calendar week this log applies to
+  weekStart  DateTime
+  kg         Float?
+  sets       Int?
+  km         Float?
+  loggedAt   DateTime         @default(now())
 
-  @@unique([goalId, weekStart])
+  @@unique([exerciseId, weekStart])
 }
 
 model StepEntry {

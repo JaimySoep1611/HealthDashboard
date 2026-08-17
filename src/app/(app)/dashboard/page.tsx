@@ -10,7 +10,7 @@ import { DashboardHero } from "@/components/DashboardHero";
 import { TargetForm } from "@/components/nutrition/target-form";
 import { FoodLogger } from "@/components/nutrition/food-logger";
 import { EntryList } from "@/components/nutrition/entry-list";
-import { GoalList } from "@/components/training/goal-list";
+import { WeeklySchedule } from "@/components/training/weekly-schedule";
 import { ManualStepsForm } from "@/components/steps/manual-steps-form";
 import { WaterCard } from "@/components/health/WaterCard";
 import { WeightCard } from "@/components/health/WeightCard";
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
     todayFoodEntries,
     weekFoodEntries,
     trendFoodEntries,
-    trainingGoals,
+    trainingExercises,
     stepEntries,
     todayWater,
     weightEntries,
@@ -52,10 +52,10 @@ export default async function DashboardPage() {
     prisma.foodEntry.findMany({
       where: { profileId: profile.id, date: { gte: trendRangeStart } },
     }),
-    prisma.trainingGoal.findMany({
+    prisma.trainingExercise.findMany({
       where: { profileId: profile.id },
       orderBy: { order: "asc" },
-      include: { completions: { where: { weekStart } } },
+      include: { logs: { where: { weekStart } } },
     }),
     prisma.stepEntry.findMany({
       where: { profileId: profile.id, date: { gte: stepsRangeStart } },
@@ -67,12 +67,16 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  const goals = trainingGoals.map((goal) => ({
-    id: goal.id,
-    name: goal.name,
-    completedThisWeek: goal.completions.length > 0,
+  const exercises = trainingExercises.map((exercise) => ({
+    id: exercise.id,
+    name: exercise.name,
+    weekday: exercise.weekday,
+    kind: exercise.kind as "weight" | "cardio",
+    log: exercise.logs[0]
+      ? { kg: exercise.logs[0].kg, sets: exercise.logs[0].sets, km: exercise.logs[0].km }
+      : null,
   }));
-  const goalsDone = goals.filter((g) => g.completedThisWeek).length;
+  const exercisesLogged = exercises.filter((e) => e.log).length;
 
   // Nutrition calculations
   const totals = todayFoodEntries.reduce(
@@ -234,14 +238,14 @@ export default async function DashboardPage() {
             <StatCard
               icon={<DumbbellIcon size={22} />}
               color="var(--navy-light)"
-              value={`${goalsDone}/${goals.length || 0}`}
-              label="Training goals this week"
+              value={`${exercisesLogged}/${exercises.length || 0}`}
+              label="Exercises logged this week"
             />
           </div>
 
           <WeightCard latestKg={latestWeight} goalKg={profile.goalWeightKg} trend={weightTrend} />
 
-          <GoalList goals={goals} />
+          <WeeklySchedule exercises={exercises} />
 
           <div className="tile p-5 sm:p-6">
             <h3 className="mb-4 font-medium">Cardio — last {STEPS_DAYS_TO_SHOW} days</h3>
