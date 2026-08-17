@@ -177,7 +177,7 @@ export default async function DashboardPage() {
                       />
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2 sm:items-end sm:pl-4 sm:text-right">
+                  <div className="flex flex-col items-start gap-2 sm:items-end sm:pl-4 sm:text-right">
                     <p className="text-xs text-muted">
                       Week avg{" "}
                       <span className="text-foreground">{Math.round(weekAvgCalories)}</span> /{" "}

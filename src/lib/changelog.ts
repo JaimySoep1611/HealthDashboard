@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Layout pass & mobile polish",
+    description:
+      "Reorganized Food and Exercise into side-by-side columns on desktop, tidied up which stats live where, and fixed a few spots (food logger, goal list, entry list, target editor) that didn't line up cleanly on an iPhone screen.",
+  },
+  {
+    date: "2026-08-17",
     title: "Info guide & changelog",
     description: "Added the info button you're looking at right now — a guide to every tile, plus this changelog.",
   },
