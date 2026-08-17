@@ -5,7 +5,7 @@ import { useState } from "react";
 import { WEEKDAY_LABELS } from "@/lib/weekdays";
 import { DumbbellIcon, FootprintsIcon } from "@/components/icons";
 
-type Log = { kg: number | null; sets: number | null; km: number | null };
+type Log = { kg: number | null; sets: number | null; reps: number | null; km: number | null };
 type Exercise = {
   id: string;
   name: string;
@@ -55,8 +55,8 @@ export function WeeklySchedule({ exercises }: { exercises: Exercise[] }) {
 
       {activeDays.length === 0 ? (
         <p className="text-sm text-muted">
-          Add exercises below — pick a day, a name, and whether to track kg (power training) or
-          km (running). It repeats every week.
+          Add exercises below — pick a day, a name, and whether to track kg + sets + reps (power
+          training) or km (running). It repeats every week.
         </p>
       ) : (
         <div className="flex flex-col gap-4">
@@ -122,6 +122,7 @@ function ExerciseRow({ exercise, onRemove }: { exercise: Exercise; onRemove: () 
   const [editing, setEditing] = useState(!exercise.log);
   const [kg, setKg] = useState(exercise.log?.kg?.toString() ?? "");
   const [sets, setSets] = useState(exercise.log?.sets?.toString() ?? "");
+  const [reps, setReps] = useState(exercise.log?.reps?.toString() ?? "");
   const [km, setKm] = useState(exercise.log?.km?.toString() ?? "");
   const [liveLog, setLiveLog] = useState(exercise.log);
 
@@ -129,6 +130,7 @@ function ExerciseRow({ exercise, onRemove }: { exercise: Exercise; onRemove: () 
     const payload = {
       kg: kg ? Number(kg) : null,
       sets: sets ? Number(sets) : null,
+      reps: reps ? Number(reps) : null,
       km: km ? Number(km) : null,
     };
     setLiveLog(payload);
@@ -168,7 +170,15 @@ function ExerciseRow({ exercise, onRemove }: { exercise: Exercise; onRemove: () 
                 value={sets}
                 onChange={(event) => setSets(event.target.value)}
                 placeholder="sets"
-                className="w-16 rounded-lg border border-border bg-surface-raised px-2 py-1.5 text-sm outline-none focus:border-navy-light"
+                className="w-14 rounded-lg border border-border bg-surface-raised px-2 py-1.5 text-sm outline-none focus:border-navy-light"
+              />
+              <input
+                type="number"
+                inputMode="numeric"
+                value={reps}
+                onChange={(event) => setReps(event.target.value)}
+                placeholder="reps"
+                className="w-14 rounded-lg border border-border bg-surface-raised px-2 py-1.5 text-sm outline-none focus:border-navy-light"
               />
             </>
           ) : (
@@ -195,6 +205,7 @@ function ExerciseRow({ exercise, onRemove }: { exercise: Exercise; onRemove: () 
               ? [
                   liveLog?.kg != null ? `${liveLog.kg}kg` : null,
                   liveLog?.sets != null ? `${liveLog.sets} sets` : null,
+                  liveLog?.reps != null ? `${liveLog.reps} reps` : null,
                 ]
                   .filter(Boolean)
                   .join(" × ")

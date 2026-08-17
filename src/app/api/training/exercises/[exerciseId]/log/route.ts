@@ -23,13 +23,14 @@ export async function POST(
   const body = await request.json();
   const kg = exercise.kind === "weight" && typeof body.kg === "number" ? body.kg : null;
   const sets = exercise.kind === "weight" && typeof body.sets === "number" ? body.sets : null;
+  const reps = exercise.kind === "weight" && typeof body.reps === "number" ? body.reps : null;
   const km = exercise.kind === "cardio" && typeof body.km === "number" ? body.km : null;
 
   const weekStart = startOfWeek(new Date());
   const log = await prisma.exerciseLog.upsert({
     where: { exerciseId_weekStart: { exerciseId, weekStart } },
-    update: { kg, sets, km, loggedAt: new Date() },
-    create: { exerciseId, weekStart, kg, sets, km },
+    update: { kg, sets, reps, km, loggedAt: new Date() },
+    create: { exerciseId, weekStart, kg, sets, reps, km },
   });
 
   return NextResponse.json(log);

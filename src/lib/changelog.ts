@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Water & Steps moved to the top, reps added",
+    description:
+      "Water and Steps are now compact widgets right next to the greeting banner at the top of the page, since they're logged most often. Power training now tracks reps alongside kg and sets.",
+  },
+  {
+    date: "2026-08-17",
     title: "Clearer sections + Trends",
     description:
       "Food, Water, Training, Steps, and Weight are now separate, clearly labeled sections instead of being grouped together, so it's obvious where to go to log each one. Added a Trends section at the bottom to look back at Calories, Water, Steps, or Weight over the last week or month.",

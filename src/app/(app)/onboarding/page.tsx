@@ -27,7 +27,12 @@ export default async function OnboardingPage() {
     weekday: exercise.weekday,
     kind: exercise.kind as "weight" | "cardio",
     log: exercise.logs[0]
-      ? { kg: exercise.logs[0].kg, sets: exercise.logs[0].sets, km: exercise.logs[0].km }
+      ? {
+          kg: exercise.logs[0].kg,
+          sets: exercise.logs[0].sets,
+          reps: exercise.logs[0].reps,
+          km: exercise.logs[0].km,
+        }
       : null,
   }));
 

@@ -8,19 +8,11 @@ import { DashboardHero } from "@/components/DashboardHero";
 import { TargetForm } from "@/components/nutrition/target-form";
 import { FoodLogSection } from "@/components/nutrition/FoodLogSection";
 import { WeeklySchedule } from "@/components/training/weekly-schedule";
-import { ManualStepsForm } from "@/components/steps/manual-steps-form";
 import { WaterCard } from "@/components/health/WaterCard";
+import { StepsCard } from "@/components/health/StepsCard";
 import { WeightCard } from "@/components/health/WeightCard";
 import { TrendsSection } from "@/components/TrendsSection";
-import {
-  FlameIcon,
-  DropletIcon,
-  FootprintsIcon,
-  DumbbellIcon,
-  ScaleIcon,
-  TrendUpIcon,
-  TrophyIcon,
-} from "@/components/icons";
+import { FlameIcon, DumbbellIcon, ScaleIcon, TrendUpIcon, TrophyIcon } from "@/components/icons";
 
 const TRENDS_DAYS = 30;
 const TREND_DAYS = 7;
@@ -81,7 +73,12 @@ export default async function DashboardPage() {
     weekday: exercise.weekday,
     kind: exercise.kind as "weight" | "cardio",
     log: exercise.logs[0]
-      ? { kg: exercise.logs[0].kg, sets: exercise.logs[0].sets, km: exercise.logs[0].km }
+      ? {
+          kg: exercise.logs[0].kg,
+          sets: exercise.logs[0].sets,
+          reps: exercise.logs[0].reps,
+          km: exercise.logs[0].km,
+        }
       : null,
   }));
   const exercisesLogged = exercises.filter((e) => e.log).length;
@@ -146,7 +143,15 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <DashboardHero name={profile.name} />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-stretch">
+        <div className="lg:col-span-2">
+          <DashboardHero name={profile.name} />
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1">
+          {target && <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />}
+          <StepsCard steps={todaySteps} />
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start lg:gap-6">
         <div className="flex flex-col gap-8">
@@ -176,14 +181,6 @@ export default async function DashboardPage() {
               />
             )}
           </section>
-
-          {/* ---------- Water ---------- */}
-          {target && (
-            <section className="flex flex-col gap-4">
-              <SectionHeader icon={<DropletIcon size={16} />} title="Water" />
-              <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />
-            </section>
-          )}
         </div>
 
         <div className="flex flex-col gap-8">
@@ -197,25 +194,6 @@ export default async function DashboardPage() {
               label="Exercises logged this week"
             />
             <WeeklySchedule exercises={exercises} />
-          </section>
-
-          {/* ---------- Steps ---------- */}
-          <section className="flex flex-col gap-4">
-            <SectionHeader icon={<FootprintsIcon size={16} />} title="Steps" />
-            <StatCard
-              icon={<FootprintsIcon size={22} />}
-              color="#3b82f6"
-              value={todaySteps.toLocaleString()}
-              label="Steps today"
-            />
-            <div className="tile p-5 sm:p-6">
-              <h3 className="mb-2 font-medium">Manual step override</h3>
-              <p className="mb-3 text-sm text-muted">
-                Once the Shortcuts automation is set up, today&apos;s steps sync automatically. Use
-                this to correct today&apos;s count if needed.
-              </p>
-              <ManualStepsForm defaultValue={todaySteps} />
-            </div>
           </section>
 
           {/* ---------- Weight ---------- */}

@@ -35,7 +35,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Training schedule",
         description:
-          "Set up once: which day, which exercises, and whether to track kg + sets (power training) or km (running). It repeats every week — each week you just fill in what you actually did, which resets automatically every Monday.",
+          "Set up once: which day, which exercises, and whether to track kg + sets + reps (power training) or km (running). It repeats every week — you can add as many exercises to a day as you like (e.g. chest, legs, and back all on Monday) and they'll keep showing up every week. Each week you just fill in what you actually did, which resets automatically every Monday.",
       },
     ],
   },

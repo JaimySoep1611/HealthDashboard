@@ -35,7 +35,7 @@ model TrainingExercise {
   // 0 = Monday ... 6 = Sunday
   weekday   Int
   name      String
-  // "weight" (log kg + sets) | "cardio" (log km)
+  // "weight" (log kg + sets + reps) | "cardio" (log km)
   kind      String
   order     Int
   createdAt DateTime @default(now())
@@ -51,6 +51,7 @@ model ExerciseLog {
   weekStart  DateTime
   kg         Float?
   sets       Int?
+  reps       Int?
   km         Float?
   loggedAt   DateTime         @default(now())
 
