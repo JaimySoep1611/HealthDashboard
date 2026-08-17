@@ -46,8 +46,10 @@ export function ScaleIcon({ className, size = 20 }: IconProps) {
 export function DumbbellIcon({ className, size = 20 }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
-      <path d="M4 10v4M6.5 8v8M17.5 8v8M20 10v4" />
-      <path d="M6.5 12h11" strokeWidth={3} />
+      <rect x="2.5" y="9" width="3.2" height="6" rx="1" fill="currentColor" stroke="none" />
+      <rect x="18.3" y="9" width="3.2" height="6" rx="1" fill="currentColor" stroke="none" />
+      <path d="M5.7 12h1.8M16.5 12h1.8" strokeWidth={2.4} />
+      <path d="M7.5 12h9" strokeWidth={2.4} />
     </svg>
   );
 }
