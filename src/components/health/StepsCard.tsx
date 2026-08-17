@@ -7,7 +7,7 @@ import { DailyEntryBadge } from "@/components/DailyEntryBadge";
 
 const STEPS_COLOR = "#3b82f6";
 
-export function StepsCard({ steps }: { steps: number }) {
+export function StepsCard({ steps, goal }: { steps: number; goal: number | null }) {
   const router = useRouter();
   const [prevSteps, setPrevSteps] = useState(steps);
   const [liveSteps, setLiveSteps] = useState(steps);
@@ -48,7 +48,9 @@ export function StepsCard({ steps }: { steps: number }) {
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="text-2xl font-semibold tracking-tight">{liveSteps.toLocaleString()}</span>
-          <span className="text-xs text-muted">Steps today</span>
+          <span className="truncate text-xs text-muted">
+            {goal !== null ? `Goal ${goal.toLocaleString()} steps` : "Steps today"}
+          </span>
         </div>
       </div>
 

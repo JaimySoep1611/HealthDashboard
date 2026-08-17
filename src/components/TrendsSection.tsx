@@ -23,6 +23,7 @@ type Props = {
   water: DayValue[];
   waterTarget: number;
   steps: DayValue[];
+  stepsGoal: number | null;
   // Sparse — only days actually logged, ascending.
   weight: DayValue[];
   weightGoal: number | null;
@@ -80,6 +81,7 @@ export function TrendsSection({
   water,
   waterTarget,
   steps,
+  stepsGoal,
   weight,
   weightGoal,
   days,
@@ -151,6 +153,7 @@ export function TrendsSection({
   const target: Partial<Record<MetricKey, number>> = {
     calories: caloriesTarget || undefined,
     water: waterTarget || undefined,
+    steps: stepsGoal ?? undefined,
     weight: weightGoal ?? undefined,
   };
 

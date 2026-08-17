@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { startOfDay, startOfWeek, addDays } from "@/lib/dates";
+import { startOfDay, startOfWeek, addDays, weekdayIndex } from "@/lib/dates";
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatCard } from "@/components/StatCard";
 import { DashboardHero } from "@/components/DashboardHero";
@@ -14,6 +14,7 @@ import { WaterCard } from "@/components/health/WaterCard";
 import { StepsCard } from "@/components/health/StepsCard";
 import { WeightCard } from "@/components/health/WeightCard";
 import { TrendsSection } from "@/components/TrendsSection";
+import { StreakBar } from "@/components/StreakBar";
 import { FlameIcon, DumbbellIcon, TrendUpIcon } from "@/components/icons";
 
 const TRENDS_DAYS = 30;
@@ -33,6 +34,9 @@ export default async function DashboardPage() {
   const weekStart = startOfWeek(new Date());
   const trendsRangeStart = addDays(today, -(TRENDS_DAYS - 1));
   const trainingTrendsStart = addDays(weekStart, -7 * (TRAINING_TREND_WEEKS - 1));
+  // The streak only looks back as far as the zero-filled TRENDS_DAYS window,
+  // so this only needs to cover the weeks that window can touch.
+  const streakLogsStart = startOfWeek(trendsRangeStart);
 
   const [
     target,
@@ -45,6 +49,7 @@ export default async function DashboardPage() {
     monthWaterEntries,
     weightEntries,
     weightExerciseLogs,
+    streakExerciseLogs,
   ] = await Promise.all([
     prisma.nutritionTarget.findUnique({ where: { profileId: profile.id } }),
     prisma.foodEntry.findMany({
@@ -77,6 +82,9 @@ export default async function DashboardPage() {
         weekStart: { gte: trainingTrendsStart },
       },
       orderBy: { weekStart: "asc" },
+    }),
+    prisma.exerciseLog.findMany({
+      where: { exercise: { profileId: profile.id }, weekStart: { gte: streakLogsStart } },
     }),
   ]);
 
@@ -171,6 +179,65 @@ export default async function DashboardPage() {
   const weightTrend = weightEntries.map((entry) => entry.weightKg);
   const weightLoggedToday = weightEntries.some((entry) => entry.date.getTime() === today.getTime());
 
+  // Streak: consecutive days (ending today) where every goal that's actually
+  // been set was hit — water, steps, calories & macros, and training (a day
+  // with nothing scheduled always counts as "hit" for training). A goal that
+  // was never configured is skipped rather than counted as a miss.
+  const dailyMacros = new Map(
+    monthFoodEntries.reduce((byDate, entry) => {
+      const key = entry.date.toISOString();
+      const existing = byDate.get(key) ?? { proteinG: 0, carbsG: 0, fatG: 0 };
+      byDate.set(key, {
+        proteinG: existing.proteinG + entry.proteinG,
+        carbsG: existing.carbsG + entry.carbsG,
+        fatG: existing.fatG + entry.fatG,
+      });
+      return byDate;
+    }, new Map<string, { proteinG: number; carbsG: number; fatG: number }>())
+  );
+  const caloriesByDate = new Map(dailyCalories.map((d) => [d.date, d.value]));
+  const waterByDate = new Map(dailyWater.map((d) => [d.date, d.value]));
+  const loggedExerciseWeeks = new Set(
+    streakExerciseLogs.map((log) => `${log.exerciseId}|${log.weekStart.toISOString()}`)
+  );
+  const stepsGoal = profile.stepsGoal;
+
+  // Within 10% of target in either direction counts as "hit" — calorie/macro
+  // goals aren't a floor like water or steps, so over- and under-shooting both
+  // count against it.
+  function withinTarget(actual: number, goal: number): boolean {
+    return goal <= 0 || Math.abs(actual - goal) <= goal * 0.1;
+  }
+
+  function isTrainingDayComplete(day: Date): boolean {
+    const scheduled = trainingExercises.filter((exercise) => exercise.weekday === weekdayIndex(day));
+    if (scheduled.length === 0) return true;
+    const dayWeekStart = startOfWeek(day).toISOString();
+    return scheduled.every((exercise) => loggedExerciseWeeks.has(`${exercise.id}|${dayWeekStart}`));
+  }
+
+  function isDayComplete(day: Date): boolean {
+    const iso = day.toISOString();
+    if (target) {
+      const macros = dailyMacros.get(iso) ?? { proteinG: 0, carbsG: 0, fatG: 0 };
+      if (!withinTarget(caloriesByDate.get(iso) ?? 0, target.calories)) return false;
+      if (!withinTarget(macros.proteinG, target.proteinG)) return false;
+      if (!withinTarget(macros.carbsG, target.carbsG)) return false;
+      if (!withinTarget(macros.fatG, target.fatG)) return false;
+      if ((waterByDate.get(iso) ?? 0) < target.waterTargetMl) return false;
+    }
+    if (stepsGoal !== null && (stepsByDate.get(iso) ?? 0) < stepsGoal) return false;
+    if (!isTrainingDayComplete(day)) return false;
+    return true;
+  }
+
+  let streak = 0;
+  for (let i = 0; i < TRENDS_DAYS; i++) {
+    const day = addDays(today, -i);
+    if (!isDayComplete(day)) break;
+    streak++;
+  }
+
   return (
     <FoodEntriesProvider initialEntries={todayFoodEntries}>
       <div className="flex flex-col gap-8">
@@ -181,7 +248,7 @@ export default async function DashboardPage() {
               <DashboardHero name={profile.name} />
             </div>
             {target && <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />}
-            <StepsCard steps={todaySteps} />
+            <StepsCard steps={todaySteps} goal={profile.stepsGoal} />
             <WeightCard
               latestKg={latestWeight}
               goalKg={profile.goalWeightKg}
@@ -200,6 +267,8 @@ export default async function DashboardPage() {
             />
           </div>
         </div>
+
+        <StreakBar streak={streak} />
 
         {/* ---------- Food ---------- */}
         <section className="flex flex-col gap-4">
@@ -242,6 +311,7 @@ export default async function DashboardPage() {
             water={dailyWater}
             waterTarget={target?.waterTargetMl ?? 0}
             steps={dailySteps}
+            stepsGoal={profile.stepsGoal}
             weight={dailyWeight}
             weightGoal={profile.goalWeightKg}
             days={TRENDS_DAYS}

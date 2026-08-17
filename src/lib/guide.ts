@@ -8,6 +8,11 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     title: "Food",
     items: [
       {
+        name: "Daily streak",
+        description:
+          "The small bar above Food counts consecutive days where you hit every goal you've set: water, steps, calories & macros, and training (a day with nothing scheduled always counts as a training day hit). Any goal you haven't set yet — say, no steps goal — is simply skipped rather than counted against you.",
+      },
+      {
         name: "Calorie & macro rings",
         description:
           "Fill up as you log food today, toward the daily targets you set in \"Edit Goals\". The thin line below shows your calories over the last 7 days against your target.",
@@ -45,7 +50,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Steps",
         description:
-          "Today's step count, synced automatically via the Apple Shortcuts automation, or entered manually if it needs correcting. The \"Once/day\" tag is a reminder that this is a single daily number, not something you add to repeatedly like water — but you can still overwrite it any time you want.",
+          "Today's step count, synced automatically via the Apple Shortcuts automation, or entered manually if it needs correcting. The \"Once/day\" tag is a reminder that this is a single daily number, not something you add to repeatedly like water — but you can still overwrite it any time you want. Set a daily steps goal in \"Edit Goals\" to see it shown here and used in Trends.",
       },
     ],
   },

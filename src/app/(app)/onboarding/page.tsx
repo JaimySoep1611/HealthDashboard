@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { startOfWeek } from "@/lib/dates";
 import { WeeklySchedule } from "@/components/training/weekly-schedule";
 import { TargetForm } from "@/components/nutrition/target-form";
-import { GoalWeightForm } from "@/components/health/GoalWeightForm";
+import { ProfileGoalsForm } from "@/components/health/ProfileGoalsForm";
 import { FinishSetupButton } from "./finish-setup-button";
 
 export default async function OnboardingPage() {
@@ -59,8 +59,8 @@ export default async function OnboardingPage() {
       </div>
 
       <div className="tile p-6">
-        <h3 className="mb-3 font-medium">Body weight goal</h3>
-        <GoalWeightForm existing={profile.goalWeightKg} />
+        <h3 className="mb-3 font-medium">Body weight &amp; steps goals</h3>
+        <ProfileGoalsForm existingWeightGoal={profile.goalWeightKg} existingStepsGoal={profile.stepsGoal} />
       </div>
 
       <FinishSetupButton firstTime={firstTime} />

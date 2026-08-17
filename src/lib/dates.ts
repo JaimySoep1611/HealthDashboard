@@ -26,6 +26,12 @@ export function startOfWeek(date: Date): Date {
   return result;
 }
 
+// 0 = Monday ... 6 = Sunday, matching TrainingExercise.weekday
+export function weekdayIndex(date: Date): number {
+  const day = date.getDay(); // 0 = Sunday
+  return day === 0 ? 6 : day - 1;
+}
+
 export function addDays(date: Date, days: number): Date {
   const result = new Date(date);
   result.setDate(result.getDate() + days);
