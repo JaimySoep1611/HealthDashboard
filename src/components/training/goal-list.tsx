@@ -64,7 +64,7 @@ export function GoalList({ goals }: { goals: Goal[] }) {
               <button
                 onClick={() => toggle(goal)}
                 disabled={pendingId === goal.id}
-                className="flex items-center gap-3 text-left disabled:opacity-50"
+                className="flex min-w-0 flex-1 items-center gap-3 text-left disabled:opacity-50"
               >
                 <span
                   className={`flex h-5 w-5 flex-none items-center justify-center rounded border ${
@@ -85,13 +85,13 @@ export function GoalList({ goals }: { goals: Goal[] }) {
                     </svg>
                   )}
                 </span>
-                <span className={goal.completedThisWeek ? "text-muted line-through" : ""}>
+                <span className={`truncate ${goal.completedThisWeek ? "text-muted line-through" : ""}`}>
                   {goal.name}
                 </span>
               </button>
               <button
                 onClick={() => removeGoal(goal.id)}
-                className="text-xs text-muted hover:text-red-400"
+                className="flex-none pl-3 text-xs text-muted hover:text-red-400"
               >
                 Remove
               </button>
@@ -105,7 +105,7 @@ export function GoalList({ goals }: { goals: Goal[] }) {
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="e.g. Push day"
-          className="flex-1 rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm outline-none focus:border-navy-light"
+          className="min-w-0 flex-1 rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm outline-none focus:border-navy-light"
         />
         <button
           type="submit"

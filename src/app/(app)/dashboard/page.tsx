@@ -112,161 +112,175 @@ export default async function DashboardPage() {
   const weightTrend = weightEntries.map((entry) => entry.weightKg);
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8">
       <DashboardHero name={profile.name} />
 
-      {/* ---------- Food ---------- */}
-      <section className="flex flex-col gap-4">
-        <SectionHeader icon={<FlameIcon size={16} />} title="Food" />
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start lg:gap-6">
+        {/* ---------- Food ---------- */}
+        <section className="flex flex-col gap-4">
+          <SectionHeader icon={<FlameIcon size={16} />} title="Food" />
 
-        {!target ? (
-          <div className="tile max-w-md p-6">
-            <h3 className="mb-3 font-medium">Set your daily target</h3>
-            <TargetForm />
-          </div>
-        ) : (
-          <>
-            <div className="tile flex flex-col gap-5 p-6">
-              <div className="flex flex-wrap items-center justify-around gap-6">
-                <ProgressRing
-                  id="calories"
-                  value={totals.calories}
-                  target={target.calories}
-                  label="kcal"
-                  color="#fb923c"
-                  colorTo="#f97316"
-                  size={116}
-                  stroke={11}
-                />
-                <ProgressRing
-                  id="protein"
-                  value={totals.proteinG}
-                  target={target.proteinG}
-                  label="protein g"
-                  color="#4ade80"
-                  colorTo="#16a34a"
-                />
-                <ProgressRing
-                  id="carbs"
-                  value={totals.carbsG}
-                  target={target.carbsG}
-                  label="carbs g"
-                  color="#facc15"
-                  colorTo="#ca8a04"
-                />
-                <ProgressRing
-                  id="fat"
-                  value={totals.fatG}
-                  target={target.fatG}
-                  label="fat g"
-                  color="#f472b6"
-                  colorTo="#db2777"
-                />
-              </div>
-
-              <div className="flex items-center justify-between border-t border-border pt-4">
-                <div className="flex-1">
-                  <p className="text-xs text-muted">Last {TREND_DAYS} days</p>
-                  <div className="h-14 w-full max-w-xs">
-                    <Sparkline id="calories-trend" points={calorieTrend} color="#fb923c" target={target.calories} />
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-2 pl-4 text-right">
-                  <p className="text-xs text-muted">
-                    Week avg{" "}
-                    <span className="text-foreground">{Math.round(weekAvgCalories)}</span> / {target.calories}{" "}
-                    kcal/day
-                  </p>
-                  <TargetForm
-                    existing={{
-                      calories: target.calories,
-                      proteinG: target.proteinG,
-                      carbsG: target.carbsG,
-                      fatG: target.fatG,
-                      waterTargetMl: target.waterTargetMl,
-                    }}
-                    compact
+          {!target ? (
+            <div className="tile p-6">
+              <h3 className="mb-3 font-medium">Set your daily target</h3>
+              <TargetForm />
+            </div>
+          ) : (
+            <>
+              <div className="tile flex flex-col gap-5 p-5 sm:p-6">
+                <div className="flex flex-wrap items-center justify-around gap-x-4 gap-y-6">
+                  <ProgressRing
+                    id="calories"
+                    value={totals.calories}
+                    target={target.calories}
+                    label="kcal"
+                    color="#fb923c"
+                    colorTo="#f97316"
+                    size={112}
+                    stroke={11}
+                  />
+                  <ProgressRing
+                    id="protein"
+                    value={totals.proteinG}
+                    target={target.proteinG}
+                    label="protein g"
+                    color="#4ade80"
+                    colorTo="#16a34a"
+                  />
+                  <ProgressRing
+                    id="carbs"
+                    value={totals.carbsG}
+                    target={target.carbsG}
+                    label="carbs g"
+                    color="#facc15"
+                    colorTo="#ca8a04"
+                  />
+                  <ProgressRing
+                    id="fat"
+                    value={totals.fatG}
+                    target={target.fatG}
+                    label="fat g"
+                    color="#f472b6"
+                    colorTo="#db2777"
                   />
                 </div>
+
+                <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-muted">Last {TREND_DAYS} days</p>
+                    <div className="h-14 w-full sm:max-w-xs">
+                      <Sparkline
+                        id="calories-trend"
+                        points={calorieTrend}
+                        color="#fb923c"
+                        target={target.calories}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 sm:items-end sm:pl-4 sm:text-right">
+                    <p className="text-xs text-muted">
+                      Week avg{" "}
+                      <span className="text-foreground">{Math.round(weekAvgCalories)}</span> /{" "}
+                      {target.calories} kcal/day
+                    </p>
+                    <TargetForm
+                      existing={{
+                        calories: target.calories,
+                        proteinG: target.proteinG,
+                        carbsG: target.carbsG,
+                        fatG: target.fatG,
+                        waterTargetMl: target.waterTargetMl,
+                      }}
+                      compact
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />
-              <StatCard
-                icon={<FootprintsIcon size={22} />}
-                color="#3b82f6"
-                value={todaySteps.toLocaleString()}
-                label="Steps today"
-              />
-            </div>
-
-            <div className="tile p-6">
-              <h3 className="mb-3 font-medium">Log food</h3>
-              <FoodLogger />
-            </div>
-
-            <div className="tile p-6">
-              <h3 className="mb-3 font-medium">Today</h3>
-              <EntryList entries={todayFoodEntries.map((e) => ({ ...e, date: e.date.toISOString() }))} />
-            </div>
-          </>
-        )}
-      </section>
-
-      {/* ---------- Exercise ---------- */}
-      <section className="flex flex-col gap-4">
-        <SectionHeader icon={<DumbbellIcon size={16} />} title="Exercise" />
-
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <WeightCard latestKg={latestWeight} goalKg={profile.goalWeightKg} trend={weightTrend} />
-          <StatCard
-            icon={<DumbbellIcon size={22} />}
-            color="var(--navy-light)"
-            value={`${goalsDone}/${goals.length || 0}`}
-            label="Training goals this week"
-          />
-        </div>
-
-        <GoalList goals={goals} />
-
-        <div className="tile p-6">
-          <h3 className="mb-4 font-medium">Cardio — last {STEPS_DAYS_TO_SHOW} days</h3>
-          <div className="flex items-end gap-2" style={{ height: 140 }}>
-            {stepsDays.map((day) => (
-              <div key={day.date.toISOString()} className="flex flex-1 flex-col items-center gap-2">
-                <div
-                  className="w-full rounded-t-md bg-gradient-to-t from-[var(--navy)] to-[var(--navy-light)] transition-all duration-500"
-                  style={{ height: `${Math.max((day.steps / maxSteps) * 110, 3)}px` }}
-                  title={`${day.steps.toLocaleString()} steps`}
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />
+                <StatCard
+                  icon={<FlameIcon size={22} />}
+                  color="#14b8a6"
+                  value={todayFoodEntries.length}
+                  label="Meals logged today"
                 />
-                <span className="text-[10px] text-muted">
-                  {day.date.toLocaleDateString(undefined, { weekday: "narrow" })}
-                </span>
               </div>
-            ))}
-          </div>
-        </div>
 
-        <div className="tile p-6">
-          <h3 className="mb-2 font-medium">Manual step override</h3>
-          <p className="mb-3 text-sm text-muted">
-            Once the Shortcuts automation is set up, today&apos;s steps sync automatically. Use
-            this to correct today&apos;s count if needed.
-          </p>
-          <ManualStepsForm defaultValue={todaySteps} />
-        </div>
+              <div className="tile p-5 sm:p-6">
+                <h3 className="mb-3 font-medium">Log food</h3>
+                <FoodLogger />
+              </div>
 
-        <div className="tile flex items-center gap-4 p-6 opacity-70">
-          <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-amber-400/15 text-amber-400">
-            <TrophyIcon size={22} />
+              <div className="tile p-5 sm:p-6">
+                <h3 className="mb-3 font-medium">Today</h3>
+                <EntryList entries={todayFoodEntries.map((e) => ({ ...e, date: e.date.toISOString() }))} />
+              </div>
+            </>
+          )}
+        </section>
+
+        {/* ---------- Exercise ---------- */}
+        <section className="flex flex-col gap-4">
+          <SectionHeader icon={<DumbbellIcon size={16} />} title="Exercise" />
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <StatCard
+              icon={<FootprintsIcon size={22} />}
+              color="#3b82f6"
+              value={todaySteps.toLocaleString()}
+              label="Steps today"
+            />
+            <StatCard
+              icon={<DumbbellIcon size={22} />}
+              color="var(--navy-light)"
+              value={`${goalsDone}/${goals.length || 0}`}
+              label="Training goals this week"
+            />
           </div>
-          <div>
-            <h3 className="font-medium">Achievements</h3>
-            <p className="text-sm text-muted">Coming later — once the trackers feel right.</p>
+
+          <WeightCard latestKg={latestWeight} goalKg={profile.goalWeightKg} trend={weightTrend} />
+
+          <GoalList goals={goals} />
+
+          <div className="tile p-5 sm:p-6">
+            <h3 className="mb-4 font-medium">Cardio — last {STEPS_DAYS_TO_SHOW} days</h3>
+            <div className="flex items-end gap-1.5 sm:gap-2" style={{ height: 140 }}>
+              {stepsDays.map((day) => (
+                <div key={day.date.toISOString()} className="flex flex-1 flex-col items-center gap-2">
+                  <div
+                    className="w-full rounded-t-md bg-gradient-to-t from-[var(--navy)] to-[var(--navy-light)] transition-all duration-500"
+                    style={{ height: `${Math.max((day.steps / maxSteps) * 110, 3)}px` }}
+                    title={`${day.steps.toLocaleString()} steps`}
+                  />
+                  <span className="text-[9px] text-muted sm:text-[10px]">
+                    {day.date.toLocaleDateString(undefined, { weekday: "narrow" })}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+
+          <div className="tile p-5 sm:p-6">
+            <h3 className="mb-2 font-medium">Manual step override</h3>
+            <p className="mb-3 text-sm text-muted">
+              Once the Shortcuts automation is set up, today&apos;s steps sync automatically. Use
+              this to correct today&apos;s count if needed.
+            </p>
+            <ManualStepsForm defaultValue={todaySteps} />
+          </div>
+
+          <div className="flex items-center gap-4 rounded-[1.25rem] border border-dashed border-border p-5 sm:p-6">
+            <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-amber-400/10 text-amber-400/80">
+              <TrophyIcon size={22} />
+            </div>
+            <div>
+              <h3 className="font-medium text-muted">Achievements — coming soon</h3>
+              <p className="text-sm text-muted">Badges and streaks once the trackers feel right.</p>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

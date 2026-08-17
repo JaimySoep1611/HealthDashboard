@@ -90,7 +90,7 @@ export function FoodLogger() {
           value={description}
           onChange={(event) => setDescription(event.target.value)}
           placeholder="What did you eat? e.g. two fried eggs and a black coffee"
-          className="flex-1 rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm outline-none focus:border-navy-light"
+          className="min-w-0 flex-1 rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm outline-none focus:border-navy-light"
         />
 
         <input

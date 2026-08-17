@@ -1,0 +1,64 @@
+export type ChangelogEntry = {
+  date: string; // YYYY-MM-DD
+  title: string;
+  description: string;
+};
+
+// Newest first. Add one entry here for every user-facing change —
+// this list is the single source of truth for the "What's new" tab.
+export const CHANGELOG: ChangelogEntry[] = [
+  {
+    date: "2026-08-17",
+    title: "Info guide & changelog",
+    description: "Added the info button you're looking at right now — a guide to every tile, plus this changelog.",
+  },
+  {
+    date: "2026-08-17",
+    title: "Visual redesign + water & weight tracking",
+    description:
+      "Gradient hero banner, icon stat cards, gradient progress rings, and trend charts. Added water intake (quick-add toward a daily goal) and weight tracking (with a goal weight and trend).",
+  },
+  {
+    date: "2026-08-17",
+    title: "First-time setup wizard & profile colors",
+    description:
+      "New profiles now pick their training goals and nutrition targets before reaching the dashboard, editable anytime via \"Edit setup\". Jaimy is navy, Lisa is dark green.",
+  },
+  {
+    date: "2026-08-17",
+    title: "Deployed to Vercel",
+    description: "Moved from local-only to a live site with a real Postgres database.",
+  },
+  {
+    date: "2026-08-17",
+    title: "Switched AI provider to Gemini",
+    description: "Food recognition (text description and photo) now runs on Google Gemini instead of Claude.",
+  },
+  {
+    date: "2026-08-17",
+    title: "Weekly goal checklist for training",
+    description:
+      "Replaced the weekday-by-weekday training schedule and set/rep logging with a simple list of goals (e.g. \"Push day\") you check off each week — resets every Monday.",
+  },
+  {
+    date: "2026-08-17",
+    title: "Simplified food logging",
+    description: "Down to one text field plus a camera icon — describe a meal or snap a photo, no more tabs to click through.",
+  },
+  {
+    date: "2026-08-17",
+    title: "One dashboard page",
+    description: "Combined Training, Nutrition, and Steps into a single page instead of separate ones — Food at the top, Exercise below.",
+  },
+  {
+    date: "2026-08-17",
+    title: "AI food logging",
+    description: "Added describing a meal in your own words or taking a photo of food to auto-fill calories and macros.",
+  },
+  {
+    date: "2026-08-17",
+    title: "Launch",
+    description:
+      "First version: shared login, profile picker, gym training schedule, nutrition tracking, and step tracking.",
+  },
+];

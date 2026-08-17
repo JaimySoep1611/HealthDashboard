@@ -107,3 +107,39 @@ export function TrendUpIcon({ className, size = 20 }: IconProps) {
     </svg>
   );
 }
+
+export function InfoIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 11v5.5" />
+      <circle cx="12" cy="8" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function CloseIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
+export function ClockIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </svg>
+  );
+}
+
+export function BookIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M4 5.5c1.8-1 4-1 5.5.3v12.2C8 16.7 5.8 16.7 4 17.7V5.5Z" />
+      <path d="M20 5.5c-1.8-1-4-1-5.5.3v12.2c1.5-1.3 3.7-1.3 5.5-.3V5.5Z" />
+    </svg>
+  );
+}

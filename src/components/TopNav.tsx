@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { InfoButton } from "@/components/InfoButton";
 
 export function TopNav({ profileName }: { profileName: string }) {
   const router = useRouter();
@@ -17,12 +18,13 @@ export function TopNav({ profileName }: { profileName: string }) {
   }
 
   return (
-    <header className="flex items-center justify-between border-b border-border px-6 py-4">
+    <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border px-4 py-3 sm:px-6 sm:py-4">
       <Link href="/dashboard" className="font-semibold tracking-tight">
         Health<span className="text-navy-light">Dashboard</span>
       </Link>
-      <div className="flex items-center gap-4 text-sm text-muted">
-        <span>{profileName}</span>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+        <InfoButton />
+        <span className="hidden text-foreground sm:inline">{profileName}</span>
         <Link href="/onboarding" className="hover:text-foreground">
           Edit setup
         </Link>
