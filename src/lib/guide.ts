@@ -70,7 +70,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Training (in Trends)",
         description:
-          "Every power-training exercise gets its own small chart, each in its own color, stacked so you can compare them side by side — one bar per month you logged it (averaged if you logged it more than once that month). Exercises aren't put on the same chart since kg isn't comparable across different lifts.",
+          "Every power-training exercise gets its own small chart, each in its own color, stacked so you can compare them side by side. Switch between \"Week\" (one bar per week you logged it) and \"Month\" (one bar per month, averaged if you logged it more than once that month) with the toggle above the charts. Exercises aren't put on the same chart since kg isn't comparable across different lifts.",
       },
     ],
   },

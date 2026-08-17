@@ -46,6 +46,12 @@ type MetricKey = (typeof METRICS)[number]["key"];
 // distinguishable from one another at a glance.
 const EXERCISE_COLORS = ["#f472b6", "#60a5fa", "#facc15", "#34d399", "#a78bfa", "#fb7185"];
 
+function groupByWeek(points: { weekStart: string; kg: number }[]): DayValue[] {
+  return points
+    .map((point) => ({ date: point.weekStart, value: point.kg }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
 // Weekly kg points don't compare cleanly week-to-week (some weeks get
 // skipped), so group into calendar months — one bar per month, averaging
 // whatever weeks were actually logged that month.
@@ -105,6 +111,19 @@ export function TrendsSection({
               </button>
             ))}
           </div>
+          <div className="flex gap-1 rounded-full border border-border p-1">
+            {(["week", "month"] as const).map((r) => (
+              <button
+                key={r}
+                onClick={() => setRange(r)}
+                className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition ${
+                  range === r ? "bg-navy text-white" : "text-muted hover:text-foreground"
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
         </div>
 
         {exerciseTrends.length === 0 ? (
@@ -114,11 +133,12 @@ export function TrendsSection({
         ) : (
           <div className="flex flex-col gap-6">
             {exerciseTrends.map((exercise, index) => (
-              <ExerciseMonthlyChart
+              <ExerciseChart
                 key={exercise.id}
                 name={exercise.name}
                 points={exercise.points}
                 color={EXERCISE_COLORS[index % EXERCISE_COLORS.length]}
+                range={range}
               />
             ))}
           </div>
@@ -314,18 +334,21 @@ function WeightTrendChart({
   );
 }
 
-function ExerciseMonthlyChart({
+function ExerciseChart({
   name,
   points,
   color,
+  range,
 }: {
   name: string;
   points: { weekStart: string; kg: number }[];
   color: string;
+  range: "week" | "month";
 }) {
-  const monthlyPoints = groupByMonth(points);
+  const chartPoints = range === "week" ? groupByWeek(points) : groupByMonth(points);
   const average =
-    monthlyPoints.length > 0 ? monthlyPoints.reduce((sum, p) => sum + p.value, 0) / monthlyPoints.length : 0;
+    chartPoints.length > 0 ? chartPoints.reduce((sum, p) => sum + p.value, 0) / chartPoints.length : 0;
+  const unitLabel = range === "week" ? "week" : "month";
 
   return (
     <div className="flex flex-col gap-2">
@@ -333,22 +356,29 @@ function ExerciseMonthlyChart({
         <h4 className="text-sm font-medium" style={{ color }}>
           {name}
         </h4>
-        {monthlyPoints.length > 0 && (
+        {chartPoints.length > 0 && (
           <span className="text-xs text-muted">
-            {monthlyPoints.length} month{monthlyPoints.length === 1 ? "" : "s"} · average{" "}
+            {chartPoints.length} {unitLabel}
+            {chartPoints.length === 1 ? "" : "s"} · average{" "}
             <span className="text-foreground">{Math.round(average)}</span> kg
           </span>
         )}
       </div>
 
-      {monthlyPoints.length > 0 ? (
+      {chartPoints.length > 0 ? (
         <DailyBarChart
-          days={monthlyPoints}
+          days={chartPoints}
           color={color}
           formatValue={(value) => `${Math.round(value)}kg`}
           showWeekdayLabels
           bottomLabel={(dateIso) =>
-            new Date(dateIso).toLocaleDateString(undefined, { month: "short", timeZone: "UTC" })
+            range === "week"
+              ? new Date(dateIso).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  timeZone: "UTC",
+                })
+              : new Date(dateIso).toLocaleDateString(undefined, { month: "short", timeZone: "UTC" })
           }
         />
       ) : (

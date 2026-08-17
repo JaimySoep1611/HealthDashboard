@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Week/month toggle for training trends",
+    description:
+      "The Training tab in Trends now has the same Week/Month toggle as Calories, Water, Steps, and Weight. \"Week\" shows one bar per week you logged that exercise; \"Month\" averages weeks into one bar per month, useful for spotting the longer-term trend.",
+  },
+  {
+    date: "2026-08-17",
     title: "Fixed badge overlap + clear a logged exercise",
     description:
       "The \"Once/day\" badge on Steps and Weight no longer overlaps the number when it's wide. Tap a logged exercise in the training schedule and hit \"Clear\" to remove it if you logged it by mistake — the day correctly goes back to not-logged, and \"Training days logged this week\" updates to match.",
