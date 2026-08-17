@@ -2,11 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FootprintsIcon } from "@/components/icons";
+import { FootprintsIcon, CheckIcon } from "@/components/icons";
 import { DailyEntryBadge } from "@/components/DailyEntryBadge";
 import { Confetti } from "@/components/Confetti";
 
 const STEPS_COLOR = "#3b82f6";
+// Same green used for the training schedule's "day complete" dot, so "goal
+// met" reads the same way across the app.
+const GOAL_MET_COLOR = "#34d399";
 
 export function StepsCard({ steps, goal }: { steps: number; goal: number | null }) {
   const router = useRouter();
@@ -38,6 +41,9 @@ export function StepsCard({ steps, goal }: { steps: number; goal: number | null 
     }).then(() => router.refresh());
   }
 
+  const goalMet = goal !== null && liveSteps >= goal;
+  const activeColor = goalMet ? GOAL_MET_COLOR : STEPS_COLOR;
+
   return (
     <div className="stat-card flex h-full flex-col justify-between gap-3 p-4">
       <Confetti burstKey={burstKey} />
@@ -48,14 +54,14 @@ export function StepsCard({ steps, goal }: { steps: number; goal: number | null 
       <div className="flex items-center gap-3">
         <div
           className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
-          style={{ backgroundColor: `${STEPS_COLOR}22`, color: STEPS_COLOR }}
+          style={{ backgroundColor: `${activeColor}22`, color: activeColor }}
         >
-          <FootprintsIcon size={20} />
+          {goalMet ? <CheckIcon size={20} /> : <FootprintsIcon size={20} />}
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="text-2xl font-semibold tracking-tight">{liveSteps.toLocaleString()}</span>
-          <span className="truncate text-xs text-muted">
-            {goal !== null ? `Goal ${goal.toLocaleString()} steps` : "Steps today"}
+          <span className={`truncate text-xs ${goalMet ? "font-medium text-emerald-400" : "text-muted"}`}>
+            {goalMet ? "Goal reached" : goal !== null ? `Goal ${goal.toLocaleString()} steps` : "Steps today"}
           </span>
         </div>
       </div>

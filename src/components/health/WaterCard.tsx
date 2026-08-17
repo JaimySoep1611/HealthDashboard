@@ -2,10 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { DropletIcon } from "@/components/icons";
+import { DropletIcon, CheckIcon } from "@/components/icons";
 import { Confetti } from "@/components/Confetti";
 
 const WATER_COLOR = "#06b6d4";
+// Same green used for the training schedule's "day complete" dot, so "goal
+// met" reads the same way across the app.
+const GOAL_MET_COLOR = "#34d399";
 const QUICK_ADD = [100, 250, 500];
 
 export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: number }) {
@@ -54,6 +57,8 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
   const ratio = targetMl > 0 ? Math.min(liveTotal / targetMl, 1) : 0;
   const liters = (liveTotal / 1000).toFixed(2);
   const targetLiters = (targetMl / 1000).toFixed(1);
+  const goalMet = targetMl > 0 && liveTotal >= targetMl;
+  const activeColor = goalMet ? GOAL_MET_COLOR : WATER_COLOR;
 
   return (
     <div className="stat-card flex h-full flex-col justify-between gap-3 p-4">
@@ -61,9 +66,9 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
       <div className="flex items-center gap-3">
         <div
           className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
-          style={{ backgroundColor: `${WATER_COLOR}22`, color: WATER_COLOR }}
+          style={{ backgroundColor: `${activeColor}22`, color: activeColor }}
         >
-          <DropletIcon size={20} />
+          {goalMet ? <CheckIcon size={20} /> : <DropletIcon size={20} />}
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-baseline gap-1">
@@ -71,7 +76,9 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
             <span className="text-sm text-muted">/ {targetLiters} L</span>
           </div>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs text-muted">Water today</span>
+            <span className={`text-xs ${goalMet ? "font-medium text-emerald-400" : "text-muted"}`}>
+              {goalMet ? "Goal reached" : "Water today"}
+            </span>
             <button
               onClick={undo}
               disabled={liveTotal === 0}
@@ -86,7 +93,7 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
       <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--ring-track)]">
         <div
           className="h-full rounded-full transition-[width] duration-700 ease-out"
-          style={{ width: `${ratio * 100}%`, backgroundColor: WATER_COLOR }}
+          style={{ width: `${ratio * 100}%`, backgroundColor: activeColor }}
         />
       </div>
 

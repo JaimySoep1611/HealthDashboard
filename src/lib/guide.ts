@@ -15,7 +15,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Calorie & macro rings",
         description:
-          "Fill up as you log food today, toward the daily targets you set in \"Edit Goals\". The thin line below shows your calories over the last 7 days against your target. Below the rings, a short line of advice names whichever macro (protein, carbs, or fat) you're furthest from and a few foods to help close the gap — it's a simple rule based on today's numbers, not AI, so it's instant and always available.",
+          "Fill up as you log food today, toward the daily targets you set in \"Edit Goals\". The thin line below shows your calories over the last 7 days against your target. Below the rings, a line of advice for each macro (protein, carbs, fat) you're still short on names a few foods to help close the gap — a simple rule based on today's numbers, not AI, so it's instant and always available. Once every macro's covered, it just says so.",
       },
       {
         name: "Log food",
@@ -30,7 +30,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Water",
         description:
-          "Tap +100/+250/+500ml each time you drink water. The bar fills toward your daily goal. \"Undo\" removes your most recent log if you tap by mistake. A little confetti burst plays the moment you cross your goal for the day.",
+          "Tap +100/+250/+500ml each time you drink water. The bar fills toward your daily goal. \"Undo\" removes your most recent log if you tap by mistake. The moment you cross your goal for the day, a confetti burst plays and the card turns green with a checkmark — a persistent \"done\" state, not just the one-off animation.",
       },
     ],
   },
@@ -50,7 +50,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Steps",
         description:
-          "Today's step count, synced automatically via the Apple Shortcuts automation, or entered manually if it needs correcting. The \"Once/day\" tag is a reminder that this is a single daily number, not something you add to repeatedly like water — but you can still overwrite it any time you want. Set a daily steps goal in \"Edit Goals\" to see it shown here and used in Trends — crossing it (via manual entry or the next automatic sync) plays a confetti burst.",
+          "Today's step count, synced automatically via the Apple Shortcuts automation, or entered manually if it needs correcting. The \"Once/day\" tag is a reminder that this is a single daily number, not something you add to repeatedly like water — but you can still overwrite it any time you want. Set a daily steps goal in \"Edit Goals\" to see it shown here and used in Trends — crossing it (via manual entry or the next automatic sync) plays a confetti burst and turns the card green with a checkmark, a persistent \"done\" state you'll still see on your next visit, not just the animation.",
       },
     ],
   },

@@ -160,3 +160,11 @@ export function MoonIcon({ className, size = 20 }: IconProps) {
     </svg>
   );
 }
+
+export function CheckIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </svg>
+  );
+}

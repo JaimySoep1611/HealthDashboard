@@ -61,9 +61,10 @@ const MACRO_FOOD_IDEAS: Record<MacroKey, string> = {
 };
 
 // Rule-based on purpose — no AI call, so it's instant and never affected by
-// the Gemini quota. Only calls out the macro furthest from target, since
-// naming all three at once stops reading as "short advice."
-function macroAdvice(totals: Record<MacroKey, number>, target: Record<MacroKey, number>): string | null {
+// the Gemini quota. Returns null when no target is set at all (nothing to
+// advise against), [] once every macro is met, or one line per macro still
+// short — sorted so the biggest gap reads first.
+function macroAdvice(totals: Record<MacroKey, number>, target: Record<MacroKey, number>): string[] | null {
   const hasAnyTarget = target.proteinG > 0 || target.carbsG > 0 || target.fatG > 0;
   if (!hasAnyTarget) return null;
 
@@ -72,10 +73,9 @@ function macroAdvice(totals: Record<MacroKey, number>, target: Record<MacroKey, 
     .filter((gap) => gap.remaining > 5) // ignore near-enough/over targets
     .sort((a, b) => b.remaining - a.remaining);
 
-  if (gaps.length === 0) return "You've hit your macro targets for today — nice work.";
-
-  const top = gaps[0];
-  return `Still ~${Math.round(top.remaining)}g ${MACRO_LABELS[top.key]} to go — try ${MACRO_FOOD_IDEAS[top.key]}.`;
+  return gaps.map(
+    (gap) => `Still ~${Math.round(gap.remaining)}g ${MACRO_LABELS[gap.key]} to go — try ${MACRO_FOOD_IDEAS[gap.key]}.`
+  );
 }
 
 export function FoodLogSection({
@@ -183,7 +183,19 @@ export function FoodLogSection({
           />
         </div>
 
-        {advice && <p className="text-center text-xs text-muted">{advice}</p>}
+        {advice !== null && (
+          <div className="flex flex-col items-center gap-1">
+            {advice.length > 0 ? (
+              advice.map((line) => (
+                <p key={line} className="text-center text-xs text-muted">
+                  {line}
+                </p>
+              ))
+            ) : (
+              <p className="text-center text-xs text-muted">You&apos;ve hit your macro targets for today — nice work.</p>
+            )}
+          </div>
+        )}
 
         <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0 flex-1">
