@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Milestone gridlines on Trends charts",
+    description:
+      "Trend charts now show evenly-spaced, round-number milestones on the side (e.g. 500ml/1000ml/1500ml/2000ml toward a 2L water goal) with faint gridlines, instead of just the top/target/bottom value.",
+  },
+  {
+    date: "2026-08-17",
     title: "Light mode",
     description:
       "Added a beige/sand light theme alongside the original dark theme, with a sun/moon button in the header to switch — your choice is remembered on this device.",

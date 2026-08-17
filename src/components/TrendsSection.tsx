@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { DailyBarChart } from "@/components/DailyBarChart";
 import { Sparkline } from "@/components/Sparkline";
+import { niceTicks } from "@/lib/chartTicks";
 import { FlameIcon, DropletIcon, FootprintsIcon, ScaleIcon } from "@/components/icons";
 
 type DayValue = { date: string; value: number };
@@ -168,19 +169,38 @@ function WeightTrendChart({
   color: string;
   goal: number | null;
 }) {
-  const max = Math.max(...points, goal ?? 0, 1);
-  const min = Math.min(...points, goal ?? Infinity, 0);
+  const rawMin = Math.min(...points, goal ?? Infinity, 0);
+  const rawMax = Math.max(...points, goal ?? 0, 1);
+  const ticks = niceTicks(rawMin, rawMax);
+  const min = ticks[0];
+  const max = ticks[ticks.length - 1];
   const range = max - min || 1;
+
+  const goalOnTick = goal !== null && ticks.some((tick) => Math.abs(tick - goal) < range * 0.01);
   const goalBottom =
-    goal !== null ? Math.min(Math.max(((goal - min) / range) * WEIGHT_CHART_HEIGHT, 0), WEIGHT_CHART_HEIGHT) : null;
+    goal !== null && !goalOnTick
+      ? Math.min(Math.max(((goal - min) / range) * WEIGHT_CHART_HEIGHT, 0), WEIGHT_CHART_HEIGHT)
+      : null;
 
   return (
     <div className="flex gap-2">
       <div
-        className="relative flex-none w-10 text-right text-[9px] text-muted sm:text-[10px]"
+        className="relative flex-none w-12 text-right text-[9px] text-muted sm:text-[10px]"
         style={{ height: WEIGHT_CHART_HEIGHT }}
       >
-        <span className="absolute right-0 top-0 leading-none">{max.toFixed(1)}</span>
+        {ticks.map((tick) => {
+          const isGoal = goal !== null && Math.abs(tick - goal) < range * 0.01;
+          const bottom = ((tick - min) / range) * WEIGHT_CHART_HEIGHT;
+          return (
+            <span
+              key={tick}
+              className={`absolute right-0 leading-none ${isGoal ? "font-medium text-foreground" : ""}`}
+              style={{ bottom: Math.min(Math.max(bottom - 4, 0), WEIGHT_CHART_HEIGHT - 8) }}
+            >
+              {tick.toFixed(1)}
+            </span>
+          );
+        })}
         {goalBottom !== null && (
           <span
             className="absolute right-0 leading-none text-foreground"
@@ -189,10 +209,24 @@ function WeightTrendChart({
             {goal!.toFixed(1)}
           </span>
         )}
-        <span className="absolute right-0 bottom-0 leading-none">{min.toFixed(1)}</span>
       </div>
-      <div className="flex-1" style={{ height: WEIGHT_CHART_HEIGHT }}>
-        <Sparkline id={id} points={points} color={color} height={WEIGHT_CHART_HEIGHT} target={goal ?? undefined} />
+      <div className="relative flex-1" style={{ height: WEIGHT_CHART_HEIGHT }}>
+        {ticks.map((tick) => (
+          <div
+            key={tick}
+            className="pointer-events-none absolute left-0 right-0 border-t border-border/60"
+            style={{ bottom: ((tick - min) / range) * WEIGHT_CHART_HEIGHT }}
+          />
+        ))}
+        <Sparkline
+          id={id}
+          points={points}
+          color={color}
+          height={WEIGHT_CHART_HEIGHT}
+          target={goalOnTick ? undefined : (goal ?? undefined)}
+          scaleMin={min}
+          scaleMax={max}
+        />
       </div>
     </div>
   );

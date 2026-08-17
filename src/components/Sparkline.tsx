@@ -4,16 +4,22 @@ export function Sparkline({
   color,
   height = 64,
   target,
+  scaleMin,
+  scaleMax,
 }: {
   id: string;
   points: number[];
   color: string;
   height?: number;
   target?: number;
+  // Override the auto-computed vertical scale — used when a caller renders its
+  // own axis labels/gridlines and needs the line to line up with them exactly.
+  scaleMin?: number;
+  scaleMax?: number;
 }) {
   const width = 100;
-  const max = Math.max(...points, target ?? 0, 1);
-  const min = Math.min(...points, target ?? Infinity, 0);
+  const max = scaleMax ?? Math.max(...points, target ?? 0, 1);
+  const min = scaleMin ?? Math.min(...points, target ?? Infinity, 0);
   const range = max - min || 1;
 
   const step = points.length > 1 ? width / (points.length - 1) : 0;
