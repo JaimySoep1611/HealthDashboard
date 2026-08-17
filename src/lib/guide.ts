@@ -67,6 +67,11 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         description:
           "Awarded when every day this week (Monday-Sunday) hits your water and calorie targets, and any exercises scheduled for that day are logged. The badge lights up once you've earned it for the week, and resets fresh every Monday.",
       },
+      {
+        name: "Challenge",
+        description:
+          "A personal long-running challenge (75 days by default) — hit your water and calorie targets every day to keep your streak alive. Missing a day breaks the streak but doesn't restart the challenge; the day counter keeps going regardless. \"End challenge\" stops it early if you want to.",
+      },
     ],
   },
   {

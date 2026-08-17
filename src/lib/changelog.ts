@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Personal 75-day challenge",
+    description:
+      "Start a long-running challenge (75 days by default) from the dashboard — hit your water and calorie targets each day to build a streak. It's a \"soft\" version: missing a day breaks your streak but the challenge keeps counting rather than restarting from day 1. End it anytime from the card.",
+  },
+  {
+    date: "2026-08-17",
     title: "Added the Tassies achievement",
     description:
       "A real first achievement: hit your water and calorie targets and log every scheduled exercise, every day of the week, to earn \"Tassies\". Shown on the Achievements card with live progress, and resets automatically each Monday. Also added a small \"Once/day\" tag to Steps and Weight, since — unlike Water — those are a single daily number you can still edit any time, not something you add to repeatedly.",

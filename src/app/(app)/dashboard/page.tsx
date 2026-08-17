@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
@@ -15,6 +16,8 @@ import { StepsCard } from "@/components/health/StepsCard";
 import { WeightCard } from "@/components/health/WeightCard";
 import { TrendsSection } from "@/components/TrendsSection";
 import { TassiesAchievement } from "@/components/TassiesAchievement";
+import { ChallengeCard } from "@/components/ChallengeCard";
+import { isWaterGoalMet, isCalorieGoalMet } from "@/lib/dayGoal";
 import { FlameIcon, DumbbellIcon, TrendUpIcon } from "@/components/icons";
 
 const TRENDS_DAYS = 30;
@@ -42,6 +45,7 @@ export default async function DashboardPage() {
     todayWater,
     monthWaterEntries,
     weightEntries,
+    challenge,
   ] = await Promise.all([
     prisma.nutritionTarget.findUnique({ where: { profileId: profile.id } }),
     prisma.foodEntry.findMany({
@@ -68,6 +72,7 @@ export default async function DashboardPage() {
       where: { profileId: profile.id, date: { gte: trendsRangeStart } },
       orderBy: { date: "asc" },
     }),
+    prisma.challenge.findUnique({ where: { profileId: profile.id } }),
   ]);
 
   const exercises = trainingExercises.map((exercise) => ({
@@ -151,18 +156,62 @@ export default async function DashboardPage() {
   const todayWeekdayIndex = daysElapsed - 1; // 0 = Monday
   function isDayGoalComplete(dayIndex: number): boolean {
     const dateIso = addDays(weekStart, dayIndex).toISOString();
-    const waterOk = (dailyWater.find((d) => d.date === dateIso)?.value ?? 0) >= target!.waterTargetMl;
+    const waterMl = dailyWater.find((d) => d.date === dateIso)?.value ?? 0;
     const calorieValue = dailyCalories.find((d) => d.date === dateIso)?.value ?? 0;
-    const calorieOk = calorieValue >= target!.calories * 0.85 && calorieValue <= target!.calories * 1.15;
     const scheduledThatDay = exercises.filter((exercise) => exercise.weekday === dayIndex);
     const trainingOk = scheduledThatDay.every((exercise) => exercise.log !== null);
-    return waterOk && calorieOk && trainingOk;
+    return (
+      isWaterGoalMet(waterMl, target!.waterTargetMl) && isCalorieGoalMet(calorieValue, target!.calories) && trainingOk
+    );
   }
   const weekDayIndexesSoFar = Array.from({ length: todayWeekdayIndex + 1 }, (_, i) => i);
   const tassiesCompletedDays = tassiesConfigured ? weekDayIndexesSoFar.filter(isDayGoalComplete).length : 0;
   const tassiesTotalDaysSoFar = weekDayIndexesSoFar.length;
   const tassiesAllCompleteSoFar = tassiesConfigured && tassiesCompletedDays === tassiesTotalDaysSoFar;
   const tassiesEarned = tassiesAllCompleteSoFar && todayWeekdayIndex === 6;
+
+  // Long-running challenge (e.g. 75 days): water + calorie targets only —
+  // exercise logs aren't stored with exact per-day precision far enough back
+  // to check retroactively, so training stays a Tassies-only (weekly) check.
+  let challengeCardProps: ComponentProps<typeof ChallengeCard> = { active: false };
+  if (challenge) {
+    const challengeStart = startOfDay(challenge.startDate);
+    const daysSinceStart = Math.floor((today.getTime() - challengeStart.getTime()) / 86_400_000);
+    const dayNumber = Math.min(daysSinceStart + 1, challenge.days);
+    const finished = daysSinceStart + 1 >= challenge.days;
+
+    const [challengeFoodEntries, challengeWaterEntries] = await Promise.all([
+      prisma.foodEntry.findMany({ where: { profileId: profile.id, date: { gte: challengeStart } } }),
+      prisma.waterEntry.findMany({ where: { profileId: profile.id, date: { gte: challengeStart } } }),
+    ]);
+
+    const challengeDaysComplete = Array.from({ length: dayNumber }, (_, index) => {
+      const dayTime = addDays(challengeStart, index).getTime();
+      const waterMl = challengeWaterEntries
+        .filter((e) => e.date.getTime() === dayTime)
+        .reduce((sum, e) => sum + e.amountMl, 0);
+      const calories = challengeFoodEntries
+        .filter((e) => e.date.getTime() === dayTime)
+        .reduce((sum, e) => sum + e.calories, 0);
+      return target !== null && isWaterGoalMet(waterMl, target.waterTargetMl) && isCalorieGoalMet(calories, target.calories);
+    });
+
+    const completedDays = challengeDaysComplete.filter(Boolean).length;
+    let currentStreak = 0;
+    for (let i = challengeDaysComplete.length - 1; i >= 0; i--) {
+      if (challengeDaysComplete[i]) currentStreak++;
+      else break;
+    }
+
+    challengeCardProps = {
+      active: true,
+      dayNumber,
+      totalDays: challenge.days,
+      completedDays,
+      currentStreak,
+      finished,
+    };
+  }
 
   return (
     <FoodEntriesProvider initialEntries={todayFoodEntries}>
@@ -202,6 +251,9 @@ export default async function DashboardPage() {
           completedDays={tassiesCompletedDays}
           totalDaysSoFar={tassiesTotalDaysSoFar}
         />
+
+        {/* ---------- Challenge ---------- */}
+        <ChallengeCard {...challengeCardProps} />
 
         {/* ---------- Food ---------- */}
         <section className="flex flex-col gap-4">
