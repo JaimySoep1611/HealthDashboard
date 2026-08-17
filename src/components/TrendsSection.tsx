@@ -355,35 +355,42 @@ function ExerciseChart({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-baseline justify-between gap-2">
-        <h4 className="text-sm font-medium" style={{ color }}>
-          {name}
-        </h4>
-        {chartPoints.length > 0 && (
-          <span className="text-xs text-muted">
-            {chartPoints.length} {unitLabel}
-            {chartPoints.length === 1 ? "" : "s"} · average{" "}
-            <span className="text-foreground">{Math.round(average)}</span> kg
-          </span>
-        )}
-      </div>
+      <h4 className="text-sm font-medium" style={{ color }}>
+        {name}
+      </h4>
+      {chartPoints.length > 0 && (
+        <p className="text-xs text-muted">
+          Last {chartPoints.length} {unitLabel}
+          {chartPoints.length === 1 ? "" : "s"} average:{" "}
+          <span className="text-foreground">{Math.round(average)}</span> kg
+        </p>
+      )}
 
       {chartPoints.length > 0 ? (
-        <DailyBarChart
-          days={chartPoints}
-          color={color}
-          formatValue={(value) => `${Math.round(value)}kg`}
-          showWeekdayLabels
-          bottomLabel={(dateIso) =>
-            range === "week"
-              ? new Date(dateIso).toLocaleDateString(undefined, {
+        <>
+          <DailyBarChart
+            days={chartPoints}
+            color={color}
+            formatValue={(value) => `${Math.round(value)}kg`}
+            showWeekdayLabels={range === "week"}
+            bottomLabel={(dateIso) =>
+              new Date(dateIso).toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" })
+            }
+          />
+          {range === "month" && (
+            <div className="flex justify-between text-[10px] text-muted">
+              <span>
+                {new Date(chartPoints[0].date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+              </span>
+              <span>
+                {new Date(chartPoints[chartPoints.length - 1].date).toLocaleDateString(undefined, {
                   month: "short",
                   day: "numeric",
-                  timeZone: "UTC",
-                })
-              : new Date(dateIso).toLocaleDateString(undefined, { month: "short", timeZone: "UTC" })
-          }
-        />
+                })}
+              </span>
+            </div>
+          )}
+        </>
       ) : (
         <p className="text-sm text-muted">Not logged yet.</p>
       )}

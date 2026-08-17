@@ -75,13 +75,18 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Training (in Trends)",
         description:
-          "Every power-training exercise gets its own small chart, each in its own color, stacked so you can compare them side by side. Switch between \"Week\" (one bar per week you logged it) and \"Month\" (one bar per month, averaged if you logged it more than once that month) with the toggle above the charts. Exercises aren't put on the same chart since kg isn't comparable across different lifts.",
+          "Every power-training exercise gets its own small chart, each in its own color, stacked so you can compare them side by side. Switch between \"Week\" (one bar per week you logged it, labeled) and \"Month\" (one bar per month, averaged if you logged it more than once — same as Calories/Water/Steps, bars aren't individually labeled in Month view, just the date range underneath). Exercises aren't put on the same chart since kg isn't comparable across different lifts.",
       },
     ],
   },
   {
     title: "General",
     items: [
+      {
+        name: "Add to Home Screen",
+        description:
+          "On iPhone, Share → Add to Home Screen adds the otter icon to your home screen and opens the dashboard full-screen, without the Safari address bar.",
+      },
       {
         name: "Sun/moon icon",
         description: "Switch between dark and light mode. Your choice is remembered on this device.",

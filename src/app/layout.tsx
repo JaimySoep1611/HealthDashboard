@@ -26,6 +26,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Soephart & Ligtenberg",
   description: "Gym goals, nutrition and steps tracking",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Soephart & Ligtenberg",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

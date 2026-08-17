@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Real app icon on iPhone + training chart consistency",
+    description:
+      "Saving the dashboard to your iPhone home screen (Share → Add to Home Screen) now shows the actual otter logo instead of a generic icon, and opens full-screen without the Safari address bar. Also restyled the Training trend charts to match Calories/Water/Steps: same \"Last N average\" caption style, and bars aren't individually labeled in Month view anymore (just the date range underneath) — same as the other metrics.",
+  },
+  {
+    date: "2026-08-17",
     title: "Daily streak bar + a daily steps goal",
     description:
       "Added a small streak bar above Food showing how many days in a row you've hit every goal you've set — water, steps, calories & macros, and training (rest days always count for training). Also added a daily steps goal, settable in \"Edit Goals\" alongside your weight goal, shown on the Steps card and as a target line in Trends.",
