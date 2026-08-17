@@ -13,11 +13,6 @@ export const GUIDE_SECTIONS: GuideSection[] = [
           "Fill up as you log food today, toward the daily targets you set in \"Edit setup\". The thin line below shows your calories over the last 7 days against your target.",
       },
       {
-        name: "Water",
-        description:
-          "Tap +100/+250/+500ml each time you drink water. The bar fills toward your daily goal. \"Undo\" removes your most recent log if you tap by mistake.",
-      },
-      {
         name: "Log food",
         description:
           "Type what you ate in plain words (e.g. \"two eggs and toast\") or tap the camera to photograph a meal — AI estimates calories and macros for you to add.",
@@ -25,22 +20,52 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     ],
   },
   {
-    title: "Exercise",
+    title: "Water",
+    items: [
+      {
+        name: "Water",
+        description:
+          "Tap +100/+250/+500ml each time you drink water. The bar fills toward your daily goal. \"Undo\" removes your most recent log if you tap by mistake.",
+      },
+    ],
+  },
+  {
+    title: "Training",
+    items: [
+      {
+        name: "Training schedule",
+        description:
+          "Set up once: which day, which exercises, and whether to track kg + sets (power training) or km (running). It repeats every week — each week you just fill in what you actually did, which resets automatically every Monday.",
+      },
+    ],
+  },
+  {
+    title: "Steps",
     items: [
       {
         name: "Steps",
         description:
-          "Today's step count, synced automatically via the Apple Shortcuts automation, or entered manually below the 14-day chart if needed.",
+          "Today's step count, synced automatically via the Apple Shortcuts automation, or entered manually if it needs correcting.",
       },
+    ],
+  },
+  {
+    title: "Weight",
+    items: [
       {
         name: "Weight",
         description:
           "Log your weight once a day. The trend line compares your recent weigh-ins to your goal weight, with how far you have left to go.",
       },
+    ],
+  },
+  {
+    title: "Trends",
+    items: [
       {
-        name: "Training schedule",
+        name: "Trends",
         description:
-          "Set up once: which day, which exercises, and whether to track kg + sets (power training) or km (running). It repeats every week — each week you just fill in what you actually did, which resets automatically every Monday.",
+          "Look back over the last week or month for Calories, Water, Steps, or Weight — pick a metric and a range to see the chart and the average for that period.",
       },
     ],
   },

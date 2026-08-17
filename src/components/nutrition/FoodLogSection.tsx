@@ -9,7 +9,6 @@ import { FlameIcon } from "@/components/icons";
 import { TargetForm } from "@/components/nutrition/target-form";
 import { FoodLogger } from "@/components/nutrition/food-logger";
 import { EntryList } from "@/components/nutrition/entry-list";
-import { WaterCard } from "@/components/health/WaterCard";
 
 type FoodEntryItem = {
   id: string;
@@ -50,7 +49,6 @@ function sumTotals(entries: FoodEntryItem[]) {
 
 export function FoodLogSection({
   target,
-  totalWaterMl,
   initialEntries,
   calorieTrend,
   trendDays,
@@ -58,7 +56,6 @@ export function FoodLogSection({
   daysElapsed,
 }: {
   target: Target;
-  totalWaterMl: number;
   initialEntries: FoodEntryItem[];
   calorieTrend: number[];
   trendDays: number;
@@ -180,15 +177,12 @@ export function FoodLogSection({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />
-        <StatCard
-          icon={<FlameIcon size={22} />}
-          color="#14b8a6"
-          value={entries.length}
-          label="Meals logged today"
-        />
-      </div>
+      <StatCard
+        icon={<FlameIcon size={22} />}
+        color="#14b8a6"
+        value={entries.length}
+        label="Meals logged today"
+      />
 
       <div className="tile p-5 sm:p-6">
         <h3 className="mb-3 font-medium">Log food</h3>

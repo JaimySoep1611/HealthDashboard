@@ -9,10 +9,20 @@ import { TargetForm } from "@/components/nutrition/target-form";
 import { FoodLogSection } from "@/components/nutrition/FoodLogSection";
 import { WeeklySchedule } from "@/components/training/weekly-schedule";
 import { ManualStepsForm } from "@/components/steps/manual-steps-form";
+import { WaterCard } from "@/components/health/WaterCard";
 import { WeightCard } from "@/components/health/WeightCard";
-import { FlameIcon, FootprintsIcon, DumbbellIcon, TrophyIcon } from "@/components/icons";
+import { TrendsSection } from "@/components/TrendsSection";
+import {
+  FlameIcon,
+  DropletIcon,
+  FootprintsIcon,
+  DumbbellIcon,
+  ScaleIcon,
+  TrendUpIcon,
+  TrophyIcon,
+} from "@/components/icons";
 
-const STEPS_DAYS_TO_SHOW = 14;
+const TRENDS_DAYS = 30;
 const TREND_DAYS = 7;
 
 export default async function DashboardPage() {
@@ -25,18 +35,17 @@ export default async function DashboardPage() {
 
   const today = startOfDay(new Date());
   const weekStart = startOfWeek(new Date());
-  const stepsRangeStart = addDays(today, -(STEPS_DAYS_TO_SHOW - 1));
-  const trendRangeStart = addDays(today, -(TREND_DAYS - 1));
-  const weightRangeStart = addDays(today, -29);
+  const trendsRangeStart = addDays(today, -(TRENDS_DAYS - 1));
 
   const [
     target,
     todayFoodEntries,
     weekFoodEntries,
-    trendFoodEntries,
+    monthFoodEntries,
     trainingExercises,
-    stepEntries,
+    monthStepEntries,
     todayWater,
+    monthWaterEntries,
     weightEntries,
   ] = await Promise.all([
     prisma.nutritionTarget.findUnique({ where: { profileId: profile.id } }),
@@ -46,7 +55,7 @@ export default async function DashboardPage() {
     }),
     prisma.foodEntry.findMany({ where: { profileId: profile.id, date: { gte: weekStart } } }),
     prisma.foodEntry.findMany({
-      where: { profileId: profile.id, date: { gte: trendRangeStart } },
+      where: { profileId: profile.id, date: { gte: trendsRangeStart } },
     }),
     prisma.trainingExercise.findMany({
       where: { profileId: profile.id },
@@ -54,11 +63,14 @@ export default async function DashboardPage() {
       include: { logs: { where: { weekStart } } },
     }),
     prisma.stepEntry.findMany({
-      where: { profileId: profile.id, date: { gte: stepsRangeStart } },
+      where: { profileId: profile.id, date: { gte: trendsRangeStart } },
     }),
     prisma.waterEntry.findMany({ where: { profileId: profile.id, date: today } }),
+    prisma.waterEntry.findMany({
+      where: { profileId: profile.id, date: { gte: trendsRangeStart } },
+    }),
     prisma.weightEntry.findMany({
-      where: { profileId: profile.id, date: { gte: weightRangeStart } },
+      where: { profileId: profile.id, date: { gte: trendsRangeStart } },
       orderBy: { date: "asc" },
     }),
   ]);
@@ -91,24 +103,43 @@ export default async function DashboardPage() {
   const weekTotalCalories = weekFoodEntries.reduce((sum, e) => sum + e.calories, 0);
   const weekTotalExcludingToday = weekTotalCalories - totals.calories;
 
-  const calorieTrend = Array.from({ length: TREND_DAYS }, (_, index) => {
-    const day = addDays(trendRangeStart, index);
-    return trendFoodEntries
-      .filter((e) => e.date.getTime() === day.getTime())
-      .reduce((sum, e) => sum + e.calories, 0);
+  // 30-day zero-filled daily totals, shared by the compact "last 7 days" mini
+  // chart in the Food card and the full Trends section below.
+  const dailyCalories = Array.from({ length: TRENDS_DAYS }, (_, index) => {
+    const day = addDays(trendsRangeStart, index);
+    return {
+      date: day.toISOString(),
+      value: monthFoodEntries
+        .filter((e) => e.date.getTime() === day.getTime())
+        .reduce((sum, e) => sum + e.calories, 0),
+    };
+  });
+  const calorieTrend = dailyCalories.slice(-TREND_DAYS).map((day) => day.value);
+
+  const dailyWater = Array.from({ length: TRENDS_DAYS }, (_, index) => {
+    const day = addDays(trendsRangeStart, index);
+    return {
+      date: day.toISOString(),
+      value: monthWaterEntries
+        .filter((e) => e.date.getTime() === day.getTime())
+        .reduce((sum, e) => sum + e.amountMl, 0),
+    };
   });
 
   const totalWaterMl = todayWater.reduce((sum, entry) => sum + entry.amountMl, 0);
 
   // Steps calculations
-  const stepsByDate = new Map(stepEntries.map((entry) => [entry.date.toISOString(), entry.steps]));
-  const stepsDays = Array.from({ length: STEPS_DAYS_TO_SHOW }, (_, index) => {
-    const date = addDays(stepsRangeStart, index);
-    return { date, steps: stepsByDate.get(date.toISOString()) ?? 0 };
+  const stepsByDate = new Map(monthStepEntries.map((entry) => [entry.date.toISOString(), entry.steps]));
+  const dailySteps = Array.from({ length: TRENDS_DAYS }, (_, index) => {
+    const day = addDays(trendsRangeStart, index);
+    return { date: day.toISOString(), value: stepsByDate.get(day.toISOString()) ?? 0 };
   });
-  const maxSteps = Math.max(...stepsDays.map((day) => day.steps), 1000);
-  const todaySteps = stepsDays[stepsDays.length - 1].steps;
+  const todaySteps = dailySteps[dailySteps.length - 1].value;
 
+  const dailyWeight = weightEntries.map((entry) => ({
+    date: entry.date.toISOString(),
+    value: entry.weightKg,
+  }));
   const latestWeight = weightEntries.length > 0 ? weightEntries[weightEntries.length - 1].weightKg : null;
   const weightTrend = weightEntries.map((entry) => entry.weightKg);
   const weightLoggedToday = weightEntries.some((entry) => entry.date.getTime() === today.getTime());
@@ -118,88 +149,85 @@ export default async function DashboardPage() {
       <DashboardHero name={profile.name} />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start lg:gap-6">
-        {/* ---------- Food ---------- */}
-        <section className="flex flex-col gap-4">
-          <SectionHeader icon={<FlameIcon size={16} />} title="Food" />
+        <div className="flex flex-col gap-8">
+          {/* ---------- Food ---------- */}
+          <section className="flex flex-col gap-4">
+            <SectionHeader icon={<FlameIcon size={16} />} title="Food" />
 
-          {!target ? (
-            <div className="tile p-6">
-              <h3 className="mb-3 font-medium">Set your daily target</h3>
-              <TargetForm />
-            </div>
-          ) : (
-            <FoodLogSection
-              target={{
-                calories: target.calories,
-                proteinG: target.proteinG,
-                carbsG: target.carbsG,
-                fatG: target.fatG,
-                waterTargetMl: target.waterTargetMl,
-              }}
-              totalWaterMl={totalWaterMl}
-              initialEntries={todayFoodEntries}
-              calorieTrend={calorieTrend}
-              trendDays={TREND_DAYS}
-              weekTotalExcludingToday={weekTotalExcludingToday}
-              daysElapsed={daysElapsed}
-            />
+            {!target ? (
+              <div className="tile p-6">
+                <h3 className="mb-3 font-medium">Set your daily target</h3>
+                <TargetForm />
+              </div>
+            ) : (
+              <FoodLogSection
+                target={{
+                  calories: target.calories,
+                  proteinG: target.proteinG,
+                  carbsG: target.carbsG,
+                  fatG: target.fatG,
+                  waterTargetMl: target.waterTargetMl,
+                }}
+                initialEntries={todayFoodEntries}
+                calorieTrend={calorieTrend}
+                trendDays={TREND_DAYS}
+                weekTotalExcludingToday={weekTotalExcludingToday}
+                daysElapsed={daysElapsed}
+              />
+            )}
+          </section>
+
+          {/* ---------- Water ---------- */}
+          {target && (
+            <section className="flex flex-col gap-4">
+              <SectionHeader icon={<DropletIcon size={16} />} title="Water" />
+              <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />
+            </section>
           )}
-        </section>
+        </div>
 
-        {/* ---------- Exercise ---------- */}
-        <section className="flex flex-col gap-4">
-          <SectionHeader icon={<DumbbellIcon size={16} />} title="Exercise" />
-
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            <StatCard
-              icon={<FootprintsIcon size={22} />}
-              color="#3b82f6"
-              value={todaySteps.toLocaleString()}
-              label="Steps today"
-            />
+        <div className="flex flex-col gap-8">
+          {/* ---------- Training ---------- */}
+          <section className="flex flex-col gap-4">
+            <SectionHeader icon={<DumbbellIcon size={16} />} title="Training" />
             <StatCard
               icon={<DumbbellIcon size={22} />}
               color="var(--navy-light)"
               value={`${exercisesLogged}/${exercises.length || 0}`}
               label="Exercises logged this week"
             />
-          </div>
+            <WeeklySchedule exercises={exercises} />
+          </section>
 
-          <WeightCard
-            latestKg={latestWeight}
-            goalKg={profile.goalWeightKg}
-            trend={weightTrend}
-            loggedToday={weightLoggedToday}
-          />
-
-          <WeeklySchedule exercises={exercises} />
-
-          <div className="tile p-5 sm:p-6">
-            <h3 className="mb-4 font-medium">Cardio — last {STEPS_DAYS_TO_SHOW} days</h3>
-            <div className="flex items-end gap-1.5 sm:gap-2" style={{ height: 140 }}>
-              {stepsDays.map((day) => (
-                <div key={day.date.toISOString()} className="flex flex-1 flex-col items-center gap-2">
-                  <div
-                    className="w-full rounded-t-md bg-gradient-to-t from-[var(--navy)] to-[var(--navy-light)] transition-all duration-500"
-                    style={{ height: `${Math.max((day.steps / maxSteps) * 110, 3)}px` }}
-                    title={`${day.steps.toLocaleString()} steps`}
-                  />
-                  <span className="text-[9px] text-muted sm:text-[10px]">
-                    {day.date.toLocaleDateString(undefined, { weekday: "narrow" })}
-                  </span>
-                </div>
-              ))}
+          {/* ---------- Steps ---------- */}
+          <section className="flex flex-col gap-4">
+            <SectionHeader icon={<FootprintsIcon size={16} />} title="Steps" />
+            <StatCard
+              icon={<FootprintsIcon size={22} />}
+              color="#3b82f6"
+              value={todaySteps.toLocaleString()}
+              label="Steps today"
+            />
+            <div className="tile p-5 sm:p-6">
+              <h3 className="mb-2 font-medium">Manual step override</h3>
+              <p className="mb-3 text-sm text-muted">
+                Once the Shortcuts automation is set up, today&apos;s steps sync automatically. Use
+                this to correct today&apos;s count if needed.
+              </p>
+              <ManualStepsForm defaultValue={todaySteps} />
             </div>
-          </div>
+          </section>
 
-          <div className="tile p-5 sm:p-6">
-            <h3 className="mb-2 font-medium">Manual step override</h3>
-            <p className="mb-3 text-sm text-muted">
-              Once the Shortcuts automation is set up, today&apos;s steps sync automatically. Use
-              this to correct today&apos;s count if needed.
-            </p>
-            <ManualStepsForm defaultValue={todaySteps} />
-          </div>
+          {/* ---------- Weight ---------- */}
+          <section className="flex flex-col gap-4">
+            <SectionHeader icon={<ScaleIcon size={16} />} title="Weight" />
+            <WeightCard
+              latestKg={latestWeight}
+              goalKg={profile.goalWeightKg}
+              trend={weightTrend}
+              loggedToday={weightLoggedToday}
+            />
+          </section>
 
           <div className="flex items-center gap-4 rounded-[1.25rem] border border-dashed border-border p-5 sm:p-6">
             <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-amber-400/10 text-amber-400/80">
@@ -210,8 +238,23 @@ export default async function DashboardPage() {
               <p className="text-sm text-muted">Badges and streaks once the trackers feel right.</p>
             </div>
           </div>
-        </section>
+        </div>
       </div>
+
+      {/* ---------- Trends ---------- */}
+      <section className="flex flex-col gap-4">
+        <SectionHeader icon={<TrendUpIcon size={16} />} title="Trends" />
+        <TrendsSection
+          calories={dailyCalories}
+          caloriesTarget={target?.calories ?? 0}
+          water={dailyWater}
+          waterTarget={target?.waterTargetMl ?? 0}
+          steps={dailySteps}
+          weight={dailyWeight}
+          weightGoal={profile.goalWeightKg}
+          days={TRENDS_DAYS}
+        />
+      </section>
     </div>
   );
 }
