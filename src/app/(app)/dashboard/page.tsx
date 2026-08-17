@@ -18,6 +18,7 @@ import { FlameIcon, DumbbellIcon, TrendUpIcon } from "@/components/icons";
 
 const TRENDS_DAYS = 30;
 const TREND_DAYS = 7;
+const TRAINING_TREND_WEEKS = 16;
 
 export default async function DashboardPage() {
   const profile = await getCurrentProfile();
@@ -30,6 +31,7 @@ export default async function DashboardPage() {
   const today = startOfDay(new Date());
   const weekStart = startOfWeek(new Date());
   const trendsRangeStart = addDays(today, -(TRENDS_DAYS - 1));
+  const trainingTrendsStart = addDays(weekStart, -7 * (TRAINING_TREND_WEEKS - 1));
 
   const [
     target,
@@ -41,6 +43,7 @@ export default async function DashboardPage() {
     todayWater,
     monthWaterEntries,
     weightEntries,
+    weightExerciseLogs,
   ] = await Promise.all([
     prisma.nutritionTarget.findUnique({ where: { profileId: profile.id } }),
     prisma.foodEntry.findMany({
@@ -67,6 +70,13 @@ export default async function DashboardPage() {
       where: { profileId: profile.id, date: { gte: trendsRangeStart } },
       orderBy: { date: "asc" },
     }),
+    prisma.exerciseLog.findMany({
+      where: {
+        exercise: { profileId: profile.id, kind: "weight" },
+        weekStart: { gte: trainingTrendsStart },
+      },
+      orderBy: { weekStart: "asc" },
+    }),
   ]);
 
   const exercises = trainingExercises.map((exercise) => ({
@@ -90,6 +100,17 @@ export default async function DashboardPage() {
   const trainingDaysLogged = scheduledWeekdays.filter((weekday) =>
     exercises.filter((e) => e.weekday === weekday).every((e) => e.log !== null)
   ).length;
+
+  // Weekly kg history per power-training exercise, for the Trends "Training" tab.
+  const exerciseTrends = trainingExercises
+    .filter((exercise) => exercise.kind === "weight")
+    .map((exercise) => ({
+      id: exercise.id,
+      name: exercise.name,
+      points: weightExerciseLogs
+        .filter((log) => log.exerciseId === exercise.id && log.kg !== null)
+        .map((log) => ({ weekStart: log.weekStart.toISOString(), kg: log.kg! })),
+    }));
 
   // Nutrition calculations
   const totals = todayFoodEntries.reduce(
@@ -223,6 +244,7 @@ export default async function DashboardPage() {
             weight={dailyWeight}
             weightGoal={profile.goalWeightKg}
             days={TRENDS_DAYS}
+            exerciseTrends={exerciseTrends}
           />
         </section>
       </div>

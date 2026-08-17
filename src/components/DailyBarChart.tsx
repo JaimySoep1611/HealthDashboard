@@ -11,6 +11,7 @@ export function DailyBarChart({
   target,
   formatValue,
   showWeekdayLabels,
+  bottomLabel,
 }: {
   days: DayValue[];
   color: string;
@@ -20,6 +21,10 @@ export function DailyBarChart({
   target?: number;
   formatValue: (value: number) => string;
   showWeekdayLabels: boolean;
+  // Override the bottom-row label per bar — defaults to a single weekday
+  // letter, but callers charting non-daily data (e.g. one bar per week) can
+  // supply their own short label instead.
+  bottomLabel?: (dateIso: string) => string;
 }) {
   const rawMax = Math.max(...days.map((day) => day.value), target ?? 0, 1);
   const ticks = niceTicks(0, rawMax);
@@ -101,7 +106,9 @@ export function DailyBarChart({
           <div className="flex flex-1 gap-1 sm:gap-1.5">
             {days.map((day) => (
               <span key={day.date} className="flex-1 text-center text-[9px] text-muted sm:text-[10px]">
-                {new Date(day.date).toLocaleDateString(undefined, { weekday: "narrow" })}
+                {bottomLabel
+                  ? bottomLabel(day.date)
+                  : new Date(day.date).toLocaleDateString(undefined, { weekday: "narrow" })}
               </span>
             ))}
           </div>

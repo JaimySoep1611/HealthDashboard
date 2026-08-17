@@ -4,9 +4,17 @@ import { useState } from "react";
 import { DailyBarChart } from "@/components/DailyBarChart";
 import { Sparkline } from "@/components/Sparkline";
 import { niceTicks } from "@/lib/chartTicks";
-import { FlameIcon, DropletIcon, FootprintsIcon, ScaleIcon } from "@/components/icons";
+import { FlameIcon, DropletIcon, FootprintsIcon, ScaleIcon, DumbbellIcon } from "@/components/icons";
 
 type DayValue = { date: string; value: number };
+
+type ExerciseTrend = {
+  id: string;
+  name: string;
+  // One point per week the exercise was logged (sparse — skips weeks with
+  // nothing logged), ascending by week.
+  points: { weekStart: string; kg: number }[];
+};
 
 type Props = {
   // Zero-filled, ascending, one entry per calendar day, last entry = today.
@@ -20,6 +28,8 @@ type Props = {
   weightGoal: number | null;
   // Length of the zero-filled history window (e.g. 30).
   days: number;
+  // Weekly kg history per power-training exercise.
+  exerciseTrends: ExerciseTrend[];
 };
 
 const METRICS = [
@@ -27,6 +37,7 @@ const METRICS = [
   { key: "water", label: "Water", icon: DropletIcon, color: "#06b6d4", unit: "ml" },
   { key: "steps", label: "Steps", icon: FootprintsIcon, color: "var(--navy-light)", unit: "steps" },
   { key: "weight", label: "Weight", icon: ScaleIcon, color: "#8b5cf6", unit: "kg" },
+  { key: "training", label: "Training", icon: DumbbellIcon, color: "#f472b6", unit: "kg" },
 ] as const;
 
 type MetricKey = (typeof METRICS)[number]["key"];
@@ -40,12 +51,91 @@ export function TrendsSection({
   weight,
   weightGoal,
   days,
+  exerciseTrends,
 }: Props) {
   const [metric, setMetric] = useState<MetricKey>("calories");
   const [range, setRange] = useState<"week" | "month">("week");
+  const [selectedExerciseId, setSelectedExerciseId] = useState(exerciseTrends[0]?.id);
 
   const active = METRICS.find((m) => m.key === metric)!;
   const rangeDays = range === "week" ? 7 : days;
+
+  if (metric === "training") {
+    const selectedExercise = exerciseTrends.find((e) => e.id === selectedExerciseId) ?? exerciseTrends[0];
+    const trainingPoints: DayValue[] =
+      selectedExercise?.points.map((p) => ({ date: p.weekStart, value: p.kg })) ?? [];
+    const trainingAverage =
+      trainingPoints.length > 0
+        ? trainingPoints.reduce((sum, p) => sum + p.value, 0) / trainingPoints.length
+        : 0;
+
+    return (
+      <div className="tile flex flex-col gap-5 p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
+            {METRICS.map((m) => (
+              <button
+                key={m.key}
+                onClick={() => setMetric(m.key)}
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                  metric === m.key
+                    ? "border-navy-light bg-navy-light/15 text-foreground"
+                    : "border-border text-muted hover:text-foreground"
+                }`}
+              >
+                <m.icon size={13} />
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {exerciseTrends.length === 0 ? (
+          <p className="text-sm text-muted">
+            Add a power-training exercise via &quot;Edit Goals&quot; and log a few weeks to see its trend here.
+          </p>
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-2">
+              {exerciseTrends.map((exercise) => (
+                <button
+                  key={exercise.id}
+                  onClick={() => setSelectedExerciseId(exercise.id)}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                    selectedExerciseId === exercise.id
+                      ? "border-navy-light bg-navy-light/15 text-foreground"
+                      : "border-border text-muted hover:text-foreground"
+                  }`}
+                >
+                  {exercise.name}
+                </button>
+              ))}
+            </div>
+
+            {trainingPoints.length > 0 ? (
+              <>
+                <p className="text-xs text-muted">
+                  {trainingPoints.length} week{trainingPoints.length === 1 ? "" : "s"} logged · average{" "}
+                  <span className="text-foreground">{Math.round(trainingAverage)}</span> kg
+                </p>
+                <DailyBarChart
+                  days={trainingPoints}
+                  color={active.color}
+                  formatValue={(value) => `${value}kg`}
+                  showWeekdayLabels
+                  bottomLabel={(dateIso) =>
+                    new Date(dateIso).toLocaleDateString(undefined, { month: "short", day: "numeric" })
+                  }
+                />
+              </>
+            ) : (
+              <p className="text-sm text-muted">Not logged yet — check back after a few weeks.</p>
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
 
   const zeroFilled: Record<"calories" | "water" | "steps", DayValue[]> = { calories, water, steps };
   const target: Partial<Record<MetricKey, number>> = {
@@ -63,7 +153,7 @@ export function TrendsSection({
     cutoff.setDate(cutoff.getDate() - (rangeDays - 1));
     visible = weight.filter((point) => new Date(point.date) >= cutoff);
   } else {
-    visible = zeroFilled[metric].slice(-rangeDays);
+    visible = zeroFilled[metric as "calories" | "water" | "steps"].slice(-rangeDays);
   }
 
   const average =

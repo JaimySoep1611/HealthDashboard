@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Training weight trend in Trends",
+    description:
+      "Added a new \"Training\" tab in Trends showing how the kg you've logged for a power-training exercise has progressed over the last several months — pick which exercise with the pills above the chart. Each bar is a week you actually logged it, not a fixed daily/weekly grid, since exercise logs don't work that way.",
+  },
+  {
+    date: "2026-08-17",
     title: "Removed Tassies/challenge, cleaner training schedule, fixes",
     description:
       "Removed the Tassies achievement and the 75-day challenge (a different approach is planned later). Fixed the \"Once/day\" tag pushing weight/steps content outside the tile. \"Exercises logged\" is now \"Training days logged\" and counts full training days, not individual exercises. Exercises in the training schedule now always start collapsed, so a day with several exercises stays compact instead of stretching the whole row.",

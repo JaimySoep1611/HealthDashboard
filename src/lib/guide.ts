@@ -67,6 +67,11 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         description:
           "Look back over the last week or month for Calories, Water, Steps, or Weight — pick a metric and a range to see the chart and the average for that period.",
       },
+      {
+        name: "Training (in Trends)",
+        description:
+          "Pick a power-training exercise with the pills above the chart to see its logged kg per week over the last few months. If it hasn't been logged yet, it'll just say so until you've filled it in for a couple of weeks.",
+      },
     ],
   },
   {
