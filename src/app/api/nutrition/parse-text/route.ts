@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentProfile } from "@/lib/session";
-import { anthropic, FOOD_ITEMS_TOOL, extractFoodItems } from "@/lib/anthropic";
+import { genAI, FOOD_ITEMS_SCHEMA, parseFoodItems } from "@/lib/gemini";
 
 export async function POST(request: NextRequest) {
   const profile = await getCurrentProfile();
@@ -11,24 +11,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
 
-  const response = await anthropic.messages.create({
-    model: "claude-opus-5",
-    max_tokens: 1024,
-    output_config: { effort: "low" },
-    tools: [FOOD_ITEMS_TOOL],
-    tool_choice: { type: "tool", name: "log_food_items" },
-    messages: [
-      {
-        role: "user",
-        content: `Identify the distinct food/drink items described here and estimate calories and macros (in grams) for the described portion size. If no portion size is given, assume a typical single serving. Description: "${text}"`,
+  try {
+    const response = await genAI.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `Identify the distinct food/drink items described here and estimate calories and macros (in grams) for the described portion size. If no portion size is given, assume a typical single serving. Description: "${text}"`,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: FOOD_ITEMS_SCHEMA,
       },
-    ],
-  });
+    });
 
-  if (response.stop_reason === "refusal") {
+    const items = parseFoodItems(response.text);
+    return NextResponse.json({ items });
+  } catch (error) {
+    console.error("Gemini parse-text error:", error);
     return NextResponse.json({ error: "Could not analyze this description" }, { status: 422 });
   }
-
-  const items = extractFoodItems(response.content);
-  return NextResponse.json({ items });
 }
