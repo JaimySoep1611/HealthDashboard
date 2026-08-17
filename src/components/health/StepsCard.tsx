@@ -35,20 +35,21 @@ export function StepsCard({ steps }: { steps: number }) {
 
   return (
     <div className="stat-card flex h-full flex-col justify-between gap-3 p-4">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <div
-            className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
-            style={{ backgroundColor: `${STEPS_COLOR}22`, color: STEPS_COLOR }}
-          >
-            <FootprintsIcon size={20} />
-          </div>
-          <div className="flex min-w-0 flex-1 flex-col">
-            <span className="text-2xl font-semibold tracking-tight">{liveSteps.toLocaleString()}</span>
-            <span className="text-xs text-muted">Steps today</span>
-          </div>
-        </div>
+      <div className="flex justify-end">
         <DailyEntryBadge color={STEPS_COLOR} />
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div
+          className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
+          style={{ backgroundColor: `${STEPS_COLOR}22`, color: STEPS_COLOR }}
+        >
+          <FootprintsIcon size={20} />
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <span className="text-2xl font-semibold tracking-tight">{liveSteps.toLocaleString()}</span>
+          <span className="text-xs text-muted">Steps today</span>
+        </div>
       </div>
 
       <form onSubmit={save} className="flex items-center gap-2">

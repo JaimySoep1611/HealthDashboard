@@ -196,6 +196,20 @@ function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: (
     }).then(() => router.refresh());
   }
 
+  function clearLog() {
+    setKg("");
+    setSets("");
+    setReps("");
+    setKm("");
+    setLiveLog(null);
+    setEditing(false);
+
+    // Deletes the row outright (rather than just nulling its fields) so this
+    // exercise — and the day it belongs to — correctly count as "not logged"
+    // again, matching how "Training days logged" is computed.
+    fetch(`/api/training/exercises/${exercise.id}/log`, { method: "DELETE" }).then(() => router.refresh());
+  }
+
   const inputClass =
     "w-full min-w-0 rounded-md border border-border bg-surface-raised px-1.5 py-1 text-[10px] outline-none focus:border-navy-light";
 
@@ -252,12 +266,22 @@ function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: (
               className={inputClass}
             />
           )}
-          <button
-            onClick={save}
-            className="w-full rounded-md bg-navy py-1 text-[10px] font-medium text-white transition hover:bg-navy-light"
-          >
-            Log
-          </button>
+          <div className="flex gap-1">
+            <button
+              onClick={save}
+              className="flex-1 rounded-md bg-navy py-1 text-[10px] font-medium text-white transition hover:bg-navy-light"
+            >
+              Log
+            </button>
+            {liveLog && (
+              <button
+                onClick={clearLog}
+                className="flex-none rounded-md border border-border px-2 py-1 text-[10px] text-muted transition hover:border-red-400 hover:text-red-400"
+              >
+                Clear
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <button

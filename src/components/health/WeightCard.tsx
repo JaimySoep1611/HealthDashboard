@@ -55,29 +55,30 @@ export function WeightCard({
 
   return (
     <div className="stat-card flex h-full flex-col justify-between gap-3 p-4">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <div
-            className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
-            style={{ backgroundColor: `${WEIGHT_COLOR}22`, color: WEIGHT_COLOR }}
-          >
-            <ScaleIcon size={20} />
-          </div>
-          <div className="flex min-w-0 flex-1 flex-col">
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-semibold tracking-tight">
-                {liveLatestKg !== null ? liveLatestKg : "—"}
-              </span>
-              <span className="text-sm text-muted">kg</span>
-            </div>
-            <span className="truncate text-xs text-muted">
-              {goalKg !== null
-                ? `Goal ${goalKg}kg${delta !== null ? ` · ${delta > 0 ? "+" : ""}${delta.toFixed(1)}kg` : ""}`
-                : "No goal set"}
-            </span>
-          </div>
-        </div>
+      <div className="flex justify-end">
         <DailyEntryBadge color={WEIGHT_COLOR} />
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div
+          className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
+          style={{ backgroundColor: `${WEIGHT_COLOR}22`, color: WEIGHT_COLOR }}
+        >
+          <ScaleIcon size={20} />
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl font-semibold tracking-tight">
+              {liveLatestKg !== null ? liveLatestKg : "—"}
+            </span>
+            <span className="text-sm text-muted">kg</span>
+          </div>
+          <span className="truncate text-xs text-muted">
+            {goalKg !== null
+              ? `Goal ${goalKg}kg${delta !== null ? ` · ${delta > 0 ? "+" : ""}${delta.toFixed(1)}kg` : ""}`
+              : "No goal set"}
+          </span>
+        </div>
       </div>
 
       {liveTrend.length > 1 && (
