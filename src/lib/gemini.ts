@@ -40,3 +40,17 @@ export function parseFoodItems(responseText: string | undefined): FoodItemEstima
     return [];
   }
 }
+
+// Surfaces the Gemini free-tier daily quota limit as its own message —
+// otherwise it looks identical to "couldn't understand this" to the user,
+// when actually retrying (today) won't help at all.
+export function describeGeminiError(error: unknown): { message: string; status: number } {
+  const status = (error as { status?: number })?.status;
+  if (status === 429) {
+    return {
+      message: "Hit today's AI food-recognition limit (Gemini's free daily quota) — try again tomorrow, or log it manually for now.",
+      status: 429,
+    };
+  }
+  return { message: "Could not analyze this — try again.", status: 422 };
+}

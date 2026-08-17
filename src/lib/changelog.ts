@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Clearer message when AI food recognition hits its daily limit",
+    description:
+      "\"Couldn't analyze\" was showing for any failure, including hitting Gemini's free-tier daily limit on food recognition (20 requests/day) — which looks nothing like an unclear description and won't be fixed by rephrasing. That case now says so directly, so it's clear it's a limit, not you.",
+  },
+  {
+    date: "2026-08-17",
     title: "Fixed food entries deleting themselves right after saving",
     description:
       "Found the real cause of food not sticking: after saving, a safety check meant to catch \"you removed this before it finished saving\" was misfiring almost every time, so the app deleted the food entry it had just created, moments later. Removed that check — entries you add now stay added.",

@@ -62,12 +62,12 @@ export function FoodLogger({ onAdd }: { onAdd: (item: AiFoodItem, source: string
       body: JSON.stringify({ text: description }),
     });
     setLoading(false);
+    const data = await response.json().catch(() => null);
     if (!response.ok) {
-      setError("Couldn't analyze that description — try rephrasing.");
+      setError(data?.error ?? "Couldn't analyze that description — try rephrasing.");
       return;
     }
-    const data = await response.json();
-    setItems(data.items ?? []);
+    setItems(data?.items ?? []);
   }
 
   function handlePhotoSelected(event: React.ChangeEvent<HTMLInputElement>) {
@@ -90,12 +90,12 @@ export function FoodLogger({ onAdd }: { onAdd: (item: AiFoodItem, source: string
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ imageBase64: base64, mediaType }),
         });
+        const data = await response.json().catch(() => null);
         if (!response.ok) {
-          setError("Couldn't recognize this photo — try a clearer shot.");
+          setError(data?.error ?? "Couldn't recognize this photo — try a clearer shot.");
           return;
         }
-        const data = await response.json();
-        setItems(data.items ?? []);
+        setItems(data?.items ?? []);
       } catch {
         setError("Couldn't process this photo — try again.");
       } finally {

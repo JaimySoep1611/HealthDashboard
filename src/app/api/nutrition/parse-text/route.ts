@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentProfile } from "@/lib/session";
-import { genAI, FOOD_ITEMS_SCHEMA, parseFoodItems } from "@/lib/gemini";
+import { genAI, FOOD_ITEMS_SCHEMA, parseFoodItems, describeGeminiError } from "@/lib/gemini";
 
 export async function POST(request: NextRequest) {
   const profile = await getCurrentProfile();
@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ items });
   } catch (error) {
     console.error("Gemini parse-text error:", error);
-    return NextResponse.json({ error: "Could not analyze this description" }, { status: 422 });
+    const { message, status } = describeGeminiError(error);
+    return NextResponse.json({ error: message }, { status });
   }
 }

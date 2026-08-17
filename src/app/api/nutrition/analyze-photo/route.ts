@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentProfile } from "@/lib/session";
-import { genAI, FOOD_ITEMS_SCHEMA, parseFoodItems } from "@/lib/gemini";
+import { genAI, FOOD_ITEMS_SCHEMA, parseFoodItems, describeGeminiError } from "@/lib/gemini";
 
 const ALLOWED_MEDIA_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"] as const;
 
@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ items });
   } catch (error) {
     console.error("Gemini analyze-photo error:", error);
-    return NextResponse.json({ error: "Could not analyze this photo" }, { status: 422 });
+    const { message, status } = describeGeminiError(error);
+    return NextResponse.json({ error: message }, { status });
   }
 }
