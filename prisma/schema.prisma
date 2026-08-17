@@ -20,6 +20,7 @@ model Profile {
   goalWeightKg     Float?
   stepsGoal        Int?
   startingWeightKg Float?
+  funBackground    Boolean   @default(false)
 
   nutritionTarget   NutritionTarget?
   trainingExercises TrainingExercise[]

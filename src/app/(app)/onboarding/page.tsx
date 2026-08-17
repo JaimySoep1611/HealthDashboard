@@ -5,6 +5,7 @@ import { WeeklySchedule } from "@/components/training/weekly-schedule";
 import { TargetForm } from "@/components/nutrition/target-form";
 import { ProfileGoalsForm } from "@/components/health/ProfileGoalsForm";
 import { NotificationsToggle } from "@/components/NotificationsToggle";
+import { FunBackgroundToggle } from "@/components/FunBackgroundToggle";
 import { FinishSetupButton } from "./finish-setup-button";
 
 export default async function OnboardingPage() {
@@ -71,6 +72,11 @@ export default async function OnboardingPage() {
       <div className="tile p-6">
         <h3 className="mb-3 font-medium">Daily reminders</h3>
         <NotificationsToggle />
+      </div>
+
+      <div className="tile p-6">
+        <h3 className="mb-3 font-medium">Fun background</h3>
+        <FunBackgroundToggle existing={profile.funBackground} />
       </div>
 
       <FinishSetupButton firstTime={firstTime} />

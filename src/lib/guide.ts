@@ -102,6 +102,11 @@ export const GUIDE_SECTIONS: GuideSection[] = [
           "Turn on in \"Edit Goals\" to get a phone notification in the early evening if you haven't hit your water or steps goal yet that day — skipped entirely if you've already hit both, or if you haven't set a goal for one of them. Works even with the app closed once enabled, including as a Home Screen webapp on iPhone (needs iOS 16.4+).",
       },
       {
+        name: "Fun background",
+        description:
+          "Turn on in \"Edit Goals\" for small otters and dogs drifting across the background behind everything else, purely for fun — it's per-profile, so it doesn't affect the other person's view.",
+      },
+      {
         name: "Switch User",
         description: "Change to the other profile without logging out.",
       },

@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Fun background: moving otters & dogs",
+    description:
+      "New toggle in \"Edit Goals\" — turn it on for small otters and dogs drifting slowly across the background behind the whole app, just for fun. Off by default, and it's a per-profile setting.",
+  },
+  {
+    date: "2026-08-17",
     title: "Color-matched macro advice",
     description:
       "Each macro advice line below the food rings is now colored the same as its ring (green for protein, yellow for carbs, pink for fat), so it's obvious at a glance which piece of advice is about which nutrient.",

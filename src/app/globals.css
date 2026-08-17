@@ -121,3 +121,21 @@ body {
     opacity: 0;
   }
 }
+
+@keyframes critter-drift {
+  0% {
+    transform: translate(-10vw, 0);
+  }
+  25% {
+    transform: translate(15vw, -10px);
+  }
+  50% {
+    transform: translate(50vw, 0);
+  }
+  75% {
+    transform: translate(85vw, -10px);
+  }
+  100% {
+    transform: translate(110vw, 0);
+  }
+}
