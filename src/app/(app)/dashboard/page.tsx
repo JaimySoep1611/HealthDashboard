@@ -3,13 +3,21 @@ import { getCurrentProfile } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { startOfDay, startOfWeek, addDays } from "@/lib/dates";
 import { ProgressRing } from "@/components/ProgressRing";
+import { Sparkline } from "@/components/Sparkline";
+import { SectionHeader } from "@/components/SectionHeader";
+import { StatCard } from "@/components/StatCard";
+import { DashboardHero } from "@/components/DashboardHero";
 import { TargetForm } from "@/components/nutrition/target-form";
 import { FoodLogger } from "@/components/nutrition/food-logger";
 import { EntryList } from "@/components/nutrition/entry-list";
 import { GoalList } from "@/components/training/goal-list";
 import { ManualStepsForm } from "@/components/steps/manual-steps-form";
+import { WaterCard } from "@/components/health/WaterCard";
+import { WeightCard } from "@/components/health/WeightCard";
+import { FlameIcon, FootprintsIcon, DumbbellIcon, TrophyIcon } from "@/components/icons";
 
 const STEPS_DAYS_TO_SHOW = 14;
+const TREND_DAYS = 7;
 
 export default async function DashboardPage() {
   const profile = await getCurrentProfile();
@@ -22,30 +30,49 @@ export default async function DashboardPage() {
   const today = startOfDay(new Date());
   const weekStart = startOfWeek(new Date());
   const stepsRangeStart = addDays(today, -(STEPS_DAYS_TO_SHOW - 1));
+  const trendRangeStart = addDays(today, -(TREND_DAYS - 1));
+  const weightRangeStart = addDays(today, -29);
 
-  const [target, todayFoodEntries, weekFoodEntries, trainingGoals, stepEntries] =
-    await Promise.all([
-      prisma.nutritionTarget.findUnique({ where: { profileId: profile.id } }),
-      prisma.foodEntry.findMany({
-        where: { profileId: profile.id, date: today },
-        orderBy: { createdAt: "asc" },
-      }),
-      prisma.foodEntry.findMany({ where: { profileId: profile.id, date: { gte: weekStart } } }),
-      prisma.trainingGoal.findMany({
-        where: { profileId: profile.id },
-        orderBy: { order: "asc" },
-        include: { completions: { where: { weekStart } } },
-      }),
-      prisma.stepEntry.findMany({
-        where: { profileId: profile.id, date: { gte: stepsRangeStart } },
-      }),
-    ]);
+  const [
+    target,
+    todayFoodEntries,
+    weekFoodEntries,
+    trendFoodEntries,
+    trainingGoals,
+    stepEntries,
+    todayWater,
+    weightEntries,
+  ] = await Promise.all([
+    prisma.nutritionTarget.findUnique({ where: { profileId: profile.id } }),
+    prisma.foodEntry.findMany({
+      where: { profileId: profile.id, date: today },
+      orderBy: { createdAt: "asc" },
+    }),
+    prisma.foodEntry.findMany({ where: { profileId: profile.id, date: { gte: weekStart } } }),
+    prisma.foodEntry.findMany({
+      where: { profileId: profile.id, date: { gte: trendRangeStart } },
+    }),
+    prisma.trainingGoal.findMany({
+      where: { profileId: profile.id },
+      orderBy: { order: "asc" },
+      include: { completions: { where: { weekStart } } },
+    }),
+    prisma.stepEntry.findMany({
+      where: { profileId: profile.id, date: { gte: stepsRangeStart } },
+    }),
+    prisma.waterEntry.findMany({ where: { profileId: profile.id, date: today } }),
+    prisma.weightEntry.findMany({
+      where: { profileId: profile.id, date: { gte: weightRangeStart } },
+      orderBy: { date: "asc" },
+    }),
+  ]);
 
   const goals = trainingGoals.map((goal) => ({
     id: goal.id,
     name: goal.name,
     completedThisWeek: goal.completions.length > 0,
   }));
+  const goalsDone = goals.filter((g) => g.completedThisWeek).length;
 
   // Nutrition calculations
   const totals = todayFoodEntries.reduce(
@@ -63,6 +90,15 @@ export default async function DashboardPage() {
   );
   const weekAvgCalories = weekFoodEntries.reduce((sum, e) => sum + e.calories, 0) / daysElapsed;
 
+  const calorieTrend = Array.from({ length: TREND_DAYS }, (_, index) => {
+    const day = addDays(trendRangeStart, index);
+    return trendFoodEntries
+      .filter((e) => e.date.getTime() === day.getTime())
+      .reduce((sum, e) => sum + e.calories, 0);
+  });
+
+  const totalWaterMl = todayWater.reduce((sum, entry) => sum + entry.amountMl, 0);
+
   // Steps calculations
   const stepsByDate = new Map(stepEntries.map((entry) => [entry.date.toISOString(), entry.steps]));
   const stepsDays = Array.from({ length: STEPS_DAYS_TO_SHOW }, (_, index) => {
@@ -72,13 +108,16 @@ export default async function DashboardPage() {
   const maxSteps = Math.max(...stepsDays.map((day) => day.steps), 1000);
   const todaySteps = stepsDays[stepsDays.length - 1].steps;
 
+  const latestWeight = weightEntries.length > 0 ? weightEntries[weightEntries.length - 1].weightKg : null;
+  const weightTrend = weightEntries.map((entry) => entry.weightKg);
+
   return (
     <div className="flex flex-col gap-10">
-      <h1 className="text-xl font-semibold">Welcome back, {profile.name}</h1>
+      <DashboardHero name={profile.name} />
 
       {/* ---------- Food ---------- */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-muted">Food</h2>
+        <SectionHeader icon={<FlameIcon size={16} />} title="Food" />
 
         {!target ? (
           <div className="tile max-w-md p-6">
@@ -87,40 +126,78 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <>
-            <div className="tile flex flex-wrap items-center justify-around gap-6 p-6">
-              <ProgressRing value={totals.calories} target={target.calories} label="kcal" />
-              <ProgressRing
-                value={totals.proteinG}
-                target={target.proteinG}
-                label="protein g"
-                color="#22c55e"
-              />
-              <ProgressRing
-                value={totals.carbsG}
-                target={target.carbsG}
-                label="carbs g"
-                color="#eab308"
-              />
-              <ProgressRing value={totals.fatG} target={target.fatG} label="fat g" color="#f97316" />
+            <div className="tile flex flex-col gap-5 p-6">
+              <div className="flex flex-wrap items-center justify-around gap-6">
+                <ProgressRing
+                  id="calories"
+                  value={totals.calories}
+                  target={target.calories}
+                  label="kcal"
+                  color="#fb923c"
+                  colorTo="#f97316"
+                  size={116}
+                  stroke={11}
+                />
+                <ProgressRing
+                  id="protein"
+                  value={totals.proteinG}
+                  target={target.proteinG}
+                  label="protein g"
+                  color="#4ade80"
+                  colorTo="#16a34a"
+                />
+                <ProgressRing
+                  id="carbs"
+                  value={totals.carbsG}
+                  target={target.carbsG}
+                  label="carbs g"
+                  color="#facc15"
+                  colorTo="#ca8a04"
+                />
+                <ProgressRing
+                  id="fat"
+                  value={totals.fatG}
+                  target={target.fatG}
+                  label="fat g"
+                  color="#f472b6"
+                  colorTo="#db2777"
+                />
+              </div>
+
+              <div className="flex items-center justify-between border-t border-border pt-4">
+                <div className="flex-1">
+                  <p className="text-xs text-muted">Last {TREND_DAYS} days</p>
+                  <div className="h-14 w-full max-w-xs">
+                    <Sparkline id="calories-trend" points={calorieTrend} color="#fb923c" target={target.calories} />
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-2 pl-4 text-right">
+                  <p className="text-xs text-muted">
+                    Week avg{" "}
+                    <span className="text-foreground">{Math.round(weekAvgCalories)}</span> / {target.calories}{" "}
+                    kcal/day
+                  </p>
+                  <TargetForm
+                    existing={{
+                      calories: target.calories,
+                      proteinG: target.proteinG,
+                      carbsG: target.carbsG,
+                      fatG: target.fatG,
+                      waterTargetMl: target.waterTargetMl,
+                    }}
+                    compact
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="tile flex items-center justify-between gap-4 p-6">
-              <p className="text-sm text-muted">
-                This week (Mon–{daysElapsed === 7 ? "Sun" : "today"}): avg{" "}
-                <span className="text-foreground">{Math.round(weekAvgCalories)}</span> kcal/day vs
-                target {target.calories} —{" "}
-                {weekAvgCalories <= target.calories
-                  ? `${Math.round(target.calories - weekAvgCalories)} kcal/day under, room to spare`
-                  : `${Math.round(weekAvgCalories - target.calories)} kcal/day over`}
-              </p>
-              <TargetForm
-                existing={{
-                  calories: target.calories,
-                  proteinG: target.proteinG,
-                  carbsG: target.carbsG,
-                  fatG: target.fatG,
-                }}
-                compact
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />
+              <StatCard
+                icon={<FootprintsIcon size={22} />}
+                color="#3b82f6"
+                value={todaySteps.toLocaleString()}
+                label="Steps today"
               />
             </div>
 
@@ -139,29 +216,36 @@ export default async function DashboardPage() {
 
       {/* ---------- Exercise ---------- */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-muted">Exercise</h2>
+        <SectionHeader icon={<DumbbellIcon size={16} />} title="Exercise" />
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <WeightCard latestKg={latestWeight} goalKg={profile.goalWeightKg} trend={weightTrend} />
+          <StatCard
+            icon={<DumbbellIcon size={22} />}
+            color="var(--navy-light)"
+            value={`${goalsDone}/${goals.length || 0}`}
+            label="Training goals this week"
+          />
+        </div>
 
         <GoalList goals={goals} />
 
-        <h3 className="mt-2 text-sm font-medium text-muted">Cardio (Steps)</h3>
-        <div className="tile flex flex-col gap-2 p-6">
-          <span className="text-3xl font-semibold">{todaySteps.toLocaleString()}</span>
-          <span className="text-sm text-muted">steps today</span>
-        </div>
-
-        <div className="tile flex items-end gap-2 p-6" style={{ height: 180 }}>
-          {stepsDays.map((day) => (
-            <div key={day.date.toISOString()} className="flex flex-1 flex-col items-center gap-2">
-              <div
-                className="w-full rounded-t bg-navy-light"
-                style={{ height: `${Math.max((day.steps / maxSteps) * 120, 2)}px` }}
-                title={`${day.steps.toLocaleString()} steps`}
-              />
-              <span className="text-[10px] text-muted">
-                {day.date.toLocaleDateString(undefined, { weekday: "narrow" })}
-              </span>
-            </div>
-          ))}
+        <div className="tile p-6">
+          <h3 className="mb-4 font-medium">Cardio — last {STEPS_DAYS_TO_SHOW} days</h3>
+          <div className="flex items-end gap-2" style={{ height: 140 }}>
+            {stepsDays.map((day) => (
+              <div key={day.date.toISOString()} className="flex flex-1 flex-col items-center gap-2">
+                <div
+                  className="w-full rounded-t-md bg-gradient-to-t from-[var(--navy)] to-[var(--navy-light)] transition-all duration-500"
+                  style={{ height: `${Math.max((day.steps / maxSteps) * 110, 3)}px` }}
+                  title={`${day.steps.toLocaleString()} steps`}
+                />
+                <span className="text-[10px] text-muted">
+                  {day.date.toLocaleDateString(undefined, { weekday: "narrow" })}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="tile p-6">
@@ -173,9 +257,14 @@ export default async function DashboardPage() {
           <ManualStepsForm defaultValue={todaySteps} />
         </div>
 
-        <div className="tile flex flex-col gap-2 p-6 opacity-60">
-          <h3 className="font-medium">Achievements</h3>
-          <p className="text-sm text-muted">Coming later — once the trackers feel right.</p>
+        <div className="tile flex items-center gap-4 p-6 opacity-70">
+          <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-amber-400/15 text-amber-400">
+            <TrophyIcon size={22} />
+          </div>
+          <div>
+            <h3 className="font-medium">Achievements</h3>
+            <p className="text-sm text-muted">Coming later — once the trackers feel right.</p>
+          </div>
         </div>
       </section>
     </div>

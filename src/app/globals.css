@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b0d12;
-  --surface: #14171f;
-  --surface-raised: #1b1f2a;
-  --border: #262b38;
-  --foreground: #e7e9ee;
+  --background: #0a0b10;
+  --surface: #14161f;
+  --surface-raised: #1c1f2b;
+  --border: #262a38;
+  --foreground: #edeef3;
   --muted: #8b93a7;
   --navy: #00008b;
   --navy-light: #2626c9;
-  --ring-track: #262b38;
+  --ring-track: rgba(255, 255, 255, 0.07);
 }
 
 @theme inline {
@@ -26,20 +26,71 @@
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1200px 600px at 15% -10%, color-mix(in srgb, var(--navy) 10%, transparent), transparent),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
 .tile {
-  background: var(--surface);
+  background: linear-gradient(180deg, var(--surface-raised) 0%, var(--surface) 100%);
   border: 1px solid var(--border);
-  border-radius: 1rem;
-  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 12px 24px -18px rgba(0, 0, 0, 0.6);
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease, border-color 200ms ease;
 }
 
 .tile:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--navy-light) 55%, var(--border));
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset, 0 20px 40px -20px color-mix(in srgb, var(--navy-light) 45%, transparent);
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease;
+}
+
+.stat-card:hover {
   transform: translateY(-2px);
-  border-color: var(--navy-light);
-  box-shadow: 0 8px 30px -12px rgba(38, 38, 201, 0.45);
+  border-color: color-mix(in srgb, var(--navy-light) 40%, var(--border));
+}
+
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--navy) 85%, black) 0%,
+    color-mix(in srgb, var(--navy) 55%, var(--surface)) 55%,
+    var(--surface) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--navy-light) 35%, var(--border));
+}
+
+.hero-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(500px 260px at 85% 0%, color-mix(in srgb, var(--navy-light) 35%, transparent), transparent 70%);
+  pointer-events: none;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-pop-in {
+  animation: pop-in 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }

@@ -6,20 +6,29 @@ export async function POST(request: NextRequest) {
   const profile = await getCurrentProfile();
   if (!profile) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-  const { calories, proteinG, carbsG, fatG } = await request.json();
+  const { calories, proteinG, carbsG, fatG, waterTargetMl } = await request.json();
   if (
     typeof calories !== "number" ||
     typeof proteinG !== "number" ||
     typeof carbsG !== "number" ||
-    typeof fatG !== "number"
+    typeof fatG !== "number" ||
+    (waterTargetMl !== undefined && typeof waterTargetMl !== "number")
   ) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
 
+  const data = {
+    calories,
+    proteinG,
+    carbsG,
+    fatG,
+    ...(waterTargetMl !== undefined ? { waterTargetMl } : {}),
+  };
+
   const target = await prisma.nutritionTarget.upsert({
     where: { profileId: profile.id },
-    update: { calories, proteinG, carbsG, fatG },
-    create: { profileId: profile.id, calories, proteinG, carbsG, fatG },
+    update: data,
+    create: { profileId: profile.id, waterTargetMl: 2000, ...data },
   });
 
   return NextResponse.json(target);

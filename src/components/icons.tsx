@@ -1,0 +1,107 @@
+type IconProps = { className?: string; size?: number };
+
+const base = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.75,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+};
+
+export function FlameIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M12 2.5c1.5 2 1 3.5-.3 5-1.3 1.4-2.2 2.6-2.2 4.3a3 3 0 0 0 6 0c0-.9-.3-1.5-.8-2.2 1.7 1 2.8 2.8 2.8 5a5.5 5.5 0 1 1-11 0c0-3.5 2-5.5 3.7-7.6 1.2-1.5 1.9-2.8 1.8-4.5Z" />
+    </svg>
+  );
+}
+
+export function DropletIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M12 3c3 3.6 5.5 7 5.5 10a5.5 5.5 0 1 1-11 0c0-3 2.5-6.4 5.5-10Z" />
+    </svg>
+  );
+}
+
+export function FootprintsIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M8.5 4.5c1.5 0 2.3 1.3 2.3 3.2 0 1.6-.5 2.5-.5 3.9 0 1.5.9 2.2.9 3.6a2.5 2.5 0 0 1-5 0c0-1.7.7-2.2.7-4.2 0-1.7-.9-2.3-.9-4.2 0-1.4.8-2.3 2.5-2.3Z" />
+      <path d="M16 8.5c1.5 0 2.3 1.3 2.3 3.2 0 1.6-.5 2.5-.5 3.9 0 1.5.9 2.2.9 3.6a2.5 2.5 0 0 1-5 0c0-1.7.7-2.2.7-4.2 0-1.7-.9-2.3-.9-4.2 0-1.4.8-2.3 2.5-2.3Z" />
+    </svg>
+  );
+}
+
+export function ScaleIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <rect x="3.5" y="3.5" width="17" height="17" rx="4" />
+      <path d="M8 15c0-2.5 1.8-4.5 4-4.5s4 2 4 4.5" />
+      <circle cx="12" cy="8.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function DumbbellIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M4 10v4M6.5 8v8M17.5 8v8M20 10v4" />
+      <path d="M6.5 12h11" strokeWidth={3} />
+    </svg>
+  );
+}
+
+export function TrophyIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M7 4h10v5a5 5 0 0 1-10 0V4Z" />
+      <path d="M7 5.5H4.5A2.5 2.5 0 0 0 7 8.8M17 5.5h2.5A2.5 2.5 0 0 1 17 8.8" />
+      <path d="M12 14v3m-3 3h6m-3 0v-3" />
+    </svg>
+  );
+}
+
+export function TargetIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="4.5" />
+      <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function PlusIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+export function MinusIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M5 12h14" />
+    </svg>
+  );
+}
+
+export function SparkleIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M12 3l1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4L12 3Z" />
+      <path d="M19 15l.7 2.3L22 18l-2.3.7L19 21l-.7-2.3L16 18l2.3-.7L19 15Z" />
+    </svg>
+  );
+}
+
+export function TrendUpIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M4 16l5.5-5.5 4 4L20 8" />
+      <path d="M14.5 8H20v5.5" />
+    </svg>
+  );
+}

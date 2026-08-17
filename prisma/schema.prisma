@@ -13,16 +13,19 @@ datasource db {
 }
 
 model Profile {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  createdAt   DateTime  @default(now())
-  onboardedAt DateTime?
+  id           String    @id @default(cuid())
+  name         String    @unique
+  createdAt    DateTime  @default(now())
+  onboardedAt  DateTime?
+  goalWeightKg Float?
 
   nutritionTarget  NutritionTarget?
   trainingGoals    TrainingGoal[]
   stepEntries      StepEntry[]
   foodEntries      FoodEntry[]
   customFoods      CustomFood[]
+  waterEntries     WaterEntry[]
+  weightEntries    WeightEntry[]
 }
 
 model TrainingGoal {
@@ -58,13 +61,33 @@ model StepEntry {
 }
 
 model NutritionTarget {
-  id        String  @id @default(cuid())
-  profile   Profile @relation(fields: [profileId], references: [id])
-  profileId String  @unique
-  calories  Int
-  proteinG  Int
-  carbsG    Int
-  fatG      Int
+  id           String  @id @default(cuid())
+  profile      Profile @relation(fields: [profileId], references: [id])
+  profileId    String  @unique
+  calories     Int
+  proteinG     Int
+  carbsG       Int
+  fatG         Int
+  waterTargetMl Int    @default(2000)
+}
+
+model WaterEntry {
+  id        String   @id @default(cuid())
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId String
+  date      DateTime
+  amountMl  Int
+  createdAt DateTime @default(now())
+}
+
+model WeightEntry {
+  id        String   @id @default(cuid())
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId String
+  date      DateTime
+  weightKg  Float
+
+  @@unique([profileId, date])
 }
 
 model FoodEntry {
