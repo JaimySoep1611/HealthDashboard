@@ -90,18 +90,8 @@ export function FoodLogSection({
         return response.json();
       })
       .then((created) => {
-        let wasRemovedBeforeItArrived = true;
-        setEntries((current) => {
-          wasRemovedBeforeItArrived = !current.some((entry) => entry.id === tempId);
-          return current.map((entry) => (entry.id === tempId ? { ...entry, id: created.id } : entry));
-        });
-        // If the user removed it locally while the create request was still in flight,
-        // the real row now exists in the database with nothing to delete it — clean it up.
-        if (wasRemovedBeforeItArrived) {
-          fetch(`/api/nutrition/entries/${created.id}`, { method: "DELETE" });
-        } else {
-          router.refresh();
-        }
+        setEntries((current) => current.map((entry) => (entry.id === tempId ? { ...entry, id: created.id } : entry)));
+        router.refresh();
       })
       .catch((error) => {
         setEntries((current) => current.filter((entry) => entry.id !== tempId));

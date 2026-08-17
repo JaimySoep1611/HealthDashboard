@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Fixed food entries deleting themselves right after saving",
+    description:
+      "Found the real cause of food not sticking: after saving, a safety check meant to catch \"you removed this before it finished saving\" was misfiring almost every time, so the app deleted the food entry it had just created, moments later. Removed that check — entries you add now stay added.",
+  },
+  {
+    date: "2026-08-17",
     title: "Fixed silently-failed food saves",
     description:
       "Tapping \"Add\" on a recognized food item could fail to save without telling you — if the AI left one of the macro fields blank/uncertain, the save was rejected and the item just quietly disappeared. Missing macro fields now count as 0 instead of failing, and any save that still fails now shows an actual error message instead of failing silently.",
