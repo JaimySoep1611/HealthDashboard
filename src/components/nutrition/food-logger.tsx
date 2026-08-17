@@ -340,8 +340,31 @@ export function FoodLogger() {
             accept="image/*"
             capture="environment"
             onChange={handlePhotoSelected}
-            className="text-sm text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface-raised file:px-3 file:py-1.5 file:text-sm file:text-foreground"
+            className="hidden"
           />
+
+          {!photoPreview && (
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex w-fit flex-col items-center gap-2 rounded-lg border border-border px-6 py-5 text-muted transition hover:border-navy-light hover:text-foreground"
+              aria-label="Take a photo"
+            >
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 8h2.5l1.2-2h8.6l1.2 2H20a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" />
+                <circle cx="12" cy="13" r="3.5" />
+              </svg>
+              <span className="text-xs">Take a photo</span>
+            </button>
+          )}
 
           {photoPreview && (
             <div className="flex items-center gap-3">
