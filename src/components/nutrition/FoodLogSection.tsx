@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ProgressRing } from "@/components/ProgressRing";
 import { Sparkline } from "@/components/Sparkline";
 import { TargetForm } from "@/components/nutrition/target-form";
@@ -61,6 +61,7 @@ export function FoodLogSection({
 }) {
   const router = useRouter();
   const { entries, setEntries } = useFoodEntries();
+  const [addError, setAddError] = useState<string | null>(null);
 
   const totals = useMemo(() => sumTotals(entries), [entries]);
   const liveTrend = calorieTrend.map((value, index) =>
@@ -70,6 +71,7 @@ export function FoodLogSection({
 
   function addEntry(item: AiFoodItem, source: string) {
     const tempId = `temp-${Math.random().toString(36).slice(2)}`;
+    setAddError(null);
     setEntries((current) => [...current, { id: tempId, ...item }]);
 
     fetch("/api/nutrition/entries", {
@@ -77,7 +79,16 @@ export function FoodLogSection({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...item, source }),
     })
-      .then((response) => response.json())
+      .then(async (response) => {
+        // The server rejecting this (bad input, not logged in, etc.) is not a
+        // network failure — fetch() only rejects on that — so it has to be
+        // checked explicitly, or a failed save silently looks like a success.
+        if (!response.ok) {
+          const body = await response.json().catch(() => null);
+          throw new Error(body?.error ?? `Save failed (${response.status})`);
+        }
+        return response.json();
+      })
       .then((created) => {
         let wasRemovedBeforeItArrived = true;
         setEntries((current) => {
@@ -92,8 +103,9 @@ export function FoodLogSection({
           router.refresh();
         }
       })
-      .catch(() => {
+      .catch((error) => {
         setEntries((current) => current.filter((entry) => entry.id !== tempId));
+        setAddError(error instanceof Error ? error.message : "Couldn't save this item — try again.");
       });
   }
 
@@ -177,6 +189,7 @@ export function FoodLogSection({
       <div className="tile p-5 sm:p-6">
         <h3 className="mb-3 font-medium">Log food</h3>
         <FoodLogger onAdd={addEntry} />
+        {addError && <p className="mt-2 text-sm text-red-400">{addError}</p>}
       </div>
 
       <div className="tile p-5 sm:p-6">

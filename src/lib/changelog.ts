@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Fixed silently-failed food saves",
+    description:
+      "Tapping \"Add\" on a recognized food item could fail to save without telling you — if the AI left one of the macro fields blank/uncertain, the save was rejected and the item just quietly disappeared. Missing macro fields now count as 0 instead of failing, and any save that still fails now shows an actual error message instead of failing silently.",
+  },
+  {
+    date: "2026-08-17",
     title: "Confetti, starting weight, and daily reminders",
     description:
       "Hitting your water or steps goal for the day now pops a small confetti burst. Added a starting weight, settable in \"Edit Goals\" next to your goal weight, shown as a dotted reference line on the Weight trend alongside how far you've come. Also added optional daily reminders (\"Edit Goals\" → Daily reminders): once turned on, you'll get a phone notification in the early evening if you haven't hit your water or steps goal yet that day — nothing sent if you've already hit both, or if a goal isn't set. Works even with the app closed, including installed as a Home Screen webapp on iPhone.",
