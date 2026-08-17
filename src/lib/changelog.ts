@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "What to eat next, based on today's macros",
+    description:
+      "Below the calorie/macro rings, a short line now names whichever macro you're furthest from your target on today, with a few food ideas to help close the gap (e.g. \"Still ~40g protein to go — try chicken, eggs, Greek yogurt, or tofu\"). Rule-based on today's numbers, not AI, so it's instant and unaffected by the Gemini quota.",
+  },
+  {
+    date: "2026-08-17",
     title: "Manual food entry + fixed training charts with only one bar",
     description:
       "Added \"Or log it manually\" below the food input — a popup to enter a name, calories, and macros directly, no AI needed (handy for hitting the daily AI limit, or just faster for things you know by heart). Also fixed the Training trend charts always showing a single bar stretched across the full width when only one week/month was logged — they now always show 5 weeks or 6 months of bars, with unlogged ones shown empty rather than skipped.",

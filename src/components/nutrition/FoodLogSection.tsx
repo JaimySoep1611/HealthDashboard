@@ -46,6 +46,38 @@ function sumTotals(entries: FoodEntryItem[]) {
   );
 }
 
+type MacroKey = "proteinG" | "carbsG" | "fatG";
+
+const MACRO_LABELS: Record<MacroKey, string> = {
+  proteinG: "protein",
+  carbsG: "carbs",
+  fatG: "fat",
+};
+
+const MACRO_FOOD_IDEAS: Record<MacroKey, string> = {
+  proteinG: "chicken, eggs, Greek yogurt, or tofu",
+  carbsG: "rice, oats, fruit, or potatoes",
+  fatG: "nuts, olive oil, avocado, or peanut butter",
+};
+
+// Rule-based on purpose — no AI call, so it's instant and never affected by
+// the Gemini quota. Only calls out the macro furthest from target, since
+// naming all three at once stops reading as "short advice."
+function macroAdvice(totals: Record<MacroKey, number>, target: Record<MacroKey, number>): string | null {
+  const hasAnyTarget = target.proteinG > 0 || target.carbsG > 0 || target.fatG > 0;
+  if (!hasAnyTarget) return null;
+
+  const gaps = (Object.keys(MACRO_LABELS) as MacroKey[])
+    .map((key) => ({ key, remaining: target[key] - totals[key] }))
+    .filter((gap) => gap.remaining > 5) // ignore near-enough/over targets
+    .sort((a, b) => b.remaining - a.remaining);
+
+  if (gaps.length === 0) return "You've hit your macro targets for today — nice work.";
+
+  const top = gaps[0];
+  return `Still ~${Math.round(top.remaining)}g ${MACRO_LABELS[top.key]} to go — try ${MACRO_FOOD_IDEAS[top.key]}.`;
+}
+
 export function FoodLogSection({
   target,
   calorieTrend,
@@ -64,6 +96,7 @@ export function FoodLogSection({
   const [addError, setAddError] = useState<string | null>(null);
 
   const totals = useMemo(() => sumTotals(entries), [entries]);
+  const advice = useMemo(() => macroAdvice(totals, target), [totals, target]);
   const liveTrend = calorieTrend.map((value, index) =>
     index === trendDays - 1 ? totals.calories : value
   );
@@ -149,6 +182,8 @@ export function FoodLogSection({
             colorTo="#db2777"
           />
         </div>
+
+        {advice && <p className="text-center text-xs text-muted">{advice}</p>}
 
         <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0 flex-1">
