@@ -87,7 +87,7 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
         <button
           onClick={undo}
           disabled={liveTotal === 0}
-          className="ml-auto flex items-center gap-1 rounded-full px-2 py-1.5 text-xs text-muted transition hover:text-foreground disabled:opacity-40"
+          className="flex items-center gap-1 rounded-full px-2 py-1.5 text-xs text-muted transition hover:text-foreground disabled:opacity-40"
         >
           <MinusIcon size={12} />
           Undo
