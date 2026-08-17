@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { DropletIcon, MinusIcon, PlusIcon } from "@/components/icons";
+import { DropletIcon } from "@/components/icons";
 
 const WATER_COLOR = "#06b6d4";
 const QUICK_ADD = [100, 250, 500];
@@ -73,24 +73,22 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-1.5">
         {QUICK_ADD.map((amount) => (
           <button
             key={amount}
             onClick={() => addWater(amount)}
-            className="flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs transition hover:border-cyan-500/60 hover:text-cyan-400"
+            className="rounded-full border border-border px-2 py-1 text-xs whitespace-nowrap transition hover:border-cyan-500/60 hover:text-cyan-400"
           >
-            <PlusIcon size={12} />
-            {amount}ml
+            +{amount}ml
           </button>
         ))}
         <button
           onClick={undo}
           disabled={liveTotal === 0}
-          className="flex items-center gap-1 rounded-full px-2 py-1.5 text-xs text-muted transition hover:text-foreground disabled:opacity-40"
+          className="rounded-full px-1.5 py-1 text-xs whitespace-nowrap text-muted transition hover:text-foreground disabled:opacity-40"
         >
-          <MinusIcon size={12} />
-          Undo
+          −Undo
         </button>
       </div>
     </div>
