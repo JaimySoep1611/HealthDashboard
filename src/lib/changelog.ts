@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Monthly training trends, side by side",
+    description:
+      "Reworked the Training tab in Trends: instead of picking one exercise at a time, every power-training exercise now shows as its own small monthly chart (one bar per month), stacked together in a distinct color so you can compare their progress at a glance. Also extended the history window to roughly 6 months.",
+  },
+  {
+    date: "2026-08-17",
     title: "Training weight trend in Trends",
     description:
       "Added a new \"Training\" tab in Trends showing how the kg you've logged for a power-training exercise has progressed over the last several months — pick which exercise with the pills above the chart. Each bar is a week you actually logged it, not a fixed daily/weekly grid, since exercise logs don't work that way.",

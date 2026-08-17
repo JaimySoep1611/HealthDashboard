@@ -42,6 +42,32 @@ const METRICS = [
 
 type MetricKey = (typeof METRICS)[number]["key"];
 
+// A distinct color per exercise so multiple stacked charts stay visually
+// distinguishable from one another at a glance.
+const EXERCISE_COLORS = ["#f472b6", "#60a5fa", "#facc15", "#34d399", "#a78bfa", "#fb7185"];
+
+// Weekly kg points don't compare cleanly week-to-week (some weeks get
+// skipped), so group into calendar months — one bar per month, averaging
+// whatever weeks were actually logged that month.
+function groupByMonth(points: { weekStart: string; kg: number }[]): DayValue[] {
+  const byMonth = new Map<string, { total: number; count: number; firstOfMonth: string }>();
+  for (const point of points) {
+    const date = new Date(point.weekStart);
+    const monthKey = `${date.getUTCFullYear()}-${date.getUTCMonth()}`;
+    const existing = byMonth.get(monthKey);
+    if (existing) {
+      existing.total += point.kg;
+      existing.count += 1;
+    } else {
+      const firstOfMonth = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)).toISOString();
+      byMonth.set(monthKey, { total: point.kg, count: 1, firstOfMonth });
+    }
+  }
+  return Array.from(byMonth.values())
+    .sort((a, b) => a.firstOfMonth.localeCompare(b.firstOfMonth))
+    .map(({ total, count, firstOfMonth }) => ({ date: firstOfMonth, value: total / count }));
+}
+
 export function TrendsSection({
   calories,
   caloriesTarget,
@@ -55,20 +81,11 @@ export function TrendsSection({
 }: Props) {
   const [metric, setMetric] = useState<MetricKey>("calories");
   const [range, setRange] = useState<"week" | "month">("week");
-  const [selectedExerciseId, setSelectedExerciseId] = useState(exerciseTrends[0]?.id);
 
   const active = METRICS.find((m) => m.key === metric)!;
   const rangeDays = range === "week" ? 7 : days;
 
   if (metric === "training") {
-    const selectedExercise = exerciseTrends.find((e) => e.id === selectedExerciseId) ?? exerciseTrends[0];
-    const trainingPoints: DayValue[] =
-      selectedExercise?.points.map((p) => ({ date: p.weekStart, value: p.kg })) ?? [];
-    const trainingAverage =
-      trainingPoints.length > 0
-        ? trainingPoints.reduce((sum, p) => sum + p.value, 0) / trainingPoints.length
-        : 0;
-
     return (
       <div className="tile flex flex-col gap-5 p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -95,43 +112,16 @@ export function TrendsSection({
             Add a power-training exercise via &quot;Edit Goals&quot; and log a few weeks to see its trend here.
           </p>
         ) : (
-          <>
-            <div className="flex flex-wrap gap-2">
-              {exerciseTrends.map((exercise) => (
-                <button
-                  key={exercise.id}
-                  onClick={() => setSelectedExerciseId(exercise.id)}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                    selectedExerciseId === exercise.id
-                      ? "border-navy-light bg-navy-light/15 text-foreground"
-                      : "border-border text-muted hover:text-foreground"
-                  }`}
-                >
-                  {exercise.name}
-                </button>
-              ))}
-            </div>
-
-            {trainingPoints.length > 0 ? (
-              <>
-                <p className="text-xs text-muted">
-                  {trainingPoints.length} week{trainingPoints.length === 1 ? "" : "s"} logged · average{" "}
-                  <span className="text-foreground">{Math.round(trainingAverage)}</span> kg
-                </p>
-                <DailyBarChart
-                  days={trainingPoints}
-                  color={active.color}
-                  formatValue={(value) => `${value}kg`}
-                  showWeekdayLabels
-                  bottomLabel={(dateIso) =>
-                    new Date(dateIso).toLocaleDateString(undefined, { month: "short", day: "numeric" })
-                  }
-                />
-              </>
-            ) : (
-              <p className="text-sm text-muted">Not logged yet — check back after a few weeks.</p>
-            )}
-          </>
+          <div className="flex flex-col gap-6">
+            {exerciseTrends.map((exercise, index) => (
+              <ExerciseMonthlyChart
+                key={exercise.id}
+                name={exercise.name}
+                points={exercise.points}
+                color={EXERCISE_COLORS[index % EXERCISE_COLORS.length]}
+              />
+            ))}
+          </div>
         )}
       </div>
     );
@@ -320,6 +310,50 @@ function WeightTrendChart({
           scaleMax={max}
         />
       </div>
+    </div>
+  );
+}
+
+function ExerciseMonthlyChart({
+  name,
+  points,
+  color,
+}: {
+  name: string;
+  points: { weekStart: string; kg: number }[];
+  color: string;
+}) {
+  const monthlyPoints = groupByMonth(points);
+  const average =
+    monthlyPoints.length > 0 ? monthlyPoints.reduce((sum, p) => sum + p.value, 0) / monthlyPoints.length : 0;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-baseline justify-between gap-2">
+        <h4 className="text-sm font-medium" style={{ color }}>
+          {name}
+        </h4>
+        {monthlyPoints.length > 0 && (
+          <span className="text-xs text-muted">
+            {monthlyPoints.length} month{monthlyPoints.length === 1 ? "" : "s"} · average{" "}
+            <span className="text-foreground">{Math.round(average)}</span> kg
+          </span>
+        )}
+      </div>
+
+      {monthlyPoints.length > 0 ? (
+        <DailyBarChart
+          days={monthlyPoints}
+          color={color}
+          formatValue={(value) => `${Math.round(value)}kg`}
+          showWeekdayLabels
+          bottomLabel={(dateIso) =>
+            new Date(dateIso).toLocaleDateString(undefined, { month: "short", timeZone: "UTC" })
+          }
+        />
+      ) : (
+        <p className="text-sm text-muted">Not logged yet.</p>
+      )}
     </div>
   );
 }

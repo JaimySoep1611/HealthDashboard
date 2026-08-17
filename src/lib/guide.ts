@@ -70,7 +70,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Training (in Trends)",
         description:
-          "Pick a power-training exercise with the pills above the chart to see its logged kg per week over the last few months. If it hasn't been logged yet, it'll just say so until you've filled it in for a couple of weeks.",
+          "Every power-training exercise gets its own small chart, each in its own color, stacked so you can compare them side by side — one bar per month you logged it (averaged if you logged it more than once that month). Exercises aren't put on the same chart since kg isn't comparable across different lifts.",
       },
     ],
   },

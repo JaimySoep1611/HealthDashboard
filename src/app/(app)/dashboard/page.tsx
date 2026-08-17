@@ -18,7 +18,8 @@ import { FlameIcon, DumbbellIcon, TrendUpIcon } from "@/components/icons";
 
 const TRENDS_DAYS = 30;
 const TREND_DAYS = 7;
-const TRAINING_TREND_WEEKS = 16;
+// ~6 months back, so the monthly training chart has real history to show.
+const TRAINING_TREND_WEEKS = 26;
 
 export default async function DashboardPage() {
   const profile = await getCurrentProfile();
