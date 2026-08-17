@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { OtterLogo } from "@/components/OtterLogo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,9 +38,14 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="tile w-full max-w-sm p-8 flex flex-col gap-5"
       >
-        <div className="flex flex-col gap-1">
-          <h1 className="text-xl font-semibold">Health Dashboard</h1>
-          <p className="text-sm text-muted">Enter the shared password to continue.</p>
+        <div className="flex items-center gap-3">
+          <OtterLogo size={42} />
+          <div className="flex flex-col gap-1">
+            <h1 className="text-lg font-semibold leading-tight">
+              Soephart <span className="text-navy-light">&amp;</span> Ligtenberg
+            </h1>
+            <p className="text-sm text-muted">Enter the shared password to continue.</p>
+          </div>
         </div>
 
         <input

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Health Dashboard",
+  title: "Soephart & Ligtenberg",
   description: "Gym goals, nutrition and steps tracking",
 };
 
