@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { CloseIcon } from "@/components/icons";
 
 type AiFoodItem = {
   name: string;
@@ -48,6 +49,7 @@ export function FoodLogger({ onAdd }: { onAdd: (item: AiFoodItem, source: string
   const [error, setError] = useState<string | null>(null);
   const [items, setItems] = useState<AiFoodItem[]>([]);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [manualOpen, setManualOpen] = useState(false);
 
   async function analyzeDescription(event: React.FormEvent) {
     event.preventDefault();
@@ -155,6 +157,24 @@ export function FoodLogger({ onAdd }: { onAdd: (item: AiFoodItem, source: string
         </button>
       </form>
 
+      <button
+        type="button"
+        onClick={() => setManualOpen(true)}
+        className="self-start text-xs text-muted underline-offset-2 hover:text-foreground hover:underline"
+      >
+        Or log it manually
+      </button>
+
+      {manualOpen && (
+        <ManualEntryModal
+          onClose={() => setManualOpen(false)}
+          onSave={(item) => {
+            onAdd(item, "manual");
+            setManualOpen(false);
+          }}
+        />
+      )}
+
       {photoPreview && (
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -181,6 +201,120 @@ export function FoodLogger({ onAdd }: { onAdd: (item: AiFoodItem, source: string
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function ManualEntryModal({
+  onClose,
+  onSave,
+}: {
+  onClose: () => void;
+  onSave: (item: AiFoodItem) => void;
+}) {
+  const [name, setName] = useState("");
+  const [calories, setCalories] = useState("");
+  const [proteinG, setProteinG] = useState("");
+  const [carbsG, setCarbsG] = useState("");
+  const [fatG, setFatG] = useState("");
+
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    if (!name.trim()) return;
+    onSave({
+      name: name.trim(),
+      calories: Number(calories) || 0,
+      proteinG: Number(proteinG) || 0,
+      carbsG: Number(carbsG) || 0,
+      fatG: Number(fatG) || 0,
+    });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+      <div
+        className="tile flex w-full max-w-sm flex-col gap-4 p-5"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium">Log food manually</h3>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="flex h-7 w-7 flex-none items-center justify-center rounded-full text-muted transition hover:text-foreground"
+          >
+            <CloseIcon size={16} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <label className="flex flex-col gap-1 text-xs text-muted">
+            Name
+            <input
+              autoFocus
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="e.g. Double cappuccino"
+              className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-foreground outline-none focus:border-navy-light"
+            />
+          </label>
+
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex flex-col gap-1 text-xs text-muted">
+              Calories
+              <input
+                type="number"
+                min={0}
+                value={calories}
+                onChange={(event) => setCalories(event.target.value)}
+                placeholder="0"
+                className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-foreground outline-none focus:border-navy-light"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted">
+              Protein (g)
+              <input
+                type="number"
+                min={0}
+                value={proteinG}
+                onChange={(event) => setProteinG(event.target.value)}
+                placeholder="0"
+                className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-foreground outline-none focus:border-navy-light"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted">
+              Carbs (g)
+              <input
+                type="number"
+                min={0}
+                value={carbsG}
+                onChange={(event) => setCarbsG(event.target.value)}
+                placeholder="0"
+                className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-foreground outline-none focus:border-navy-light"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted">
+              Fat (g)
+              <input
+                type="number"
+                min={0}
+                value={fatG}
+                onChange={(event) => setFatG(event.target.value)}
+                placeholder="0"
+                className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-foreground outline-none focus:border-navy-light"
+              />
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            disabled={!name.trim()}
+            className="rounded-lg bg-navy px-4 py-2 text-sm font-medium text-white transition hover:bg-navy-light disabled:opacity-50"
+          >
+            Save
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -76,6 +76,45 @@ function groupByMonth(points: { weekStart: string; kg: number }[]): DayValue[] {
     .map(({ total, count, firstOfMonth }) => ({ date: firstOfMonth, value: total / count }));
 }
 
+// A single logged week/month would otherwise render as one bar stretched
+// across the full chart width — always show a fixed run of slots (zero-filled
+// where nothing was logged) ending at the current week/month, same as how
+// Calories/Water/Steps are always zero-filled rather than only showing
+// whatever days actually have entries.
+const WEEK_SLOTS_SHOWN = 5; // ~a month of weeks
+const MONTH_SLOTS_SHOWN = 6;
+
+function startOfWeekUTC(date: Date): Date {
+  const day = date.getUTCDay(); // 0 = Sunday
+  const diffToMonday = day === 0 ? 6 : day - 1;
+  const result = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  result.setUTCDate(result.getUTCDate() - diffToMonday);
+  return result;
+}
+
+function zeroFillWeeks(points: { weekStart: string; kg: number }[], referenceDate: Date): DayValue[] {
+  const byWeek = new Map(points.map((point) => [point.weekStart, point.kg]));
+  const currentWeekStart = startOfWeekUTC(referenceDate);
+  return Array.from({ length: WEEK_SLOTS_SHOWN }, (_, index) => {
+    const d = new Date(currentWeekStart);
+    d.setUTCDate(d.getUTCDate() - 7 * (WEEK_SLOTS_SHOWN - 1 - index));
+    const iso = d.toISOString();
+    return { date: iso, value: byWeek.get(iso) ?? 0 };
+  });
+}
+
+function zeroFillMonths(points: { weekStart: string; kg: number }[], referenceDate: Date): DayValue[] {
+  const byMonth = new Map(groupByMonth(points).map((point) => [point.date, point.value]));
+  const currentMonthStart = new Date(Date.UTC(referenceDate.getUTCFullYear(), referenceDate.getUTCMonth(), 1));
+  return Array.from({ length: MONTH_SLOTS_SHOWN }, (_, index) => {
+    const d = new Date(
+      Date.UTC(currentMonthStart.getUTCFullYear(), currentMonthStart.getUTCMonth() - (MONTH_SLOTS_SHOWN - 1 - index), 1)
+    );
+    const iso = d.toISOString();
+    return { date: iso, value: byMonth.get(iso) ?? 0 };
+  });
+}
+
 export function TrendsSection({
   calories,
   caloriesTarget,
@@ -94,6 +133,9 @@ export function TrendsSection({
 
   const active = METRICS.find((m) => m.key === metric)!;
   const rangeDays = range === "week" ? 7 : days;
+  // Same "derive today from server-supplied data" convention used below for
+  // the weight metric — calories is always zero-filled through today.
+  const referenceDate = new Date(calories[calories.length - 1].date);
 
   if (metric === "training") {
     return (
@@ -143,6 +185,7 @@ export function TrendsSection({
                 points={exercise.points}
                 color={EXERCISE_COLORS[index % EXERCISE_COLORS.length]}
                 range={range}
+                referenceDate={referenceDate}
               />
             ))}
           </div>
@@ -365,15 +408,22 @@ function ExerciseChart({
   points,
   color,
   range,
+  referenceDate,
 }: {
   name: string;
   points: { weekStart: string; kg: number }[];
   color: string;
   range: "week" | "month";
+  referenceDate: Date;
 }) {
-  const chartPoints = range === "week" ? groupByWeek(points) : groupByMonth(points);
+  // The caption reflects only what was actually logged, so the average isn't
+  // dragged down by zero-filled slots — but the chart itself always shows a
+  // fixed run of slots, so a single logged week/month isn't a single bar
+  // stretched across the full width.
+  const loggedPoints = range === "week" ? groupByWeek(points) : groupByMonth(points);
+  const chartPoints = range === "week" ? zeroFillWeeks(points, referenceDate) : zeroFillMonths(points, referenceDate);
   const average =
-    chartPoints.length > 0 ? chartPoints.reduce((sum, p) => sum + p.value, 0) / chartPoints.length : 0;
+    loggedPoints.length > 0 ? loggedPoints.reduce((sum, p) => sum + p.value, 0) / loggedPoints.length : 0;
   const unitLabel = range === "week" ? "week" : "month";
 
   return (
@@ -381,15 +431,17 @@ function ExerciseChart({
       <h4 className="text-sm font-medium" style={{ color }}>
         {name}
       </h4>
-      {chartPoints.length > 0 && (
+      {loggedPoints.length > 0 ? (
         <p className="text-xs text-muted">
-          Last {chartPoints.length} {unitLabel}
-          {chartPoints.length === 1 ? "" : "s"} average:{" "}
+          Last {loggedPoints.length} {unitLabel}
+          {loggedPoints.length === 1 ? "" : "s"} logged, average:{" "}
           <span className="text-foreground">{Math.round(average)}</span> kg
         </p>
+      ) : (
+        <p className="text-sm text-muted">Not logged yet.</p>
       )}
 
-      {chartPoints.length > 0 ? (
+      {loggedPoints.length > 0 && (
         <>
           <DailyBarChart
             days={chartPoints}
@@ -414,8 +466,6 @@ function ExerciseChart({
             </div>
           )}
         </>
-      ) : (
-        <p className="text-sm text-muted">Not logged yet.</p>
       )}
     </div>
   );

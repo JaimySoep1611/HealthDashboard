@@ -20,7 +20,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Log food",
         description:
-          "Type what you ate in plain words (e.g. \"two eggs and toast\") or tap the camera to photograph a meal — AI estimates calories and macros for you to add.",
+          "Type what you ate in plain words (e.g. \"two eggs and toast\") or tap the camera to photograph a meal — AI estimates calories and macros for you to add. Prefer not to use AI, or hit its daily limit? Tap \"Or log it manually\" below the input to enter a name, calories, and macros directly, no AI involved.",
       },
     ],
   },
@@ -75,7 +75,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Training (in Trends)",
         description:
-          "Every power-training exercise gets its own small chart, each in its own color, stacked so you can compare them side by side. Switch between \"Week\" (one bar per week you logged it, labeled) and \"Month\" (one bar per month, averaged if you logged it more than once — same as Calories/Water/Steps, bars aren't individually labeled in Month view, just the date range underneath). Exercises aren't put on the same chart since kg isn't comparable across different lifts.",
+          "Every power-training exercise gets its own small chart, each in its own color, stacked so you can compare them side by side. Switch between \"Week\" (5 weeks shown, one bar per week) and \"Month\" (6 months shown, averaged if you logged it more than once — same as Calories/Water/Steps, bars aren't individually labeled in Month view, just the date range underneath). Weeks/months you didn't log show as an empty bar rather than being skipped, so a single logged week doesn't stretch across the whole chart. Exercises aren't put on the same chart since kg isn't comparable across different lifts.",
       },
     ],
   },

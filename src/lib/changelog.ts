@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Manual food entry + fixed training charts with only one bar",
+    description:
+      "Added \"Or log it manually\" below the food input — a popup to enter a name, calories, and macros directly, no AI needed (handy for hitting the daily AI limit, or just faster for things you know by heart). Also fixed the Training trend charts always showing a single bar stretched across the full width when only one week/month was logged — they now always show 5 weeks or 6 months of bars, with unlogged ones shown empty rather than skipped.",
+  },
+  {
+    date: "2026-08-17",
     title: "Clearer message when AI food recognition hits its daily limit",
     description:
       "\"Couldn't analyze\" was showing for any failure, including hitting Gemini's free-tier daily limit on food recognition (20 requests/day) — which looks nothing like an unclear description and won't be fixed by rephrasing. That case now says so directly, so it's clear it's a limit, not you.",
