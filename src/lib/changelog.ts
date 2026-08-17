@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Full-width layout for Training and Achievements",
+    description:
+      "Weight moved up next to Water and Steps in the header row (banner narrowed to make room). Achievements now sits right below that header row, and the Training schedule and Food section are both full-width instead of squeezed into a half-width column — the training week strip finally has room to breathe.",
+  },
+  {
+    date: "2026-08-17",
     title: "Weekly training strip + layout tweaks",
     description:
       "Training schedule redesigned as a scrollable Monday-to-Sunday strip, with rest days shown explicitly and a status dot per day. Dropped the confusing \"— this week\" from its title (the schedule itself is permanent; only the logged numbers reset weekly). Also fixed the Water card to line up exactly with the greeting banner and Steps card in height.",

@@ -53,32 +53,32 @@ export function WeightCard({
   const delta = liveLatestKg !== null && goalKg !== null ? liveLatestKg - goalKg : null;
 
   return (
-    <div className="stat-card flex flex-col gap-4 p-5">
-      <div className="flex items-center gap-4">
+    <div className="stat-card flex h-full flex-col justify-between gap-3 p-4">
+      <div className="flex items-center gap-3">
         <div
-          className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl"
+          className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
           style={{ backgroundColor: `${WEIGHT_COLOR}22`, color: WEIGHT_COLOR }}
         >
-          <ScaleIcon size={22} />
+          <ScaleIcon size={20} />
         </div>
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-baseline gap-1">
             <span className="text-2xl font-semibold tracking-tight">
               {liveLatestKg !== null ? liveLatestKg : "—"}
             </span>
             <span className="text-sm text-muted">kg</span>
           </div>
-          <span className="text-xs text-muted">
+          <span className="truncate text-xs text-muted">
             {goalKg !== null
-              ? `Goal ${goalKg}kg${delta !== null ? ` · ${delta > 0 ? "+" : ""}${delta.toFixed(1)}kg to go` : ""}`
-              : "No goal weight set"}
+              ? `Goal ${goalKg}kg${delta !== null ? ` · ${delta > 0 ? "+" : ""}${delta.toFixed(1)}kg` : ""}`
+              : "No goal set"}
           </span>
         </div>
       </div>
 
       {liveTrend.length > 1 && (
-        <div style={{ height: 48 }}>
-          <Sparkline id="weight" points={liveTrend} color={WEIGHT_COLOR} height={48} target={goalKg ?? undefined} />
+        <div style={{ height: 40 }}>
+          <Sparkline id="weight" points={liveTrend} color={WEIGHT_COLOR} height={40} target={goalKg ?? undefined} />
         </div>
       )}
 
@@ -88,13 +88,13 @@ export function WeightCard({
           step="0.1"
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          placeholder="Log today's weight"
-          className="min-w-0 flex-1 rounded-lg border border-border bg-surface-raised px-3 py-1.5 text-sm outline-none focus:border-navy-light"
+          placeholder="kg"
+          className="min-w-0 flex-1 rounded-lg border border-border bg-surface-raised px-2 py-1.5 text-sm outline-none focus:border-navy-light"
         />
         <button
           type="submit"
           disabled={!value}
-          className="flex-none rounded-lg px-3 py-1.5 text-xs font-medium text-white transition disabled:opacity-50"
+          className="flex-none rounded-lg px-2.5 py-1.5 text-xs font-medium text-white transition disabled:opacity-50"
           style={{ backgroundColor: WEIGHT_COLOR }}
         >
           Log

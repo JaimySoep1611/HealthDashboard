@@ -49,15 +49,15 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
   const targetLiters = (targetMl / 1000).toFixed(1);
 
   return (
-    <div className="stat-card flex h-full flex-col justify-between gap-4 p-5">
-      <div className="flex items-center gap-4">
+    <div className="stat-card flex h-full flex-col justify-between gap-3 p-4">
+      <div className="flex items-center gap-3">
         <div
-          className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl"
+          className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
           style={{ backgroundColor: `${WATER_COLOR}22`, color: WATER_COLOR }}
         >
-          <DropletIcon size={22} />
+          <DropletIcon size={20} />
         </div>
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-baseline gap-1">
             <span className="text-2xl font-semibold tracking-tight">{liters}</span>
             <span className="text-sm text-muted">/ {targetLiters} L</span>
@@ -87,7 +87,7 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
           <button
             key={amount}
             onClick={() => addWater(amount)}
-            className="rounded-full border border-border px-2 py-1 text-xs whitespace-nowrap transition hover:border-cyan-500/60 hover:text-cyan-400"
+            className="rounded-full border border-border px-1.5 py-1 text-xs whitespace-nowrap transition hover:border-cyan-500/60 hover:text-cyan-400"
           >
             +{amount}ml
           </button>

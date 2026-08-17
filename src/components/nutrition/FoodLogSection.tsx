@@ -114,7 +114,7 @@ export function FoodLogSection({
   return (
     <>
       <div className="tile flex flex-col gap-5 p-5 sm:p-6">
-        <div className="flex flex-wrap items-center justify-around gap-x-4 gap-y-6">
+        <div className="mx-auto flex w-full max-w-xl flex-wrap items-center justify-around gap-x-4 gap-y-6">
           <ProgressRing
             id="calories"
             value={totals.calories}

@@ -12,7 +12,7 @@ import { WaterCard } from "@/components/health/WaterCard";
 import { StepsCard } from "@/components/health/StepsCard";
 import { WeightCard } from "@/components/health/WeightCard";
 import { TrendsSection } from "@/components/TrendsSection";
-import { FlameIcon, DumbbellIcon, ScaleIcon, TrendUpIcon, TrophyIcon } from "@/components/icons";
+import { FlameIcon, DumbbellIcon, TrendUpIcon, TrophyIcon } from "@/components/icons";
 
 const TRENDS_DAYS = 30;
 const TREND_DAYS = 7;
@@ -143,79 +143,70 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-stretch">
+      {/* ---------- Header row: greeting + quick-glance widgets ---------- */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:items-stretch">
         <div className="sm:col-span-2 lg:col-span-2 lg:h-full">
           <DashboardHero name={profile.name} />
         </div>
         {target && <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />}
         <StepsCard steps={todaySteps} />
+        <WeightCard
+          latestKg={latestWeight}
+          goalKg={profile.goalWeightKg}
+          trend={weightTrend}
+          loggedToday={weightLoggedToday}
+        />
       </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start lg:gap-6">
-        <div className="flex flex-col gap-8">
-          {/* ---------- Food ---------- */}
-          <section className="flex flex-col gap-4">
-            <SectionHeader icon={<FlameIcon size={16} />} title="Food" />
-
-            {!target ? (
-              <div className="tile p-6">
-                <h3 className="mb-3 font-medium">Set your daily target</h3>
-                <TargetForm />
-              </div>
-            ) : (
-              <FoodLogSection
-                target={{
-                  calories: target.calories,
-                  proteinG: target.proteinG,
-                  carbsG: target.carbsG,
-                  fatG: target.fatG,
-                  waterTargetMl: target.waterTargetMl,
-                }}
-                initialEntries={todayFoodEntries}
-                calorieTrend={calorieTrend}
-                trendDays={TREND_DAYS}
-                weekTotalExcludingToday={weekTotalExcludingToday}
-                daysElapsed={daysElapsed}
-              />
-            )}
-          </section>
+      {/* ---------- Achievements ---------- */}
+      <div className="flex flex-col items-center gap-3 rounded-[1.25rem] border border-dashed border-border p-6 text-center sm:flex-row sm:gap-4 sm:text-left">
+        <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-amber-400/10 text-amber-400/80">
+          <TrophyIcon size={22} />
         </div>
+        <div>
+          <h3 className="font-medium text-muted">Achievements — coming soon</h3>
+          <p className="text-sm text-muted">Badges and streaks once the trackers feel right.</p>
+        </div>
+      </div>
 
-        <div className="flex flex-col gap-8">
-          {/* ---------- Training ---------- */}
-          <section className="flex flex-col gap-4">
-            <SectionHeader icon={<DumbbellIcon size={16} />} title="Training" />
-            <StatCard
-              icon={<DumbbellIcon size={22} />}
-              color="var(--navy-light)"
-              value={`${exercisesLogged}/${exercises.length || 0}`}
-              label="Exercises logged this week"
-            />
-            <WeeklySchedule exercises={exercises} />
-          </section>
+      {/* ---------- Food ---------- */}
+      <section className="flex flex-col gap-4">
+        <SectionHeader icon={<FlameIcon size={16} />} title="Food" />
 
-          {/* ---------- Weight ---------- */}
-          <section className="flex flex-col gap-4">
-            <SectionHeader icon={<ScaleIcon size={16} />} title="Weight" />
-            <WeightCard
-              latestKg={latestWeight}
-              goalKg={profile.goalWeightKg}
-              trend={weightTrend}
-              loggedToday={weightLoggedToday}
-            />
-          </section>
-
-          <div className="flex items-center gap-4 rounded-[1.25rem] border border-dashed border-border p-5 sm:p-6">
-            <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-amber-400/10 text-amber-400/80">
-              <TrophyIcon size={22} />
-            </div>
-            <div>
-              <h3 className="font-medium text-muted">Achievements — coming soon</h3>
-              <p className="text-sm text-muted">Badges and streaks once the trackers feel right.</p>
-            </div>
+        {!target ? (
+          <div className="tile p-6">
+            <h3 className="mb-3 font-medium">Set your daily target</h3>
+            <TargetForm />
           </div>
-        </div>
-      </div>
+        ) : (
+          <FoodLogSection
+            target={{
+              calories: target.calories,
+              proteinG: target.proteinG,
+              carbsG: target.carbsG,
+              fatG: target.fatG,
+              waterTargetMl: target.waterTargetMl,
+            }}
+            initialEntries={todayFoodEntries}
+            calorieTrend={calorieTrend}
+            trendDays={TREND_DAYS}
+            weekTotalExcludingToday={weekTotalExcludingToday}
+            daysElapsed={daysElapsed}
+          />
+        )}
+      </section>
+
+      {/* ---------- Training ---------- */}
+      <section className="flex flex-col gap-4">
+        <SectionHeader icon={<DumbbellIcon size={16} />} title="Training" />
+        <StatCard
+          icon={<DumbbellIcon size={22} />}
+          color="var(--navy-light)"
+          value={`${exercisesLogged}/${exercises.length || 0}`}
+          label="Exercises logged this week"
+        />
+        <WeeklySchedule exercises={exercises} />
+      </section>
 
       {/* ---------- Trends ---------- */}
       <section className="flex flex-col gap-4">
