@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Fixed timezone bugs + target-anchored trend charts",
+    description:
+      "The server runs in UTC, which was causing the wrong greeting (e.g. \"Good morning\" in the afternoon) and could misfile very-early-morning entries under the wrong day — both now explicitly use Netherlands time. Also reworked the Calories/Water Trends charts to scale against your target instead of just each other, with a dashed line showing the target, so it's clear whether you hit it, undershot, or overshot.",
+  },
+  {
+    date: "2026-08-17",
     title: "Fixed photo food recognition",
     description:
       "Full-size iPhone camera photos were too large to upload and silently failing. Photos are now resized and compressed on your phone before uploading, and a clear error message shows up if something still goes wrong instead of nothing happening.",

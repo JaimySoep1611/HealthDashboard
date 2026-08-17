@@ -135,6 +135,7 @@ export function TrendsSection({
         <DailyBarChart
           days={visible}
           color={active.color}
+          target={target[metric]}
           formatValue={(value) => `${Math.round(value).toLocaleString()} ${active.unit}`}
           showWeekdayLabels={range === "week"}
         />

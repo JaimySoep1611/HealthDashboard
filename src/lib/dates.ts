@@ -1,7 +1,20 @@
+// Both users are in the Netherlands, but the server runs in UTC — setHours(0,0,0,0)
+// would anchor to midnight UTC, which is 1-2 hours *after* midnight in the
+// Netherlands, so entries logged right after midnight local time would land on
+// the wrong day. Resolve the calendar day in Europe/Amsterdam explicitly instead.
+const TIME_ZONE = "Europe/Amsterdam";
+
 export function startOfDay(date: Date): Date {
-  const result = new Date(date);
-  result.setHours(0, 0, 0, 0);
-  return result;
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const year = parts.find((p) => p.type === "year")!.value;
+  const month = parts.find((p) => p.type === "month")!.value;
+  const day = parts.find((p) => p.type === "day")!.value;
+  return new Date(`${year}-${month}-${day}T00:00:00.000Z`);
 }
 
 // Calendar week starting Monday
