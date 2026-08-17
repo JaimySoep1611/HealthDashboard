@@ -18,6 +18,33 @@ async function main() {
       create: { name },
     });
   }
+
+  const stale = await prisma.profile.findMany({
+    where: { name: { notIn: PROFILE_NAMES } },
+    include: {
+      _count: {
+        select: { foodEntries: true, stepEntries: true, trainingGoals: true },
+      },
+      nutritionTarget: true,
+    },
+  });
+
+  for (const profile of stale) {
+    const hasData =
+      profile._count.foodEntries > 0 ||
+      profile._count.stepEntries > 0 ||
+      profile._count.trainingGoals > 0 ||
+      profile.nutritionTarget !== null;
+
+    if (hasData) {
+      console.log(`Skipping stale profile "${profile.name}" — it has data, not deleting.`);
+      continue;
+    }
+
+    await prisma.profile.delete({ where: { id: profile.id } });
+    console.log(`Removed stale empty profile "${profile.name}".`);
+  }
+
   console.log(`Seeded profiles: ${PROFILE_NAMES.join(", ")}`);
 }
 
