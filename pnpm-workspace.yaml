@@ -2,3 +2,8 @@ allowBuilds:
   better-sqlite3: true
   sharp: false
   unrs-resolver: false
+  "@google/genai": true
+  "@prisma/engines": true
+  esbuild: true
+  prisma: true
+  protobufjs: true
