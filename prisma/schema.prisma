@@ -1,0 +1,139 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  nutritionTarget  NutritionTarget?
+  templates        TrainingTemplate[]
+  sessions         WorkoutSession[]
+  stepEntries      StepEntry[]
+  foodEntries      FoodEntry[]
+  customFoods      CustomFood[]
+}
+
+model TrainingTemplate {
+  id        String   @id @default(cuid())
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId String
+  name      String
+  createdAt DateTime @default(now())
+
+  days TemplateDay[]
+}
+
+model TemplateDay {
+  id         String   @id @default(cuid())
+  template   TrainingTemplate @relation(fields: [templateId], references: [id])
+  templateId String
+  // 0 = Sunday .. 6 = Saturday
+  weekday    Int
+  label      String
+
+  exercises TemplateExercise[]
+  sessions  WorkoutSession[]
+}
+
+model TemplateExercise {
+  id             String      @id @default(cuid())
+  templateDay    TemplateDay @relation(fields: [templateDayId], references: [id])
+  templateDayId  String
+  exerciseName   String
+  order          Int
+  targetSets     Int
+  targetReps     Int
+
+  loggedExercises LoggedExercise[]
+}
+
+model WorkoutSession {
+  id            String       @id @default(cuid())
+  profile       Profile      @relation(fields: [profileId], references: [id])
+  profileId     String
+  templateDay   TemplateDay? @relation(fields: [templateDayId], references: [id])
+  templateDayId String?
+  date          DateTime     @default(now())
+  notes         String?
+
+  loggedExercises LoggedExercise[]
+}
+
+model LoggedExercise {
+  id                 String            @id @default(cuid())
+  session            WorkoutSession    @relation(fields: [sessionId], references: [id])
+  sessionId          String
+  templateExercise   TemplateExercise? @relation(fields: [templateExerciseId], references: [id])
+  templateExerciseId String?
+  exerciseName       String
+  order              Int
+
+  sets LoggedSet[]
+}
+
+model LoggedSet {
+  id               String         @id @default(cuid())
+  loggedExercise   LoggedExercise @relation(fields: [loggedExerciseId], references: [id])
+  loggedExerciseId String
+  setNumber        Int
+  reps             Int
+  weightKg         Float
+}
+
+model StepEntry {
+  id        String   @id @default(cuid())
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId String
+  date      DateTime
+  steps     Int
+
+  @@unique([profileId, date])
+}
+
+model NutritionTarget {
+  id        String  @id @default(cuid())
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId String  @unique
+  calories  Int
+  proteinG  Int
+  carbsG    Int
+  fatG      Int
+}
+
+model FoodEntry {
+  id          String   @id @default(cuid())
+  profile     Profile  @relation(fields: [profileId], references: [id])
+  profileId   String
+  date        DateTime
+  name        String
+  calories    Float
+  proteinG    Float
+  carbsG      Float
+  fatG        Float
+  source      String   // "openfoodfacts" | "custom" | "manual"
+  sourceRef   String?  // barcode / id from Open Food Facts
+  createdAt   DateTime @default(now())
+}
+
+model CustomFood {
+  id        String  @id @default(cuid())
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId String
+  name      String
+  calories  Float
+  proteinG  Float
+  carbsG    Float
+  fatG      Float
+}
