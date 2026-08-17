@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Fixed Water card button wrap",
+    description:
+      "In its narrower spot next to the greeting banner, the water quick-add buttons could wrap to a second line and leave \"Undo\" stranded far to the right. It now sits directly after the buttons regardless of wrapping.",
+  },
+  {
+    date: "2026-08-17",
     title: "Trimmed the oversized greeting banner",
     description:
       "The greeting banner was stretching tall to match Water/Steps stacked next to it, leaving empty space inside it. Water and Steps now sit side by side instead of stacked, so the banner stays its natural size.",
