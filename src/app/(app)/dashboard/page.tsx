@@ -14,7 +14,8 @@ import { WaterCard } from "@/components/health/WaterCard";
 import { StepsCard } from "@/components/health/StepsCard";
 import { WeightCard } from "@/components/health/WeightCard";
 import { TrendsSection } from "@/components/TrendsSection";
-import { FlameIcon, DumbbellIcon, TrendUpIcon, TrophyIcon } from "@/components/icons";
+import { TassiesAchievement } from "@/components/TassiesAchievement";
+import { FlameIcon, DumbbellIcon, TrendUpIcon } from "@/components/icons";
 
 const TRENDS_DAYS = 30;
 const TREND_DAYS = 7;
@@ -143,6 +144,26 @@ export default async function DashboardPage() {
   const weightTrend = weightEntries.map((entry) => entry.weightKg);
   const weightLoggedToday = weightEntries.some((entry) => entry.date.getTime() === today.getTime());
 
+  // "Tassies" achievement: every day this week (so far), water + calories hit
+  // target and any exercises scheduled for that weekday were logged. Recomputed
+  // fresh from this week's data every time, so it naturally resets each Monday.
+  const tassiesConfigured = target !== null && target.waterTargetMl > 0 && target.calories > 0;
+  const todayWeekdayIndex = daysElapsed - 1; // 0 = Monday
+  function isDayGoalComplete(dayIndex: number): boolean {
+    const dateIso = addDays(weekStart, dayIndex).toISOString();
+    const waterOk = (dailyWater.find((d) => d.date === dateIso)?.value ?? 0) >= target!.waterTargetMl;
+    const calorieValue = dailyCalories.find((d) => d.date === dateIso)?.value ?? 0;
+    const calorieOk = calorieValue >= target!.calories * 0.85 && calorieValue <= target!.calories * 1.15;
+    const scheduledThatDay = exercises.filter((exercise) => exercise.weekday === dayIndex);
+    const trainingOk = scheduledThatDay.every((exercise) => exercise.log !== null);
+    return waterOk && calorieOk && trainingOk;
+  }
+  const weekDayIndexesSoFar = Array.from({ length: todayWeekdayIndex + 1 }, (_, i) => i);
+  const tassiesCompletedDays = tassiesConfigured ? weekDayIndexesSoFar.filter(isDayGoalComplete).length : 0;
+  const tassiesTotalDaysSoFar = weekDayIndexesSoFar.length;
+  const tassiesAllCompleteSoFar = tassiesConfigured && tassiesCompletedDays === tassiesTotalDaysSoFar;
+  const tassiesEarned = tassiesAllCompleteSoFar && todayWeekdayIndex === 6;
+
   return (
     <FoodEntriesProvider initialEntries={todayFoodEntries}>
       <div className="flex flex-col gap-8">
@@ -174,15 +195,13 @@ export default async function DashboardPage() {
         </div>
 
         {/* ---------- Achievements ---------- */}
-        <div className="flex flex-col items-center gap-3 rounded-[1.25rem] border border-dashed border-border p-6 text-center sm:flex-row sm:gap-4 sm:text-left">
-          <div className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-amber-400/10 text-amber-400/80">
-            <TrophyIcon size={22} />
-          </div>
-          <div>
-            <h3 className="font-medium text-muted">Achievements — coming soon</h3>
-            <p className="text-sm text-muted">Badges and streaks once the trackers feel right.</p>
-          </div>
-        </div>
+        <TassiesAchievement
+          configured={tassiesConfigured}
+          earned={tassiesEarned}
+          allCompleteSoFar={tassiesAllCompleteSoFar}
+          completedDays={tassiesCompletedDays}
+          totalDaysSoFar={tassiesTotalDaysSoFar}
+        />
 
         {/* ---------- Food ---------- */}
         <section className="flex flex-col gap-4">

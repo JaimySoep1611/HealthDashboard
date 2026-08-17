@@ -9,6 +9,18 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Added the Tassies achievement",
+    description:
+      "A real first achievement: hit your water and calorie targets and log every scheduled exercise, every day of the week, to earn \"Tassies\". Shown on the Achievements card with live progress, and resets automatically each Monday. Also added a small \"Once/day\" tag to Steps and Weight, since — unlike Water — those are a single daily number you can still edit any time, not something you add to repeatedly.",
+  },
+  {
+    date: "2026-08-17",
+    title: "Reset all data for a fresh start",
+    description:
+      "Cleared all logged entries and goals for both profiles at your request — food, water, weight, steps, training schedule and targets. Both profiles will go through first-time setup again on next login.",
+  },
+  {
+    date: "2026-08-17",
     title: "Fixed spacing issues in Training and Trends",
     description:
       "The training week strip now stretches to fill the full width on tablet/desktop instead of leaving empty space on the right (still scrolls on mobile, where 7 columns wouldn't fit). Fixed the Trends charts' axis labels overlapping when the target sat close to a milestone number, and made the charts taller so they look better now that they're full width.",

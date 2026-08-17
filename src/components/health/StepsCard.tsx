@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FootprintsIcon } from "@/components/icons";
+import { DailyEntryBadge } from "@/components/DailyEntryBadge";
 
 const STEPS_COLOR = "#3b82f6";
 
@@ -34,17 +35,20 @@ export function StepsCard({ steps }: { steps: number }) {
 
   return (
     <div className="stat-card flex h-full flex-col justify-between gap-3 p-4">
-      <div className="flex items-center gap-3">
-        <div
-          className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
-          style={{ backgroundColor: `${STEPS_COLOR}22`, color: STEPS_COLOR }}
-        >
-          <FootprintsIcon size={20} />
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
+            style={{ backgroundColor: `${STEPS_COLOR}22`, color: STEPS_COLOR }}
+          >
+            <FootprintsIcon size={20} />
+          </div>
+          <div className="flex min-w-0 flex-1 flex-col">
+            <span className="text-2xl font-semibold tracking-tight">{liveSteps.toLocaleString()}</span>
+            <span className="text-xs text-muted">Steps today</span>
+          </div>
         </div>
-        <div className="flex min-w-0 flex-1 flex-col">
-          <span className="text-2xl font-semibold tracking-tight">{liveSteps.toLocaleString()}</span>
-          <span className="text-xs text-muted">Steps today</span>
-        </div>
+        <DailyEntryBadge color={STEPS_COLOR} />
       </div>
 
       <form onSubmit={save} className="flex items-center gap-2">

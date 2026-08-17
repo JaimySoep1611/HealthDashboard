@@ -45,7 +45,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Steps",
         description:
-          "Today's step count, synced automatically via the Apple Shortcuts automation, or entered manually if it needs correcting.",
+          "Today's step count, synced automatically via the Apple Shortcuts automation, or entered manually if it needs correcting. The \"Once/day\" tag is a reminder that this is a single daily number, not something you add to repeatedly like water — but you can still overwrite it any time you want.",
       },
     ],
   },
@@ -55,7 +55,17 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Weight",
         description:
-          "Log your weight once a day. The trend line compares your recent weigh-ins to your goal weight, with how far you have left to go.",
+          "Log your weight once a day — the \"Once/day\" tag is just a reminder of that, you can still update it whenever. The trend line compares your recent weigh-ins to your goal weight, with how far you have left to go.",
+      },
+    ],
+  },
+  {
+    title: "Achievements",
+    items: [
+      {
+        name: "Tassies",
+        description:
+          "Awarded when every day this week (Monday-Sunday) hits your water and calorie targets, and any exercises scheduled for that day are logged. The badge lights up once you've earned it for the week, and resets fresh every Monday.",
       },
     ],
   },

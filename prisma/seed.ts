@@ -10,37 +10,7 @@ const PROFILE_NAMES = (process.env.PROFILE_NAMES ?? "You,Partner")
   .map((name) => name.trim())
   .filter(Boolean);
 
-// ONE-OFF: reset all entries/goals for every profile, per explicit user request.
-// Remove this function and its call in main() right after this deploy runs once.
-async function resetAllEntriesAndGoals() {
-  const exerciseLogs = await prisma.exerciseLog.deleteMany({});
-  const trainingExercises = await prisma.trainingExercise.deleteMany({});
-  const foodEntries = await prisma.foodEntry.deleteMany({});
-  const customFoods = await prisma.customFood.deleteMany({});
-  const waterEntries = await prisma.waterEntry.deleteMany({});
-  const weightEntries = await prisma.weightEntry.deleteMany({});
-  const stepEntries = await prisma.stepEntry.deleteMany({});
-  const nutritionTargets = await prisma.nutritionTarget.deleteMany({});
-  const profiles = await prisma.profile.updateMany({
-    data: { goalWeightKg: null, onboardedAt: null },
-  });
-
-  console.log("RESET SUMMARY:", {
-    exerciseLogs: exerciseLogs.count,
-    trainingExercises: trainingExercises.count,
-    foodEntries: foodEntries.count,
-    customFoods: customFoods.count,
-    waterEntries: waterEntries.count,
-    weightEntries: weightEntries.count,
-    stepEntries: stepEntries.count,
-    nutritionTargets: nutritionTargets.count,
-    profilesReset: profiles.count,
-  });
-}
-
 async function main() {
-  await resetAllEntriesAndGoals();
-
   for (const name of PROFILE_NAMES) {
     await prisma.profile.upsert({
       where: { name },
