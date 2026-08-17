@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Weekly training strip + layout tweaks",
+    description:
+      "Training schedule redesigned as a scrollable Monday-to-Sunday strip, with rest days shown explicitly and a status dot per day. Dropped the confusing \"— this week\" from its title (the schedule itself is permanent; only the logged numbers reset weekly). Also fixed the Water card to line up exactly with the greeting banner and Steps card in height.",
+  },
+  {
+    date: "2026-08-17",
     title: "Fixed Water card button wrap",
     description:
       "In its narrower spot next to the greeting banner, the water quick-add buttons could wrap to a second line and leave \"Undo\" stranded far to the right. It now sits directly after the buttons regardless of wrapping.",

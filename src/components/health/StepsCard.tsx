@@ -33,7 +33,7 @@ export function StepsCard({ steps }: { steps: number }) {
   }
 
   return (
-    <div className="stat-card flex flex-col gap-4 p-5">
+    <div className="stat-card flex h-full flex-col justify-between gap-4 p-5">
       <div className="flex items-center gap-4">
         <div
           className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl"

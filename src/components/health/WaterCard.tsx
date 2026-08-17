@@ -49,7 +49,7 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
   const targetLiters = (targetMl / 1000).toFixed(1);
 
   return (
-    <div className="stat-card flex flex-col gap-4 p-5">
+    <div className="stat-card flex h-full flex-col justify-between gap-4 p-5">
       <div className="flex items-center gap-4">
         <div
           className="flex h-12 w-12 flex-none items-center justify-center rounded-2xl"
@@ -62,7 +62,16 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
             <span className="text-2xl font-semibold tracking-tight">{liters}</span>
             <span className="text-sm text-muted">/ {targetLiters} L</span>
           </div>
-          <span className="text-xs text-muted">Water today</span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs text-muted">Water today</span>
+            <button
+              onClick={undo}
+              disabled={liveTotal === 0}
+              className="text-[10px] whitespace-nowrap text-muted transition hover:text-foreground disabled:opacity-40"
+            >
+              − Undo
+            </button>
+          </div>
         </div>
       </div>
 
@@ -83,13 +92,6 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
             +{amount}ml
           </button>
         ))}
-        <button
-          onClick={undo}
-          disabled={liveTotal === 0}
-          className="rounded-full px-1.5 py-1 text-xs whitespace-nowrap text-muted transition hover:text-foreground disabled:opacity-40"
-        >
-          −Undo
-        </button>
       </div>
     </div>
   );
