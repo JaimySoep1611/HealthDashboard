@@ -1,13 +1,11 @@
 import { getCurrentProfile } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { getOrCreateTemplate } from "@/lib/training";
 import { startOfDay, startOfWeek, addDays } from "@/lib/dates";
 import { ProgressRing } from "@/components/ProgressRing";
 import { TargetForm } from "@/components/nutrition/target-form";
 import { FoodLogger } from "@/components/nutrition/food-logger";
 import { EntryList } from "@/components/nutrition/entry-list";
-import { AddDayForm } from "@/components/training/add-day-form";
-import { DayCard } from "@/components/training/day-card";
+import { GoalList } from "@/components/training/goal-list";
 import { ManualStepsForm } from "@/components/steps/manual-steps-form";
 
 const STEPS_DAYS_TO_SHOW = 14;
@@ -20,31 +18,29 @@ export default async function DashboardPage() {
   const weekStart = startOfWeek(new Date());
   const stepsRangeStart = addDays(today, -(STEPS_DAYS_TO_SHOW - 1));
 
-  const [target, todayFoodEntries, weekFoodEntries, template, stepEntries] = await Promise.all([
-    prisma.nutritionTarget.findUnique({ where: { profileId: profile.id } }),
-    prisma.foodEntry.findMany({
-      where: { profileId: profile.id, date: today },
-      orderBy: { createdAt: "asc" },
-    }),
-    prisma.foodEntry.findMany({ where: { profileId: profile.id, date: { gte: weekStart } } }),
-    getOrCreateTemplate(profile.id),
-    prisma.stepEntry.findMany({
-      where: { profileId: profile.id, date: { gte: stepsRangeStart } },
-    }),
-  ]);
+  const [target, todayFoodEntries, weekFoodEntries, trainingGoals, stepEntries] =
+    await Promise.all([
+      prisma.nutritionTarget.findUnique({ where: { profileId: profile.id } }),
+      prisma.foodEntry.findMany({
+        where: { profileId: profile.id, date: today },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.foodEntry.findMany({ where: { profileId: profile.id, date: { gte: weekStart } } }),
+      prisma.trainingGoal.findMany({
+        where: { profileId: profile.id },
+        orderBy: { order: "asc" },
+        include: { completions: { where: { weekStart } } },
+      }),
+      prisma.stepEntry.findMany({
+        where: { profileId: profile.id, date: { gte: stepsRangeStart } },
+      }),
+    ]);
 
-  const lastSessions = await prisma.workoutSession.findMany({
-    where: { profileId: profile.id, templateDayId: { in: template.days.map((d) => d.id) } },
-    orderBy: { date: "desc" },
-    include: { loggedExercises: { include: { sets: true } } },
-  });
-
-  const lastSessionByDay = new Map<string, (typeof lastSessions)[number]>();
-  for (const session of lastSessions) {
-    if (session.templateDayId && !lastSessionByDay.has(session.templateDayId)) {
-      lastSessionByDay.set(session.templateDayId, session);
-    }
-  }
+  const goals = trainingGoals.map((goal) => ({
+    id: goal.id,
+    name: goal.name,
+    completedThisWeek: goal.completions.length > 0,
+  }));
 
   // Nutrition calculations
   const totals = todayFoodEntries.reduce(
@@ -140,36 +136,7 @@ export default async function DashboardPage() {
       <section className="flex flex-col gap-4">
         <h2 className="text-sm font-medium uppercase tracking-wide text-muted">Exercise</h2>
 
-        <h3 className="text-sm font-medium text-muted">Power Training — {template.name}</h3>
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          {template.days.map((day) => {
-            const lastSession = lastSessionByDay.get(day.id);
-            const lastSetsByExercise: Record<string, { reps: number; weightKg: number }[]> = {};
-            if (lastSession) {
-              for (const logged of lastSession.loggedExercises) {
-                if (logged.templateExerciseId) {
-                  lastSetsByExercise[logged.templateExerciseId] = logged.sets.map((s) => ({
-                    reps: s.reps,
-                    weightKg: s.weightKg,
-                  }));
-                }
-              }
-            }
-            return (
-              <DayCard
-                key={day.id}
-                day={day}
-                lastSetsByExercise={lastSetsByExercise}
-                lastLoggedDate={lastSession ? lastSession.date.toLocaleDateString() : null}
-              />
-            );
-          })}
-        </div>
-
-        <div className="tile p-6">
-          <h3 className="mb-3 font-medium">Add a training day</h3>
-          <AddDayForm />
-        </div>
+        <GoalList goals={goals} />
 
         <h3 className="mt-2 text-sm font-medium text-muted">Cardio (Steps)</h3>
         <div className="tile flex flex-col gap-2 p-6">

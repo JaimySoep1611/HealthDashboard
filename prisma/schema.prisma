@@ -18,78 +18,32 @@ model Profile {
   createdAt DateTime @default(now())
 
   nutritionTarget  NutritionTarget?
-  templates        TrainingTemplate[]
-  sessions         WorkoutSession[]
+  trainingGoals    TrainingGoal[]
   stepEntries      StepEntry[]
   foodEntries      FoodEntry[]
   customFoods      CustomFood[]
 }
 
-model TrainingTemplate {
+model TrainingGoal {
   id        String   @id @default(cuid())
   profile   Profile  @relation(fields: [profileId], references: [id])
   profileId String
   name      String
+  order     Int
   createdAt DateTime @default(now())
 
-  days TemplateDay[]
+  completions GoalCompletion[]
 }
 
-model TemplateDay {
-  id         String   @id @default(cuid())
-  template   TrainingTemplate @relation(fields: [templateId], references: [id])
-  templateId String
-  // 0 = Sunday .. 6 = Saturday
-  weekday    Int
-  label      String
+model GoalCompletion {
+  id          String       @id @default(cuid())
+  goal        TrainingGoal @relation(fields: [goalId], references: [id])
+  goalId      String
+  // Start (Monday) of the calendar week this completion applies to
+  weekStart   DateTime
+  completedAt DateTime     @default(now())
 
-  exercises TemplateExercise[]
-  sessions  WorkoutSession[]
-}
-
-model TemplateExercise {
-  id             String      @id @default(cuid())
-  templateDay    TemplateDay @relation(fields: [templateDayId], references: [id])
-  templateDayId  String
-  exerciseName   String
-  order          Int
-  targetSets     Int
-  targetReps     Int
-
-  loggedExercises LoggedExercise[]
-}
-
-model WorkoutSession {
-  id            String       @id @default(cuid())
-  profile       Profile      @relation(fields: [profileId], references: [id])
-  profileId     String
-  templateDay   TemplateDay? @relation(fields: [templateDayId], references: [id])
-  templateDayId String?
-  date          DateTime     @default(now())
-  notes         String?
-
-  loggedExercises LoggedExercise[]
-}
-
-model LoggedExercise {
-  id                 String            @id @default(cuid())
-  session            WorkoutSession    @relation(fields: [sessionId], references: [id])
-  sessionId          String
-  templateExercise   TemplateExercise? @relation(fields: [templateExerciseId], references: [id])
-  templateExerciseId String?
-  exerciseName       String
-  order              Int
-
-  sets LoggedSet[]
-}
-
-model LoggedSet {
-  id               String         @id @default(cuid())
-  loggedExercise   LoggedExercise @relation(fields: [loggedExerciseId], references: [id])
-  loggedExerciseId String
-  setNumber        Int
-  reps             Int
-  weightKg         Float
+  @@unique([goalId, weekStart])
 }
 
 model StepEntry {
