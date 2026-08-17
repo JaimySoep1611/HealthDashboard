@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Confetti, starting weight, and daily reminders",
+    description:
+      "Hitting your water or steps goal for the day now pops a small confetti burst. Added a starting weight, settable in \"Edit Goals\" next to your goal weight, shown as a dotted reference line on the Weight trend alongside how far you've come. Also added optional daily reminders (\"Edit Goals\" → Daily reminders): once turned on, you'll get a phone notification in the early evening if you haven't hit your water or steps goal yet that day — nothing sent if you've already hit both, or if a goal isn't set. Works even with the app closed, including installed as a Home Screen webapp on iPhone.",
+  },
+  {
+    date: "2026-08-17",
     title: "Real app icon on iPhone + training chart consistency",
     description:
       "Saving the dashboard to your iPhone home screen (Share → Add to Home Screen) now shows the actual otter logo instead of a generic icon, and opens full-screen without the Safari address bar. Also restyled the Training trend charts to match Calories/Water/Steps: same \"Last N average\" caption style, and bars aren't individually labeled in Month view anymore (just the date range underneath) — same as the other metrics.",

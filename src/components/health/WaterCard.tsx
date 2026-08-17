@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DropletIcon } from "@/components/icons";
+import { Confetti } from "@/components/Confetti";
 
 const WATER_COLOR = "#06b6d4";
 const QUICK_ADD = [100, 250, 500];
@@ -12,6 +13,7 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
   const [prevTotalMl, setPrevTotalMl] = useState(totalMl);
   const [liveTotal, setLiveTotal] = useState(totalMl);
   const [addedThisSession, setAddedThisSession] = useState<number[]>([]);
+  const [burstKey, setBurstKey] = useState(0);
 
   if (totalMl !== prevTotalMl) {
     setPrevTotalMl(totalMl);
@@ -19,8 +21,13 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
   }
 
   function addWater(amountMl: number) {
-    setLiveTotal((current) => current + amountMl);
+    const previous = liveTotal;
+    const updated = previous + amountMl;
+    setLiveTotal(updated);
     setAddedThisSession((current) => [...current, amountMl]);
+    if (targetMl > 0 && previous < targetMl && updated >= targetMl) {
+      setBurstKey((key) => key + 1);
+    }
 
     fetch("/api/health/water", {
       method: "POST",
@@ -50,6 +57,7 @@ export function WaterCard({ totalMl, targetMl }: { totalMl: number; targetMl: nu
 
   return (
     <div className="stat-card flex h-full flex-col justify-between gap-3 p-4">
+      <Confetti burstKey={burstKey} />
       <div className="flex items-center gap-3">
         <div
           className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"

@@ -4,6 +4,7 @@ export function Sparkline({
   color,
   height = 64,
   target,
+  secondaryTarget,
   scaleMin,
   scaleMax,
 }: {
@@ -12,14 +13,19 @@ export function Sparkline({
   color: string;
   height?: number;
   target?: number;
+  // A second reference line (e.g. a starting value) — dotted instead of
+  // dashed so it reads as distinct from `target`, and unlabeled (the caller
+  // is expected to state the value in text elsewhere) to avoid the two
+  // labels colliding when the values are close together.
+  secondaryTarget?: number;
   // Override the auto-computed vertical scale — used when a caller renders its
   // own axis labels/gridlines and needs the line to line up with them exactly.
   scaleMin?: number;
   scaleMax?: number;
 }) {
   const width = 100;
-  const max = scaleMax ?? Math.max(...points, target ?? 0, 1);
-  const min = scaleMin ?? Math.min(...points, target ?? Infinity, 0);
+  const max = scaleMax ?? Math.max(...points, target ?? 0, secondaryTarget ?? 0, 1);
+  const min = scaleMin ?? Math.min(...points, target ?? Infinity, secondaryTarget ?? Infinity, 0);
   const range = max - min || 1;
 
   const step = points.length > 1 ? width / (points.length - 1) : 0;
@@ -35,6 +41,8 @@ export function Sparkline({
 
   const targetY =
     target !== undefined ? height - ((target - min) / range) * (height - 8) - 4 : null;
+  const secondaryTargetY =
+    secondaryTarget !== undefined ? height - ((secondaryTarget - min) / range) * (height - 8) - 4 : null;
   const gradientId = `sparkline-gradient-${id}`;
 
   return (
@@ -49,6 +57,18 @@ export function Sparkline({
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
+      {secondaryTargetY !== null && (
+        <line
+          x1={0}
+          y1={secondaryTargetY}
+          x2={width}
+          y2={secondaryTargetY}
+          stroke="var(--muted)"
+          strokeWidth={0.5}
+          strokeDasharray="1 3"
+          vectorEffect="non-scaling-stroke"
+        />
+      )}
       {targetY !== null && (
         <line
           x1={0}

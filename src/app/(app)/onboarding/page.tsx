@@ -4,6 +4,7 @@ import { startOfWeek } from "@/lib/dates";
 import { WeeklySchedule } from "@/components/training/weekly-schedule";
 import { TargetForm } from "@/components/nutrition/target-form";
 import { ProfileGoalsForm } from "@/components/health/ProfileGoalsForm";
+import { NotificationsToggle } from "@/components/NotificationsToggle";
 import { FinishSetupButton } from "./finish-setup-button";
 
 export default async function OnboardingPage() {
@@ -60,7 +61,16 @@ export default async function OnboardingPage() {
 
       <div className="tile p-6">
         <h3 className="mb-3 font-medium">Body weight &amp; steps goals</h3>
-        <ProfileGoalsForm existingWeightGoal={profile.goalWeightKg} existingStepsGoal={profile.stepsGoal} />
+        <ProfileGoalsForm
+          existingWeightGoal={profile.goalWeightKg}
+          existingStepsGoal={profile.stepsGoal}
+          existingStartingWeight={profile.startingWeightKg}
+        />
+      </div>
+
+      <div className="tile p-6">
+        <h3 className="mb-3 font-medium">Daily reminders</h3>
+        <NotificationsToggle />
       </div>
 
       <FinishSetupButton firstTime={firstTime} />

@@ -30,7 +30,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Water",
         description:
-          "Tap +100/+250/+500ml each time you drink water. The bar fills toward your daily goal. \"Undo\" removes your most recent log if you tap by mistake.",
+          "Tap +100/+250/+500ml each time you drink water. The bar fills toward your daily goal. \"Undo\" removes your most recent log if you tap by mistake. A little confetti burst plays the moment you cross your goal for the day.",
       },
     ],
   },
@@ -50,7 +50,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Steps",
         description:
-          "Today's step count, synced automatically via the Apple Shortcuts automation, or entered manually if it needs correcting. The \"Once/day\" tag is a reminder that this is a single daily number, not something you add to repeatedly like water — but you can still overwrite it any time you want. Set a daily steps goal in \"Edit Goals\" to see it shown here and used in Trends.",
+          "Today's step count, synced automatically via the Apple Shortcuts automation, or entered manually if it needs correcting. The \"Once/day\" tag is a reminder that this is a single daily number, not something you add to repeatedly like water — but you can still overwrite it any time you want. Set a daily steps goal in \"Edit Goals\" to see it shown here and used in Trends — crossing it (via manual entry or the next automatic sync) plays a confetti burst.",
       },
     ],
   },
@@ -60,7 +60,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Weight",
         description:
-          "Log your weight once a day — the \"Once/day\" tag is just a reminder of that, you can still update it whenever. The trend line compares your recent weigh-ins to your goal weight, with how far you have left to go.",
+          "Log your weight once a day — the \"Once/day\" tag is just a reminder of that, you can still update it whenever. The trend line compares your recent weigh-ins to your goal weight, with how far you have left to go. Set a starting weight in \"Edit Goals\" to see a second, dotted reference line and how much you've moved from it.",
       },
     ],
   },
@@ -94,7 +94,12 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Edit Goals",
         description:
-          "Revisit anytime to add, remove, or change your training goals, nutrition targets, water goal, or weight goal.",
+          "Revisit anytime to add, remove, or change your training goals, nutrition targets, water goal, weight goal, starting weight, or steps goal — and to turn daily reminders on or off.",
+      },
+      {
+        name: "Daily reminders",
+        description:
+          "Turn on in \"Edit Goals\" to get a phone notification in the early evening if you haven't hit your water or steps goal yet that day — skipped entirely if you've already hit both, or if you haven't set a goal for one of them. Works even with the app closed once enabled, including as a Home Screen webapp on iPhone (needs iOS 16.4+).",
       },
       {
         name: "Switch User",

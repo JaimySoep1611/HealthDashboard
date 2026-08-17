@@ -13,12 +13,13 @@ datasource db {
 }
 
 model Profile {
-  id           String    @id @default(cuid())
-  name         String    @unique
-  createdAt    DateTime  @default(now())
-  onboardedAt  DateTime?
-  goalWeightKg Float?
-  stepsGoal    Int?
+  id               String    @id @default(cuid())
+  name             String    @unique
+  createdAt        DateTime  @default(now())
+  onboardedAt      DateTime?
+  goalWeightKg     Float?
+  stepsGoal        Int?
+  startingWeightKg Float?
 
   nutritionTarget   NutritionTarget?
   trainingExercises TrainingExercise[]
@@ -27,6 +28,17 @@ model Profile {
   customFoods       CustomFood[]
   waterEntries      WaterEntry[]
   weightEntries     WeightEntry[]
+  pushSubscriptions PushSubscription[]
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
 }
 
 model TrainingExercise {
@@ -70,14 +82,14 @@ model StepEntry {
 }
 
 model NutritionTarget {
-  id           String  @id @default(cuid())
-  profile      Profile @relation(fields: [profileId], references: [id])
-  profileId    String  @unique
-  calories     Int
-  proteinG     Int
-  carbsG       Int
-  fatG         Int
-  waterTargetMl Int    @default(2000)
+  id            String  @id @default(cuid())
+  profile       Profile @relation(fields: [profileId], references: [id])
+  profileId     String  @unique
+  calories      Int
+  proteinG      Int
+  carbsG        Int
+  fatG          Int
+  waterTargetMl Int     @default(2000)
 }
 
 model WaterEntry {
@@ -100,18 +112,18 @@ model WeightEntry {
 }
 
 model FoodEntry {
-  id          String   @id @default(cuid())
-  profile     Profile  @relation(fields: [profileId], references: [id])
-  profileId   String
-  date        DateTime
-  name        String
-  calories    Float
-  proteinG    Float
-  carbsG      Float
-  fatG        Float
-  source      String   // "openfoodfacts" | "custom" | "manual"
-  sourceRef   String?  // barcode / id from Open Food Facts
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  profileId String
+  date      DateTime
+  name      String
+  calories  Float
+  proteinG  Float
+  carbsG    Float
+  fatG      Float
+  source    String // "openfoodfacts" | "custom" | "manual"
+  sourceRef String? // barcode / id from Open Food Facts
+  createdAt DateTime @default(now())
 }
 
 model CustomFood {

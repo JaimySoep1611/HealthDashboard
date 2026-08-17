@@ -27,6 +27,7 @@ type Props = {
   // Sparse — only days actually logged, ascending.
   weight: DayValue[];
   weightGoal: number | null;
+  startingWeightKg: number | null;
   // Length of the zero-filled history window (e.g. 30).
   days: number;
   // Weekly kg history per power-training exercise.
@@ -84,6 +85,7 @@ export function TrendsSection({
   stepsGoal,
   weight,
   weightGoal,
+  startingWeightKg,
   days,
   exerciseTrends,
 }: Props) {
@@ -219,6 +221,23 @@ export function TrendsSection({
             {metric !== "weight" ? "/day" : ""}
           </>
         )}
+        {metric === "weight" && startingWeightKg !== null && (
+          <>
+            {" "}
+            · started at {startingWeightKg.toLocaleString()} {active.unit}
+            {visible.length > 0 && (
+              <>
+                {" "}
+                (
+                {(() => {
+                  const delta = visible[visible.length - 1].value - startingWeightKg;
+                  return `${delta > 0 ? "+" : ""}${delta.toFixed(1)} kg so far`;
+                })()}
+                )
+              </>
+            )}
+          </>
+        )}
       </p>
 
       {metric === "weight" ? (
@@ -228,6 +247,7 @@ export function TrendsSection({
             points={visible.map((point) => point.value)}
             color={active.color}
             goal={weightGoal}
+            startWeight={startingWeightKg}
           />
         ) : (
           <p className="text-sm text-muted">Not enough weigh-ins logged yet in this range.</p>
@@ -266,14 +286,16 @@ function WeightTrendChart({
   points,
   color,
   goal,
+  startWeight,
 }: {
   id: string;
   points: number[];
   color: string;
   goal: number | null;
+  startWeight: number | null;
 }) {
-  const rawMin = Math.min(...points, goal ?? Infinity, 0);
-  const rawMax = Math.max(...points, goal ?? 0, 1);
+  const rawMin = Math.min(...points, goal ?? Infinity, startWeight ?? Infinity, 0);
+  const rawMax = Math.max(...points, goal ?? 0, startWeight ?? 0, 1);
   const ticks = niceTicks(rawMin, rawMax);
   const min = ticks[0];
   const max = ticks[ticks.length - 1];
@@ -329,6 +351,7 @@ function WeightTrendChart({
           color={color}
           height={WEIGHT_CHART_HEIGHT}
           target={goal ?? undefined}
+          secondaryTarget={startWeight ?? undefined}
           scaleMin={min}
           scaleMax={max}
         />

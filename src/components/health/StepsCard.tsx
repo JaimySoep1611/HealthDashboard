@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FootprintsIcon } from "@/components/icons";
 import { DailyEntryBadge } from "@/components/DailyEntryBadge";
+import { Confetti } from "@/components/Confetti";
 
 const STEPS_COLOR = "#3b82f6";
 
@@ -12,8 +13,12 @@ export function StepsCard({ steps, goal }: { steps: number; goal: number | null 
   const [prevSteps, setPrevSteps] = useState(steps);
   const [liveSteps, setLiveSteps] = useState(steps);
   const [value, setValue] = useState(String(steps));
+  const [burstKey, setBurstKey] = useState(0);
 
   if (steps !== prevSteps) {
+    if (goal !== null && prevSteps < goal && steps >= goal) {
+      setBurstKey((key) => key + 1);
+    }
     setPrevSteps(steps);
     setLiveSteps(steps);
     setValue(String(steps));
@@ -35,6 +40,7 @@ export function StepsCard({ steps, goal }: { steps: number; goal: number | null 
 
   return (
     <div className="stat-card flex h-full flex-col justify-between gap-3 p-4">
+      <Confetti burstKey={burstKey} />
       <div className="flex justify-end">
         <DailyEntryBadge color={STEPS_COLOR} />
       </div>

@@ -314,6 +314,7 @@ export default async function DashboardPage() {
             stepsGoal={profile.stepsGoal}
             weight={dailyWeight}
             weightGoal={profile.goalWeightKg}
+            startingWeightKg={profile.startingWeightKg}
             days={TRENDS_DAYS}
             exerciseTrends={exerciseTrends}
           />
