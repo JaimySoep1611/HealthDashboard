@@ -156,7 +156,7 @@ export function TrendsSection({
   );
 }
 
-const WEIGHT_CHART_HEIGHT = 140;
+const WEIGHT_CHART_HEIGHT = 170;
 
 function WeightTrendChart({
   id,
@@ -175,12 +175,14 @@ function WeightTrendChart({
   const min = ticks[0];
   const max = ticks[ticks.length - 1];
   const range = max - min || 1;
+  const tickStep = ticks.length > 1 ? ticks[1] - ticks[0] : range;
+  // A tick sitting within this distance of the goal would visually collide
+  // with the goal's own label, so we drop the tick's label there (the goal's
+  // bold label already marks that spot — the gridline stays).
+  const mergeThreshold = tickStep * 0.4;
 
-  const goalOnTick = goal !== null && ticks.some((tick) => Math.abs(tick - goal) < range * 0.01);
   const goalBottom =
-    goal !== null && !goalOnTick
-      ? Math.min(Math.max(((goal - min) / range) * WEIGHT_CHART_HEIGHT, 0), WEIGHT_CHART_HEIGHT)
-      : null;
+    goal !== null ? Math.min(Math.max(((goal - min) / range) * WEIGHT_CHART_HEIGHT, 0), WEIGHT_CHART_HEIGHT) : null;
 
   return (
     <div className="flex gap-2">
@@ -189,12 +191,12 @@ function WeightTrendChart({
         style={{ height: WEIGHT_CHART_HEIGHT }}
       >
         {ticks.map((tick) => {
-          const isGoal = goal !== null && Math.abs(tick - goal) < range * 0.01;
+          if (goal !== null && Math.abs(tick - goal) < mergeThreshold) return null;
           const bottom = ((tick - min) / range) * WEIGHT_CHART_HEIGHT;
           return (
             <span
               key={tick}
-              className={`absolute right-0 leading-none ${isGoal ? "font-medium text-foreground" : ""}`}
+              className="absolute right-0 leading-none"
               style={{ bottom: Math.min(Math.max(bottom - 4, 0), WEIGHT_CHART_HEIGHT - 8) }}
             >
               {tick.toFixed(1)}
@@ -203,7 +205,7 @@ function WeightTrendChart({
         })}
         {goalBottom !== null && (
           <span
-            className="absolute right-0 leading-none text-foreground"
+            className="absolute right-0 leading-none font-medium text-foreground"
             style={{ bottom: Math.min(Math.max(goalBottom - 4, 0), WEIGHT_CHART_HEIGHT - 8) }}
           >
             {goal!.toFixed(1)}
@@ -223,7 +225,7 @@ function WeightTrendChart({
           points={points}
           color={color}
           height={WEIGHT_CHART_HEIGHT}
-          target={goalOnTick ? undefined : (goal ?? undefined)}
+          target={goal ?? undefined}
           scaleMin={min}
           scaleMax={max}
         />

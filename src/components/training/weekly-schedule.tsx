@@ -74,7 +74,7 @@ export function WeeklySchedule({
     <div className="tile flex flex-col gap-4 p-6">
       <h3 className="font-medium">Training schedule</h3>
 
-      <div className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-1">
+      <div className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-7 sm:overflow-visible sm:px-0 sm:pb-0">
         {WEEKDAY_SHORT.map((label, day) => {
           const dayExercises = byDay.get(day) ?? [];
           const isToday = day === todayWeekday;
@@ -83,7 +83,7 @@ export function WeeklySchedule({
           return (
             <div
               key={day}
-              className={`flex w-28 flex-none snap-start flex-col gap-2 rounded-xl border p-3 transition-colors ${
+              className={`flex w-28 flex-none snap-start flex-col gap-2 rounded-xl border p-3 transition-colors sm:w-auto ${
                 isToday ? "border-navy-light bg-navy-light/10" : "border-border bg-surface"
               }`}
             >

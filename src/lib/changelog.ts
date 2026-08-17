@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Fixed spacing issues in Training and Trends",
+    description:
+      "The training week strip now stretches to fill the full width on tablet/desktop instead of leaving empty space on the right (still scrolls on mobile, where 7 columns wouldn't fit). Fixed the Trends charts' axis labels overlapping when the target sat close to a milestone number, and made the charts taller so they look better now that they're full width.",
+  },
+  {
+    date: "2026-08-17",
     title: "Schedule editing moved to Edit Goals",
     description:
       "Adding or removing training exercises now only happens from \"Edit Goals\" — the dashboard's training schedule is for logging what you did, not changing the plan. Also moved \"Meals logged today\" and \"Exercises logged this week\" up into the header, next to the other quick-glance stats, instead of being buried inside the Food and Training sections.",

@@ -2,7 +2,7 @@ import { niceTicks } from "@/lib/chartTicks";
 
 type DayValue = { date: string; value: number };
 
-const BAR_AREA_HEIGHT = 110;
+const BAR_AREA_HEIGHT = 170;
 const AXIS_WIDTH = "w-12";
 
 export function DailyBarChart({
@@ -24,12 +24,13 @@ export function DailyBarChart({
   const rawMax = Math.max(...days.map((day) => day.value), target ?? 0, 1);
   const ticks = niceTicks(0, rawMax);
   const max = ticks[ticks.length - 1];
+  const tickStep = ticks.length > 1 ? ticks[1] - ticks[0] : max;
+  // A tick sitting within this distance of the target would visually collide
+  // with the target's own label, so we drop the tick's label there (the
+  // target's bold label already marks that spot — the gridline stays).
+  const mergeThreshold = tickStep * 0.4;
 
-  // If the target doesn't land on one of the evenly-spaced milestones, it
-  // still gets its own dashed line so the exact goal is always visible.
-  const targetOnTick = target !== undefined && ticks.some((tick) => Math.abs(tick - target) < max * 0.01);
-  const targetBottom =
-    target !== undefined && !targetOnTick ? Math.min((target / max) * BAR_AREA_HEIGHT, BAR_AREA_HEIGHT) : null;
+  const targetBottom = target !== undefined ? Math.min((target / max) * BAR_AREA_HEIGHT, BAR_AREA_HEIGHT) : null;
 
   return (
     <div className="flex flex-col gap-2">
@@ -39,12 +40,12 @@ export function DailyBarChart({
           style={{ height: BAR_AREA_HEIGHT }}
         >
           {ticks.map((tick) => {
-            const isTarget = target !== undefined && Math.abs(tick - target) < max * 0.01;
+            if (target !== undefined && Math.abs(tick - target) < mergeThreshold) return null;
             const bottom = (tick / max) * BAR_AREA_HEIGHT;
             return (
               <span
                 key={tick}
-                className={`absolute right-0 leading-none ${isTarget ? "font-medium text-foreground" : ""}`}
+                className="absolute right-0 leading-none"
                 style={{ bottom: Math.min(Math.max(bottom - 4, 0), BAR_AREA_HEIGHT - 8) }}
               >
                 {Math.round(tick).toLocaleString()}
@@ -53,7 +54,7 @@ export function DailyBarChart({
           })}
           {targetBottom !== null && (
             <span
-              className="absolute right-0 leading-none text-foreground"
+              className="absolute right-0 leading-none font-medium text-foreground"
               style={{ bottom: Math.min(Math.max(targetBottom - 4, 0), BAR_AREA_HEIGHT - 8) }}
             >
               {Math.round(target!).toLocaleString()}
