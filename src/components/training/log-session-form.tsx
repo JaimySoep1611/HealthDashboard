@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type ExerciseInput = {
@@ -27,11 +26,14 @@ function buildInitialSets(exercise: ExerciseInput): SetRow[] {
 export function LogSessionForm({
   dayId,
   exercises,
+  onSaved,
+  onCancel,
 }: {
   dayId: string;
   exercises: ExerciseInput[];
+  onSaved: () => void;
+  onCancel: () => void;
 }) {
-  const router = useRouter();
   const [setsByExercise, setSetsByExercise] = useState<Record<string, SetRow[]>>(() =>
     Object.fromEntries(exercises.map((exercise) => [exercise.id, buildInitialSets(exercise)]))
   );
@@ -74,8 +76,7 @@ export function LogSessionForm({
     });
 
     setSaving(false);
-    router.push("/training");
-    router.refresh();
+    onSaved();
   }
 
   if (exercises.length === 0) {
@@ -126,13 +127,22 @@ export function LogSessionForm({
         </div>
       ))}
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="rounded-lg bg-navy px-4 py-2 font-medium text-white transition hover:bg-navy-light disabled:opacity-50"
-      >
-        {saving ? "Saving…" : "Save session"}
-      </button>
+      <div className="flex items-center gap-3">
+        <button
+          type="submit"
+          disabled={saving}
+          className="rounded-lg bg-navy px-4 py-2 font-medium text-white transition hover:bg-navy-light disabled:opacity-50"
+        >
+          {saving ? "Saving…" : "Save session"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="text-sm text-muted hover:text-foreground"
+        >
+          Cancel
+        </button>
+      </div>
     </form>
   );
 }
