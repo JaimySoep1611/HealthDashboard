@@ -23,6 +23,9 @@ export function TopNav({ profileName }: { profileName: string }) {
       </Link>
       <div className="flex items-center gap-4 text-sm text-muted">
         <span>{profileName}</span>
+        <Link href="/onboarding" className="hover:text-foreground">
+          Edit setup
+        </Link>
         <button onClick={switchProfile} className="hover:text-foreground">
           Switch
         </button>

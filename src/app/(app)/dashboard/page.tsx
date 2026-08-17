@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { startOfDay, startOfWeek, addDays } from "@/lib/dates";
@@ -13,6 +14,10 @@ const STEPS_DAYS_TO_SHOW = 14;
 export default async function DashboardPage() {
   const profile = await getCurrentProfile();
   if (!profile) return null;
+
+  if (!profile.onboardedAt) {
+    redirect("/onboarding");
+  }
 
   const today = startOfDay(new Date());
   const weekStart = startOfWeek(new Date());

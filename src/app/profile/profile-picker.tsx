@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { getProfileTheme } from "@/lib/profileTheme";
 
 export function ProfilePicker({ profiles }: { profiles: { id: string; name: string }[] }) {
   const router = useRouter();
@@ -27,7 +28,10 @@ export function ProfilePicker({ profiles }: { profiles: { id: string; name: stri
           disabled={pending !== null}
           className="tile flex flex-col items-center gap-3 p-8 disabled:opacity-50"
         >
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-navy text-2xl font-semibold text-white">
+          <div
+            className="flex h-16 w-16 items-center justify-center rounded-full text-2xl font-semibold text-white"
+            style={{ backgroundColor: getProfileTheme(profile.name).accent }}
+          >
             {profile.name.slice(0, 1).toUpperCase()}
           </div>
           <span className="text-lg font-medium">
