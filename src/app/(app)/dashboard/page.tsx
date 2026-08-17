@@ -143,14 +143,12 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-stretch">
-        <div className="lg:col-span-2 lg:h-full">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-start">
+        <div className="sm:col-span-2 lg:col-span-2">
           <DashboardHero name={profile.name} />
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1">
-          {target && <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />}
-          <StepsCard steps={todaySteps} />
-        </div>
+        {target && <WaterCard totalMl={totalWaterMl} targetMl={target.waterTargetMl} />}
+        <StepsCard steps={todaySteps} />
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start lg:gap-6">

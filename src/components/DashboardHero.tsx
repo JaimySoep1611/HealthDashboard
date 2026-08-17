@@ -25,7 +25,7 @@ export function DashboardHero({ name }: { name: string }) {
   );
 
   return (
-    <div className="hero-card animate-pop-in flex h-full flex-col gap-1 p-7 sm:flex-row sm:items-center sm:justify-between">
+    <div className="hero-card animate-pop-in flex flex-col gap-1 p-7 sm:flex-row sm:items-center sm:justify-between">
       <div className="relative z-10 flex flex-col gap-1">
         <span className="flex items-center gap-2 text-sm text-white/70">
           <SparkleIcon size={16} />
