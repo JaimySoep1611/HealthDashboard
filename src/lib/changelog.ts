@@ -9,6 +9,18 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Light mode",
+    description:
+      "Added a beige/sand light theme alongside the original dark theme, with a sun/moon button in the header to switch — your choice is remembered on this device.",
+  },
+  {
+    date: "2026-08-17",
+    title: "Layout polish + chart value labels",
+    description:
+      "Fixed a gap of empty space below the greeting banner on desktop when Water/Steps were taller than it. Trend charts (Calories, Water, Steps, Weight) now show the actual amounts on the side instead of only on hover. Renamed \"Edit setup\" to \"Edit Goals\" and \"Switch\" to \"Switch User\".",
+  },
+  {
+    date: "2026-08-17",
     title: "Fixed timezone bugs + target-anchored trend charts",
     description:
       "The server runs in UTC, which was causing the wrong greeting (e.g. \"Good morning\" in the afternoon) and could misfile very-early-morning entries under the wrong day — both now explicitly use Netherlands time. Also reworked the Calories/Water Trends charts to scale against your target instead of just each other, with a dashed line showing the target, so it's clear whether you hit it, undershot, or overshot.",

@@ -10,7 +10,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Calorie & macro rings",
         description:
-          "Fill up as you log food today, toward the daily targets you set in \"Edit setup\". The thin line below shows your calories over the last 7 days against your target.",
+          "Fill up as you log food today, toward the daily targets you set in \"Edit Goals\". The thin line below shows your calories over the last 7 days against your target.",
       },
       {
         name: "Log food",
@@ -73,12 +73,16 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     title: "General",
     items: [
       {
-        name: "Edit setup",
+        name: "Sun/moon icon",
+        description: "Switch between dark and light mode. Your choice is remembered on this device.",
+      },
+      {
+        name: "Edit Goals",
         description:
           "Revisit anytime to add, remove, or change your training goals, nutrition targets, water goal, or weight goal.",
       },
       {
-        name: "Switch",
+        name: "Switch User",
         description: "Change to the other profile without logging out.",
       },
     ],

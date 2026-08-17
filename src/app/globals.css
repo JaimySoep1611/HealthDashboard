@@ -10,6 +10,22 @@
   --navy: #00008b;
   --navy-light: #2626c9;
   --ring-track: rgba(255, 255, 255, 0.07);
+  --tile-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 12px 24px -18px rgba(0, 0, 0, 0.6);
+  --tile-shadow-hover: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 20px 40px -20px color-mix(in srgb, var(--navy-light) 45%, transparent);
+}
+
+[data-theme="light"] {
+  --background: #f3ecdc;
+  --surface: #faf6ec;
+  --surface-raised: #ffffff;
+  --border: #e3d8bf;
+  --foreground: #2b2519;
+  --muted: #8a7f68;
+  --ring-track: rgba(43, 37, 25, 0.08);
+  --tile-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.7) inset, 0 12px 24px -18px rgba(43, 37, 25, 0.16);
+  --tile-shadow-hover: 0 1px 0 0 rgba(255, 255, 255, 0.8) inset,
+    0 20px 40px -20px color-mix(in srgb, var(--navy-light) 30%, transparent);
 }
 
 @theme inline {
@@ -37,14 +53,14 @@ body {
   background: linear-gradient(180deg, var(--surface-raised) 0%, var(--surface) 100%);
   border: 1px solid var(--border);
   border-radius: 1.25rem;
-  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 12px 24px -18px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--tile-shadow);
   transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms ease, border-color 200ms ease;
 }
 
 .tile:hover {
   transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--navy-light) 55%, var(--border));
-  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset, 0 20px 40px -20px color-mix(in srgb, var(--navy-light) 45%, transparent);
+  box-shadow: var(--tile-shadow-hover);
 }
 
 .stat-card {

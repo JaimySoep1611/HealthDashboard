@@ -119,15 +119,12 @@ export function TrendsSection({
 
       {metric === "weight" ? (
         visible.length > 1 ? (
-          <div style={{ height: 140 }}>
-            <Sparkline
-              id={`trend-weight-${range}`}
-              points={visible.map((point) => point.value)}
-              color={active.color}
-              height={140}
-              target={weightGoal ?? undefined}
-            />
-          </div>
+          <WeightTrendChart
+            id={`trend-weight-${range}`}
+            points={visible.map((point) => point.value)}
+            color={active.color}
+            goal={weightGoal}
+          />
         ) : (
           <p className="text-sm text-muted">Not enough weigh-ins logged yet in this range.</p>
         )
@@ -154,6 +151,49 @@ export function TrendsSection({
           </span>
         </div>
       )}
+    </div>
+  );
+}
+
+const WEIGHT_CHART_HEIGHT = 140;
+
+function WeightTrendChart({
+  id,
+  points,
+  color,
+  goal,
+}: {
+  id: string;
+  points: number[];
+  color: string;
+  goal: number | null;
+}) {
+  const max = Math.max(...points, goal ?? 0, 1);
+  const min = Math.min(...points, goal ?? Infinity, 0);
+  const range = max - min || 1;
+  const goalBottom =
+    goal !== null ? Math.min(Math.max(((goal - min) / range) * WEIGHT_CHART_HEIGHT, 0), WEIGHT_CHART_HEIGHT) : null;
+
+  return (
+    <div className="flex gap-2">
+      <div
+        className="relative flex-none w-10 text-right text-[9px] text-muted sm:text-[10px]"
+        style={{ height: WEIGHT_CHART_HEIGHT }}
+      >
+        <span className="absolute right-0 top-0 leading-none">{max.toFixed(1)}</span>
+        {goalBottom !== null && (
+          <span
+            className="absolute right-0 leading-none text-foreground"
+            style={{ bottom: Math.min(Math.max(goalBottom - 4, 0), WEIGHT_CHART_HEIGHT - 8) }}
+          >
+            {goal!.toFixed(1)}
+          </span>
+        )}
+        <span className="absolute right-0 bottom-0 leading-none">{min.toFixed(1)}</span>
+      </div>
+      <div className="flex-1" style={{ height: WEIGHT_CHART_HEIGHT }}>
+        <Sparkline id={id} points={points} color={color} height={WEIGHT_CHART_HEIGHT} target={goal ?? undefined} />
+      </div>
     </div>
   );
 }
