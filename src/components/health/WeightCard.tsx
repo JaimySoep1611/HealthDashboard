@@ -55,8 +55,6 @@ export function WeightCard({
     }).then(() => router.refresh());
   }
 
-  const delta = liveLatestKg !== null && goalKg !== null ? liveLatestKg - goalKg : null;
-
   return (
     <div className="stat-card flex h-full flex-col justify-between gap-3 p-4">
       <div className="flex justify-end">
@@ -88,11 +86,7 @@ export function WeightCard({
             />
             <span className="text-base text-muted">kg</span>
           </div>
-          <span className="truncate text-xs text-muted">
-            {goalKg !== null
-              ? `Goal ${goalKg}kg${delta !== null ? ` · ${delta > 0 ? "+" : ""}${delta.toFixed(1)}kg` : ""}`
-              : "No goal set"}
-          </span>
+          <span className="truncate text-xs text-muted">{goalKg !== null ? `Goal ${goalKg}kg` : "No goal set"}</span>
         </div>
       </div>
 

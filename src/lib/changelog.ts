@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Simplified the Weight card's goal line",
+    description:
+      "The Weight card now just shows \"Goal 80kg\" instead of also appending the exact gap (e.g. \"· +2.0kg\") — the trend chart already shows progress toward the goal visually.",
+  },
+  {
+    date: "2026-08-17",
     title: "Bigger Steps/Weight numbers, no spinner arrows",
     description:
       "Removed the up/down spinner arrows on the editable Steps and Weight numbers (and every other number field in the app) — tidier, and they weren't needed for typing a value directly. Also enlarged the icon and number on both cards so they fill the tile better now that the separate input row underneath is gone.",
