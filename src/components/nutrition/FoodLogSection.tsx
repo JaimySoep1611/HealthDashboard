@@ -34,6 +34,8 @@ type Target = {
   waterTargetMl: number;
 };
 
+type FavoriteMeal = { id: string; name: string };
+
 function sumTotals(entries: FoodEntryItem[]) {
   return entries.reduce(
     (acc, entry) => ({
@@ -96,6 +98,7 @@ export function FoodLogSection({
   weekTotalExcludingToday,
   daysElapsed,
   recentMeals,
+  favoriteMeals,
 }: {
   target: Target;
   calorieTrend: number[];
@@ -103,6 +106,7 @@ export function FoodLogSection({
   weekTotalExcludingToday: number;
   daysElapsed: number;
   recentMeals: AiFoodItem[];
+  favoriteMeals: FavoriteMeal[];
 }) {
   const router = useRouter();
   const { entries, setEntries } = useFoodEntries();
@@ -244,7 +248,7 @@ export function FoodLogSection({
 
       <div className="tile p-5 sm:p-6">
         <h3 className="mb-3 font-medium">Today</h3>
-        <EntryList entries={entries} onRemove={removeEntry} />
+        <EntryList entries={entries} onRemove={removeEntry} favoriteMeals={favoriteMeals} />
       </div>
     </>
   );

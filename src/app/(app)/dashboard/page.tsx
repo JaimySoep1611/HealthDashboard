@@ -50,6 +50,7 @@ export default async function DashboardPage() {
     weightEntries,
     weightExerciseLogs,
     streakExerciseLogs,
+    favoriteMeals,
   ] = await Promise.all([
     prisma.nutritionTarget.findUnique({ where: { profileId: profile.id } }),
     prisma.foodEntry.findMany({
@@ -86,6 +87,8 @@ export default async function DashboardPage() {
     prisma.exerciseLog.findMany({
       where: { exercise: { profileId: profile.id }, weekStart: { gte: streakLogsStart } },
     }),
+    // Shared across both profiles — see FavoriteMeal in schema.prisma.
+    prisma.favoriteMeal.findMany(),
   ]);
 
   const exercises = trainingExercises.map((exercise) => ({
@@ -318,6 +321,7 @@ export default async function DashboardPage() {
               weekTotalExcludingToday={weekTotalExcludingToday}
               daysElapsed={daysElapsed}
               recentMeals={recentMeals}
+              favoriteMeals={favoriteMeals}
             />
           )}
         </section>

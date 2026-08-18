@@ -30,7 +30,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Star an entry in Today",
         description:
-          "Tap the star next to anything already logged in \"Today\" to add it to the shared favorites menu directly — no need to retype it manually first. It'll show up as filled once added, and appears in the Favorites section of \"Log it manually\" for both Jaimy and Lisa.",
+          "Tap the star next to anything logged in \"Today\" to favorite it — tap the filled star again to unfavorite. It reflects the real shared favorites menu (not just this screen), so it stays filled after a refresh and shows filled for either profile once either of you has favorited that meal.",
       },
     ],
   },

@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Fixed the favorite star: real toggle, bigger target, persists",
+    description:
+      "Three fixes to the star button on logged entries: it now reflects the actual shared favorites list (so it stays filled after a refresh, instead of always resetting), tapping a filled star unfavorites it (a real toggle, not add-only), and the tap target is bigger so it's easier to hit precisely.",
+  },
+  {
+    date: "2026-08-17",
     title: "Trends bars show the day's number and gap to goal",
     description:
       "In Trends' Week view, Calories/Water/Steps bars now show the day's actual number above them, and a lighter shaded segment extends up to the goal line on days that fell short — so you can see both the number and how far it was from target without hovering. Only applies where a goal is set, and only in Week view (Month view stays as-is, same reason it already skips day labels there).",
