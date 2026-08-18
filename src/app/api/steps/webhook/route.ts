@@ -27,7 +27,9 @@ export async function POST(request: NextRequest) {
     // to help pin down a live "Unauthorized" report from a Shortcut. Revert
     // once resolved.
     console.log(
-      `DIAGNOSTIC steps-webhook auth failed: receivedType=${typeof secret} receivedLength=${
+      `DIAGNOSTIC steps-webhook auth failed: bodyType=${typeof body} bodyKeys=${
+        body && typeof body === "object" ? JSON.stringify(Object.keys(body)) : "n/a"
+      } receivedType=${typeof secret} receivedLength=${
         typeof secret === "string" ? secret.length : "n/a"
       } expectedLength=${expectedSecret.length} profileName=${JSON.stringify(profileName)}`
     );
