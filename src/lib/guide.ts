@@ -114,7 +114,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Daily reminders",
         description:
-          "Turn on in \"Edit Goals\" to get a phone notification in the early evening if you haven't hit your water or steps goal yet that day — skipped entirely if you've already hit both, or if you haven't set a goal for one of them. Works even with the app closed once enabled, including as a Home Screen webapp on iPhone (needs iOS 16.4+).",
+          "Turn on in \"Edit Goals\" to get phone notifications (Amsterdam time): water/steps in the early evening if you haven't hit those goals yet — skipped if you've already hit both, or haven't set a goal for one; and meal reminders at 10:00 (if nothing's logged yet), 13:00 (if nothing since 11:45), and 19:00 (if nothing since 18:00) for breakfast, lunch, and dinner. Works even with the app closed once enabled, including as a Home Screen webapp on iPhone (needs iOS 16.4+).",
       },
       {
         name: "Fun background",

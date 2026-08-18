@@ -37,3 +37,24 @@ export function addDays(date: Date, days: number): Date {
   result.setDate(result.getDate() + days);
   return result;
 }
+
+// Local clock time in Amsterdam — correctly accounts for the CET/CEST
+// daylight-saving switch (unlike a fixed UTC offset), same reason startOfDay
+// above resolves the calendar day via Intl instead of a hardcoded offset.
+export function amsterdamHourMinute(date: Date): { hour: number; minute: number } {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TIME_ZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(date);
+  return {
+    hour: Number(parts.find((p) => p.type === "hour")!.value),
+    minute: Number(parts.find((p) => p.type === "minute")!.value),
+  };
+}
+
+export function isAtOrAfterAmsterdamTime(date: Date, hour: number, minute: number): boolean {
+  const local = amsterdamHourMinute(date);
+  return local.hour * 60 + local.minute >= hour * 60 + minute;
+}

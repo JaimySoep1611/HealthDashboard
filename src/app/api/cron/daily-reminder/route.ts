@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { startOfDay } from "@/lib/dates";
-import { getWebPush } from "@/lib/webPush";
+import { sendPushToSubscriptions } from "@/lib/notify";
 
 // Triggered once a day by Vercel Cron (see vercel.json) — Vercel signs the
 // request with this header when CRON_SECRET is set, so this is the only
@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
   }
 
   const today = startOfDay(new Date());
-  const webpush = getWebPush();
 
   const profiles = await prisma.profile.findMany({
     where: { pushSubscriptions: { some: {} } },
@@ -49,22 +48,9 @@ export async function GET(request: NextRequest) {
         ? "You haven't hit your water or steps goal yet today — still time!"
         : `You haven't hit your ${missing[0]} goal yet today — still time!`;
     const payload = JSON.stringify({ title: "Soephart & Ligtenberg", body });
-
-    for (const subscription of profile.pushSubscriptions) {
-      try {
-        await webpush.sendNotification(
-          { endpoint: subscription.endpoint, keys: { p256dh: subscription.p256dh, auth: subscription.auth } },
-          payload
-        );
-        notified++;
-      } catch (error) {
-        const statusCode = (error as { statusCode?: number }).statusCode;
-        if (statusCode === 404 || statusCode === 410) {
-          await prisma.pushSubscription.delete({ where: { id: subscription.id } }).catch(() => {});
-          removedSubscriptions++;
-        }
-      }
-    }
+    const result = await sendPushToSubscriptions(profile.pushSubscriptions, payload);
+    notified += result.notified;
+    removedSubscriptions += result.removed;
   }
 
   return NextResponse.json({ profilesChecked: profiles.length, notified, removedSubscriptions });

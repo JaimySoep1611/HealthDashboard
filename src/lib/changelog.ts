@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Meal reminders: breakfast, lunch, and dinner",
+    description:
+      "Three new reminders (once daily reminders are enabled): 10:00 if nothing's logged yet today, 13:00 if nothing's logged since 11:45, and 19:00 if nothing's logged since 18:00 — nudges for breakfast, lunch, and dinner respectively. All times are Amsterdam local time, correctly adjusted for CET/CEST.",
+  },
+  {
+    date: "2026-08-17",
     title: "Simplified the Weight card's goal line",
     description:
       "The Weight card now just shows \"Goal 80kg\" instead of also appending the exact gap (e.g. \"· +2.0kg\") — the trend chart already shows progress toward the goal visually.",
