@@ -82,21 +82,50 @@ export function DailyBarChart({
               title={`Target: ${formatValue(target!)}`}
             />
           )}
-          {days.map((day) => (
-            <div key={day.date} className="flex flex-1 items-end">
-              <div
-                className="w-full rounded-t-md transition-all duration-500"
-                style={{
-                  height: `${Math.max((day.value / max) * BAR_AREA_HEIGHT, 3)}px`,
-                  backgroundColor: color,
-                }}
-                title={`${new Date(day.date).toLocaleDateString(undefined, {
-                  month: "short",
-                  day: "numeric",
-                })}: ${formatValue(day.value)}`}
-              />
-            </div>
-          ))}
+          {days.map((day) => {
+            const barHeight = Math.max((day.value / max) * BAR_AREA_HEIGHT, 3);
+            // With a goal set, show how far this day fell short of it — a
+            // lighter "ghost" segment from the actual bar up to the goal
+            // line, plus the day's own number labeled above it. Days that
+            // already hit/passed the goal just show the plain solid bar.
+            // Gated on showWeekdayLabels (few enough bars to have room) —
+            // a 30-bar month view would just overlap labels otherwise, same
+            // reason that view already skips the weekday-letter labels.
+            const showGoalDetail = target !== undefined && showWeekdayLabels;
+            const showGap = showGoalDetail && day.value < target!;
+            const totalHeight = showGap ? targetBottom! : barHeight;
+            const dayTitle = `${new Date(day.date).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            })}: ${formatValue(day.value)}`;
+
+            return (
+              <div key={day.date} className="relative flex flex-1 flex-col items-center justify-end">
+                {showGoalDetail && (
+                  <span
+                    className="absolute whitespace-nowrap text-[8px] leading-none text-muted sm:text-[9px]"
+                    style={{ bottom: Math.min(totalHeight + 3, BAR_AREA_HEIGHT - 4) }}
+                  >
+                    {Math.round(day.value).toLocaleString()}
+                  </span>
+                )}
+                <div className="relative w-full" style={{ height: totalHeight }} title={dayTitle}>
+                  {showGap && (
+                    <div
+                      className="absolute inset-x-0 top-0 rounded-t-md"
+                      style={{ height: Math.max(targetBottom! - barHeight, 0), backgroundColor: color, opacity: 0.25 }}
+                    />
+                  )}
+                  <div
+                    className={`absolute inset-x-0 bottom-0 w-full transition-all duration-500 ${
+                      showGap ? "" : "rounded-t-md"
+                    }`}
+                    style={{ height: barHeight, backgroundColor: color }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

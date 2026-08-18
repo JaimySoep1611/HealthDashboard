@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Trends bars show the day's number and gap to goal",
+    description:
+      "In Trends' Week view, Calories/Water/Steps bars now show the day's actual number above them, and a lighter shaded segment extends up to the goal line on days that fell short — so you can see both the number and how far it was from target without hovering. Only applies where a goal is set, and only in Week view (Month view stays as-is, same reason it already skips day labels there).",
+  },
+  {
+    date: "2026-08-17",
     title: "Strava sync for runs",
     description:
       "Connect your Strava account from \"Edit Goals\" — new runs now log in automatically to that weekday's cardio exercise in the training schedule (a \"Run\" exercise is created automatically if nothing was scheduled that day, so an unplanned run still gets captured). Tap the orange \"S\" badge on a synced exercise to see a details popup with distance, duration, pace, and elevation gain. Each profile connects Strava separately — Jaimy's runs go to Jaimy's schedule, Lisa's to Lisa's.",

@@ -85,7 +85,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Trends",
         description:
-          "Look back over the last week or month for Calories, Water, Steps, or Weight — pick a metric and a range to see the chart and the average for that period.",
+          "Look back over the last week or month for Calories, Water, Steps, or Weight — pick a metric and a range to see the chart and the average for that period. In Week view, if you have a goal set for that metric, each bar also shows the day's number and a lighter shaded gap up to the goal line on days you fell short — so it's clear both what you logged and how far it was from target, at a glance. (Month view skips this, same reason it skips the day labels — too many bars for it to stay readable.)",
       },
       {
         name: "Training (in Trends)",
