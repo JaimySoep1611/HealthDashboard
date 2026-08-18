@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Edit Goals is schedule-only, clearer \"done\" days, full names",
+    description:
+      "Three fixes to the training schedule: Edit Goals no longer shows logging controls on each exercise (just the name and a remove button) — it's for changing the plan, logging still only happens on the dashboard. A day now turns green with a checkmark once it's done, including rest days (previously only training days got any \"complete\" indicator, and it was a barely-visible dot). And exercise names that don't fit now wrap onto a second line instead of getting cut off on narrow screens.",
+  },
+  {
+    date: "2026-08-17",
     title: "Color and icons for the training schedule",
     description:
       "The training schedule was looking a bit flat, so each exercise now gets an icon and color guessed from its name — push (blue), pull (teal), legs (amber), or core (pink) — and running exercises get their own distinct icon/color too. Rest days now show a small moon icon instead of just plain text.",

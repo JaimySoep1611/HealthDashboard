@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WEEKDAY_LABELS, WEEKDAY_SHORT } from "@/lib/weekdays";
-import { FootprintsIcon, CloseIcon, PushIcon, PullIcon, LegsIcon, TargetIcon, MoonIcon } from "@/components/icons";
+import { FootprintsIcon, CloseIcon, PushIcon, PullIcon, LegsIcon, TargetIcon, MoonIcon, CheckIcon } from "@/components/icons";
 import { categorizeExercise, CATEGORY_COLORS, CARDIO_COLOR } from "@/lib/exerciseCategory";
 
 type Log = {
@@ -103,13 +103,21 @@ export function WeeklySchedule({
         {WEEKDAY_SHORT.map((label, day) => {
           const dayExercises = byDay.get(day) ?? [];
           const isToday = day === todayWeekday;
-          const isComplete = dayExercises.length > 0 && dayExercises.every((exercise) => exercise.log);
+          const isRestDay = dayExercises.length === 0;
+          // A rest day needs nothing logged, so it counts as "done" the same
+          // way a fully-logged training day does — otherwise it just sits
+          // there looking neutral/incomplete for no reason.
+          const isDone = isRestDay || dayExercises.every((exercise) => exercise.log);
 
           return (
             <div
               key={day}
               className={`flex w-28 flex-none snap-start flex-col gap-2 rounded-xl border p-3 transition-colors sm:w-auto ${
-                isToday ? "border-navy-light bg-navy-light/10" : "border-border bg-surface"
+                isDone
+                  ? "border-emerald-400/50 bg-emerald-400/10"
+                  : isToday
+                    ? "border-navy-light bg-navy-light/10"
+                    : "border-border bg-surface"
               }`}
             >
               <div className="flex items-center justify-between">
@@ -120,29 +128,31 @@ export function WeeklySchedule({
                 >
                   {label}
                 </span>
-                {dayExercises.length > 0 && (
-                  <span
-                    className={`h-1.5 w-1.5 flex-none rounded-full ${
-                      isComplete ? "bg-emerald-400" : "border border-muted"
-                    }`}
-                  />
+                {isDone && (
+                  <span className="flex-none text-emerald-400">
+                    <CheckIcon size={12} />
+                  </span>
                 )}
               </div>
 
-              {dayExercises.length === 0 ? (
+              {isRestDay ? (
                 <div className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-border py-5 text-center text-muted">
                   <MoonIcon size={16} className="opacity-60" />
                   <span className="text-[10px]">Rest</span>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
-                  {dayExercises.map((exercise) => (
-                    <ExerciseChip
-                      key={exercise.id}
-                      exercise={exercise}
-                      onRemove={editable ? () => removeExercise(exercise.id) : undefined}
-                    />
-                  ))}
+                  {dayExercises.map((exercise) =>
+                    editable ? (
+                      <ScheduleOnlyChip
+                        key={exercise.id}
+                        exercise={exercise}
+                        onRemove={() => removeExercise(exercise.id)}
+                      />
+                    ) : (
+                      <ExerciseChip key={exercise.id} exercise={exercise} />
+                    )
+                  )}
                 </div>
               )}
             </div>
@@ -194,7 +204,30 @@ export function WeeklySchedule({
   );
 }
 
-function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: () => void }) {
+// Edit Goals only edits the schedule (what's assigned to which day) — no
+// logging UI here at all, so it can't be confused with the dashboard's
+// "log what you did" view.
+function ScheduleOnlyChip({ exercise, onRemove }: { exercise: Exercise; onRemove: () => void }) {
+  const { Icon, color } = exerciseIconAndColor(exercise);
+
+  return (
+    <div className="flex items-center gap-1.5 rounded-lg border border-border bg-surface-raised p-2">
+      <span className="flex-none" style={{ color }}>
+        <Icon size={12} />
+      </span>
+      <span className="min-w-0 flex-1 text-[11px] font-medium break-words">{exercise.name}</span>
+      <button
+        onClick={onRemove}
+        aria-label={`Remove ${exercise.name}`}
+        className="flex-none text-[11px] leading-none text-muted hover:text-red-400"
+      >
+        ×
+      </button>
+    </div>
+  );
+}
+
+function ExerciseChip({ exercise }: { exercise: Exercise }) {
   const router = useRouter();
   // Always start collapsed, logged or not — a day with several exercises would
   // otherwise show several expanded input stacks at once and balloon in height.
@@ -247,7 +280,7 @@ function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: (
         <span className="flex-none" style={{ color }}>
           <Icon size={12} />
         </span>
-        <span className="min-w-0 flex-1 truncate text-[11px] font-medium">{exercise.name}</span>
+        <span className="min-w-0 flex-1 text-[11px] font-medium break-words">{exercise.name}</span>
         {liveLog?.stravaActivityId && (
           <button
             onClick={() => setDetailsOpen(true)}
@@ -257,11 +290,6 @@ function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: (
             style={{ backgroundColor: "#fc4c02" }}
           >
             S
-          </button>
-        )}
-        {onRemove && (
-          <button onClick={onRemove} className="flex-none text-[11px] leading-none text-muted hover:text-red-400">
-            ×
           </button>
         )}
       </div>

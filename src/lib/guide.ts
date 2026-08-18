@@ -50,7 +50,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Training schedule",
         description:
-          "A week strip, Monday through Sunday — scroll sideways to see every day. Days with nothing assigned show as \"Rest\" (with a little moon), and the dot next to a day fills in green once everything for that day is logged; logs reset automatically every Monday. Each exercise gets a colored icon guessed from its name — push (blue), pull (teal), legs (amber), or core (pink) — and running exercises get their own icon and color too, so the week is easier to scan at a glance. Tap an exercise here to log kg + sets + reps (power training) or km (running) — tap it again and hit \"Clear\" if you logged it by mistake, which un-counts it (and its day) as logged. To add, remove, or move exercises between days, use \"Edit Goals\" instead.",
+          "A week strip, Monday through Sunday — scroll sideways to see every day. A day turns green with a checkmark once it's done: a rest day always counts as done, and a training day counts once every exercise on it is logged; logs reset automatically every Monday. Each exercise gets a colored icon guessed from its name — push (blue), pull (teal), legs (amber), or core (pink) — and running exercises get their own icon and color too, so the week is easier to scan at a glance. Names that don't fit wrap onto a second line rather than getting cut off, so you can always read the full name. Tap an exercise here to log kg + sets + reps (power training) or km (running) — tap it again and hit \"Clear\" if you logged it by mistake, which un-counts it (and its day) as logged.",
       },
       {
         name: "Strava sync",
@@ -109,7 +109,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Edit Goals",
         description:
-          "Revisit anytime to add, remove, or change your training goals, nutrition targets, water goal, weight goal, starting weight, or steps goal — and to turn daily reminders on or off.",
+          "Revisit anytime to add, remove, or move exercises between days, or change nutrition targets, water goal, weight goal, starting weight, or steps goal — and to turn daily reminders on or off. This page is for changing the plan only — it doesn't log anything, so there's no logging UI here to mix up with the dashboard.",
       },
       {
         name: "Daily reminders",
