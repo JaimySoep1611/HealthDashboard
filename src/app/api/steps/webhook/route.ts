@@ -12,7 +12,14 @@ function timingSafeEqualStr(a: string, b: string): boolean {
 // Public webhook target for the Apple Shortcuts automation — authenticated via
 // a shared secret instead of the cookie session, since Shortcuts can't hold cookies.
 export async function POST(request: NextRequest) {
-  const { secret, profileName, date, steps } = await request.json();
+  const body = await request.json().catch(() => null);
+  if (!body) {
+    // Most common cause: the caller sent an empty or non-JSON body — e.g. a
+    // Shortcuts "Get Contents of URL" action whose Request Body isn't
+    // actually set to the JSON dictionary.
+    return NextResponse.json({ error: "Missing or invalid JSON body" }, { status: 400 });
+  }
+  const { secret, profileName, date, steps } = body;
 
   const expectedSecret = process.env.STEPS_WEBHOOK_SECRET ?? "";
   if (!expectedSecret || typeof secret !== "string" || !timingSafeEqualStr(secret, expectedSecret)) {
