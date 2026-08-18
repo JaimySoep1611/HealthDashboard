@@ -23,6 +23,14 @@ export async function POST(request: NextRequest) {
 
   const expectedSecret = process.env.STEPS_WEBHOOK_SECRET ?? "";
   if (!expectedSecret || typeof secret !== "string" || !timingSafeEqualStr(secret, expectedSecret)) {
+    // Temporary diagnostic — lengths only, never the actual secret value —
+    // to help pin down a live "Unauthorized" report from a Shortcut. Revert
+    // once resolved.
+    console.log(
+      `DIAGNOSTIC steps-webhook auth failed: receivedType=${typeof secret} receivedLength=${
+        typeof secret === "string" ? secret.length : "n/a"
+      } expectedLength=${expectedSecret.length} profileName=${JSON.stringify(profileName)}`
+    );
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
