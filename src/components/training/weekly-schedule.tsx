@@ -104,10 +104,13 @@ export function WeeklySchedule({
           const dayExercises = byDay.get(day) ?? [];
           const isToday = day === todayWeekday;
           const isRestDay = dayExercises.length === 0;
-          // A rest day needs nothing logged, so it counts as "done" the same
-          // way a fully-logged training day does — otherwise it just sits
-          // there looking neutral/incomplete for no reason.
-          const isDone = isRestDay || dayExercises.every((exercise) => exercise.log);
+          // A rest day only counts as "done" once it's actually today or in
+          // the past — a rest day later this week hasn't happened yet, so it
+          // shouldn't look complete before it's even here. todayWeekday is
+          // null pre-hydration, which correctly keeps every rest day
+          // non-done until then rather than flashing green.
+          const isPastOrToday = todayWeekday !== null && day <= todayWeekday;
+          const isDone = (isRestDay && isPastOrToday) || (!isRestDay && dayExercises.every((exercise) => exercise.log));
 
           return (
             <div
