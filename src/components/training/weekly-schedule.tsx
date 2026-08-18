@@ -3,9 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WEEKDAY_LABELS, WEEKDAY_SHORT } from "@/lib/weekdays";
-import { DumbbellIcon, FootprintsIcon } from "@/components/icons";
+import { DumbbellIcon, FootprintsIcon, CloseIcon } from "@/components/icons";
 
-type Log = { kg: number | null; sets: number | null; reps: number | null; km: number | null };
+type Log = {
+  kg: number | null;
+  sets: number | null;
+  reps: number | null;
+  km: number | null;
+  stravaActivityId?: string | null;
+  movingTimeSec?: number | null;
+  elevationGainM?: number | null;
+  avgSpeedMps?: number | null;
+};
 type Exercise = {
   id: string;
   name: string;
@@ -178,6 +187,7 @@ function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: (
   const [reps, setReps] = useState(exercise.log?.reps?.toString() ?? "");
   const [km, setKm] = useState(exercise.log?.km?.toString() ?? "");
   const [liveLog, setLiveLog] = useState(exercise.log);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   function save() {
     const payload = {
@@ -220,6 +230,17 @@ function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: (
           {exercise.kind === "weight" ? <DumbbellIcon size={11} /> : <FootprintsIcon size={11} />}
         </span>
         <span className="min-w-0 flex-1 truncate text-[11px] font-medium">{exercise.name}</span>
+        {liveLog?.stravaActivityId && (
+          <button
+            onClick={() => setDetailsOpen(true)}
+            aria-label="View synced run details"
+            title="Synced from Strava — tap for details"
+            className="flex-none rounded-full px-1 py-0.5 text-[8px] font-bold leading-none text-white"
+            style={{ backgroundColor: "#fc4c02" }}
+          >
+            S
+          </button>
+        )}
         {onRemove && (
           <button onClick={onRemove} className="flex-none text-[11px] leading-none text-muted hover:text-red-400">
             ×
@@ -306,6 +327,68 @@ function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: (
             : "Tap to log"}
         </button>
       )}
+
+      {detailsOpen && liveLog && (
+        <StravaDetailsModal name={exercise.name} log={liveLog} onClose={() => setDetailsOpen(false)} />
+      )}
+    </div>
+  );
+}
+
+function StravaDetailsModal({ name, log, onClose }: { name: string; log: Log; onClose: () => void }) {
+  const km = log.km ?? 0;
+  const movingTimeSec = log.movingTimeSec ?? 0;
+  const elevationGainM = log.elevationGainM ?? 0;
+  const avgSpeedMps = log.avgSpeedMps ?? 0;
+
+  const hours = Math.floor(movingTimeSec / 3600);
+  const minutes = Math.floor((movingTimeSec % 3600) / 60);
+  const seconds = Math.floor(movingTimeSec % 60);
+  const durationText =
+    hours > 0
+      ? `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+      : `${minutes}:${String(seconds).padStart(2, "0")}`;
+
+  const paceSecPerKm = avgSpeedMps > 0 ? 1000 / avgSpeedMps : 0;
+  const paceMin = Math.floor(paceSecPerKm / 60);
+  const paceSec = Math.round(paceSecPerKm % 60);
+  const paceText = avgSpeedMps > 0 ? `${paceMin}:${String(paceSec).padStart(2, "0")} /km` : "—";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+      <div
+        className="tile flex w-full max-w-xs flex-col gap-3 p-5"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium">{name}</h3>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="flex h-7 w-7 flex-none items-center justify-center rounded-full text-muted transition hover:text-foreground"
+          >
+            <CloseIcon size={16} />
+          </button>
+        </div>
+        <p className="text-xs" style={{ color: "#fc4c02" }}>
+          Synced from Strava
+        </p>
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <DetailStat label="Distance" value={`${km.toFixed(2)} km`} />
+          <DetailStat label="Duration" value={durationText} />
+          <DetailStat label="Pace" value={paceText} />
+          <DetailStat label="Elevation" value={`${Math.round(elevationGainM)} m`} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DetailStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[10px] text-muted">{label}</p>
+      <p className="font-medium">{value}</p>
     </div>
   );
 }

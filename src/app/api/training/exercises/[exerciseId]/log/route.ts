@@ -27,9 +27,22 @@ export async function POST(
   const km = exercise.kind === "cardio" && typeof body.km === "number" ? body.km : null;
 
   const weekStart = startOfWeek(new Date());
+  // A manual save always replaces the value outright — clear any prior
+  // Strava sync detail (pace/duration/elevation) so stale numbers don't keep
+  // showing in the "view details" popup for a value the user just retyped.
   const log = await prisma.exerciseLog.upsert({
     where: { exerciseId_weekStart: { exerciseId, weekStart } },
-    update: { kg, sets, reps, km, loggedAt: new Date() },
+    update: {
+      kg,
+      sets,
+      reps,
+      km,
+      loggedAt: new Date(),
+      stravaActivityId: null,
+      movingTimeSec: null,
+      elevationGainM: null,
+      avgSpeedMps: null,
+    },
     create: { exerciseId, weekStart, kg, sets, reps, km },
   });
 

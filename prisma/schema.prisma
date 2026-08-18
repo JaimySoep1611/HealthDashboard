@@ -29,6 +29,21 @@ model Profile {
   waterEntries      WaterEntry[]
   weightEntries     WeightEntry[]
   pushSubscriptions PushSubscription[]
+  stravaConnection  StravaConnection?
+}
+
+model StravaConnection {
+  id           String   @id @default(cuid())
+  profile      Profile  @relation(fields: [profileId], references: [id])
+  profileId    String   @unique
+  athleteId    String   @unique
+  athleteName  String?
+  accessToken  String
+  refreshToken String
+  // Unix seconds — Strava's token response format, compared directly against
+  // Math.floor(Date.now() / 1000) rather than converting to a Date.
+  expiresAt    Int
+  createdAt    DateTime @default(now())
 }
 
 model PushSubscription {
@@ -67,6 +82,14 @@ model ExerciseLog {
   reps       Int?
   km         Float?
   loggedAt   DateTime         @default(now())
+
+  // Present only when this log was synced in automatically from Strava —
+  // extra detail for the "view details" popup, beyond the plain km the
+  // schedule already shows for a manually-logged run.
+  stravaActivityId String? @unique
+  movingTimeSec    Int?
+  elevationGainM   Float?
+  avgSpeedMps      Float?
 
   @@unique([exerciseId, weekStart])
 }

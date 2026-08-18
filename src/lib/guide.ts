@@ -52,6 +52,11 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         description:
           "A week strip, Monday through Sunday — scroll sideways to see every day. Days with nothing assigned show as \"Rest\", and the dot next to a day fills in green once everything for that day is logged; logs reset automatically every Monday. Tap an exercise here to log kg + sets + reps (power training) or km (running) — tap it again and hit \"Clear\" if you logged it by mistake, which un-counts it (and its day) as logged. To add, remove, or move exercises between days, use \"Edit Goals\" instead.",
       },
+      {
+        name: "Strava sync",
+        description:
+          "Connect Strava in \"Edit Goals\" and new runs log in automatically to that weekday's cardio exercise (a \"Run\" exercise is added automatically if you don't already have one scheduled that day). A small orange \"S\" badge appears on a synced exercise — tap it for a details popup with distance, duration, pace, and elevation gain. Editing the number yourself afterward clears the synced details, since they'd no longer match what you typed. Each profile connects their own Strava account separately.",
+      },
     ],
   },
   {

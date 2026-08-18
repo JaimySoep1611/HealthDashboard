@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Strava sync for runs",
+    description:
+      "Connect your Strava account from \"Edit Goals\" — new runs now log in automatically to that weekday's cardio exercise in the training schedule (a \"Run\" exercise is created automatically if nothing was scheduled that day, so an unplanned run still gets captured). Tap the orange \"S\" badge on a synced exercise to see a details popup with distance, duration, pace, and elevation gain. Each profile connects Strava separately — Jaimy's runs go to Jaimy's schedule, Lisa's to Lisa's.",
+  },
+  {
+    date: "2026-08-17",
     title: "Star an already-logged meal to favorite it",
     description:
       "Every entry in \"Today\" now has a star button — tap it to add that meal to the shared favorites menu directly, without retyping it in manual entry first.",

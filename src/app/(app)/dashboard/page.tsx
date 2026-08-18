@@ -99,6 +99,10 @@ export default async function DashboardPage() {
           sets: exercise.logs[0].sets,
           reps: exercise.logs[0].reps,
           km: exercise.logs[0].km,
+          stravaActivityId: exercise.logs[0].stravaActivityId,
+          movingTimeSec: exercise.logs[0].movingTimeSec,
+          elevationGainM: exercise.logs[0].elevationGainM,
+          avgSpeedMps: exercise.logs[0].avgSpeedMps,
         }
       : null,
   }));
