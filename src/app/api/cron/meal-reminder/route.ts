@@ -3,14 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { startOfDay, amsterdamHourMinute, isAtOrAfterAmsterdamTime } from "@/lib/dates";
 import { sendPushToSubscriptions } from "@/lib/notify";
 
-// Fires every 15 minutes (see vercel.json), but each check below only acts
-// within its own 15-minute window — so despite running all day, this only
-// ever sends (at most) one push per meal per profile per day.
-//
-// Checking Amsterdam LOCAL time here, rather than pinning the cron itself to
-// a fixed UTC time, is what keeps this correct across the CET/CEST
-// daylight-saving switch — a static UTC cron time would silently drift an
-// hour off for half the year otherwise.
+// Vercel Hobby only allows once-daily cron schedules (no "every 15 minutes"),
+// so each check below is triggered by TWO fixed once-daily UTC cron entries
+// in vercel.json — one for each possible CET/CEST offset (an hour apart).
+// Whichever of the two actually lands within the check's window (computed
+// from real Amsterdam local time, not the cron's nominal UTC time) is the
+// "real" one for today's season; the other lands outside every window and
+// no-ops harmlessly. This is what keeps meal times correct across the
+// daylight-saving switch without a subscription that violates the Hobby
+// once-per-day limit.
 const WINDOW_MINUTES = 15;
 const CHECKS = [
   // Breakfast: nothing logged yet today at all.
