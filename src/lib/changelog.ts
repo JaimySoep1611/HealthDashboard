@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Star an already-logged meal to favorite it",
+    description:
+      "Every entry in \"Today\" now has a star button — tap it to add that meal to the shared favorites menu directly, without retyping it in manual entry first.",
+  },
+  {
+    date: "2026-08-17",
     title: "Recent meals + a shared favorites menu",
     description:
       "\"Log it manually\" now shows your recently-logged meals and a favorites menu right above the form — tap one to log it instantly with its saved numbers. Add a \"★ Save as favorite\" checkbox while manually logging something to add it to the favorites menu, which both Jaimy and Lisa see and pick from (one shared list). Recent meals stay per-profile, since they reflect your own logging history.",

@@ -27,6 +27,11 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         description:
           "Opening \"Log it manually\" shows your recently-logged meals and any saved favorites right above the form — tap one to log it instantly with its saved numbers, no retyping. Check \"Save as favorite\" while adding something to add it to the favorites menu. Favorites are shared between Jaimy and Lisa (one household menu), while \"Recent\" only reflects your own recent logging.",
       },
+      {
+        name: "Star an entry in Today",
+        description:
+          "Tap the star next to anything already logged in \"Today\" to add it to the shared favorites menu directly — no need to retype it manually first. It'll show up as filled once added, and appears in the Favorites section of \"Log it manually\" for both Jaimy and Lisa.",
+      },
     ],
   },
   {

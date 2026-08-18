@@ -27,6 +27,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
 
+  // Starring the same meal twice (e.g. from two different logged entries with
+  // the same name) shouldn't create a duplicate row in the shared menu.
+  const existing = await prisma.favoriteMeal.findFirst({
+    where: { name: { equals: name.trim(), mode: "insensitive" } },
+  });
+  if (existing) return NextResponse.json(existing);
+
   const favorite = await prisma.favoriteMeal.create({
     data: { name: name.trim(), calories, proteinG, carbsG, fatG },
   });
