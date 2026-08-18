@@ -20,7 +20,7 @@ export function WeightCard({
   loggedToday: boolean;
 }) {
   const router = useRouter();
-  const [value, setValue] = useState(latestKg ? String(latestKg) : "");
+  const [value, setValue] = useState(latestKg !== null ? String(latestKg) : "");
   const [prevLatestKg, setPrevLatestKg] = useState(latestKg);
   const [liveLatestKg, setLiveLatestKg] = useState(latestKg);
   const [liveTrend, setLiveTrend] = useState(trend);
@@ -31,12 +31,16 @@ export function WeightCard({
     setLiveLatestKg(latestKg);
     setLiveTrend(trend);
     setHasLoggedToday(loggedToday);
+    setValue(latestKg !== null ? String(latestKg) : "");
   }
 
-  function logWeight(event: React.FormEvent) {
-    event.preventDefault();
+  function save() {
     const weightKg = Number(value);
-    if (!weightKg || weightKg <= 0) return;
+    if (!value.trim() || !Number.isFinite(weightKg) || weightKg <= 0) {
+      setValue(liveLatestKg !== null ? String(liveLatestKg) : "");
+      return;
+    }
+    if (weightKg === liveLatestKg) return;
 
     setLiveLatestKg(weightKg);
     setLiveTrend((current) =>
@@ -68,9 +72,20 @@ export function WeightCard({
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-semibold tracking-tight">
-              {liveLatestKg !== null ? liveLatestKg : "—"}
-            </span>
+            <input
+              type="number"
+              step="0.1"
+              value={value}
+              onChange={(event) => setValue(event.target.value)}
+              onFocus={(event) => event.target.select()}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") event.currentTarget.blur();
+              }}
+              onBlur={save}
+              placeholder="—"
+              aria-label="Weight (kg)"
+              className="w-20 min-w-0 bg-transparent text-2xl font-semibold tracking-tight outline-none focus:underline"
+            />
             <span className="text-sm text-muted">kg</span>
           </div>
           <span className="truncate text-xs text-muted">
@@ -86,25 +101,6 @@ export function WeightCard({
           <Sparkline id="weight" points={liveTrend} color={WEIGHT_COLOR} height={40} target={goalKg ?? undefined} />
         </div>
       )}
-
-      <form onSubmit={logWeight} className="flex items-center gap-2">
-        <input
-          type="number"
-          step="0.1"
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-          placeholder="kg"
-          className="min-w-0 flex-1 rounded-lg border border-border bg-surface-raised px-2 py-1.5 text-sm outline-none focus:border-navy-light"
-        />
-        <button
-          type="submit"
-          disabled={!value}
-          className="flex-none rounded-lg px-2.5 py-1.5 text-xs font-medium text-white transition disabled:opacity-50"
-          style={{ backgroundColor: WEIGHT_COLOR }}
-        >
-          Log
-        </button>
-      </form>
     </div>
   );
 }

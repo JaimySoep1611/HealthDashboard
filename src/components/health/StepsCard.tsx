@@ -27,13 +27,15 @@ export function StepsCard({ steps, goal }: { steps: number; goal: number | null 
     setValue(String(steps));
   }
 
-  function save(event: React.FormEvent) {
-    event.preventDefault();
+  function save() {
     const parsed = Number(value);
-    if (!Number.isFinite(parsed) || parsed < 0) return;
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      setValue(String(liveSteps));
+      return;
+    }
+    if (parsed === liveSteps) return;
 
     setLiveSteps(parsed);
-
     fetch("/api/steps/manual", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -59,30 +61,24 @@ export function StepsCard({ steps, goal }: { steps: number; goal: number | null 
           {goalMet ? <CheckIcon size={20} /> : <FootprintsIcon size={20} />}
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
-          <span className="text-2xl font-semibold tracking-tight">{liveSteps.toLocaleString()}</span>
+          <input
+            type="number"
+            min={0}
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            onFocus={(event) => event.target.select()}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") event.currentTarget.blur();
+            }}
+            onBlur={save}
+            aria-label="Steps today"
+            className="w-full min-w-0 bg-transparent text-2xl font-semibold tracking-tight outline-none focus:underline"
+          />
           <span className={`truncate text-xs ${goalMet ? "font-medium text-emerald-400" : "text-muted"}`}>
             {goalMet ? "Goal reached" : goal !== null ? `Goal ${goal.toLocaleString()} steps` : "Steps today"}
           </span>
         </div>
       </div>
-
-      <form onSubmit={save} className="flex items-center gap-2">
-        <input
-          type="number"
-          min={0}
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-          placeholder="Correct steps"
-          className="min-w-0 flex-1 rounded-lg border border-border bg-surface-raised px-2 py-1.5 text-sm outline-none focus:border-navy-light"
-        />
-        <button
-          type="submit"
-          className="flex-none rounded-lg px-2.5 py-1.5 text-xs font-medium text-white transition"
-          style={{ backgroundColor: STEPS_COLOR }}
-        >
-          Save
-        </button>
-      </form>
     </div>
   );
 }

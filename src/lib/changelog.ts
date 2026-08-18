@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Edit Steps/Weight by tapping the number itself",
+    description:
+      "The big number on the Steps and Weight cards is now directly editable — tap it, type the new value, and tap away or hit Enter to save. Removed the separate correction field and Save/Log button underneath, since they did the same thing.",
+  },
+  {
+    date: "2026-08-17",
     title: "Fixed the favorite star: real toggle, bigger target, persists",
     description:
       "Three fixes to the star button on logged entries: it now reflects the actual shared favorites list (so it stays filled after a refresh, instead of always resetting), tapping a filled star unfavorites it (a real toggle, not add-only), and the tap target is bigger so it's easier to hit precisely.",

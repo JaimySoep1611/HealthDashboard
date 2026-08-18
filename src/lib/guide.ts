@@ -65,7 +65,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Steps",
         description:
-          "Today's step count, synced automatically via the Apple Shortcuts automation, or entered manually if it needs correcting. The \"Once/day\" tag is a reminder that this is a single daily number, not something you add to repeatedly like water — but you can still overwrite it any time you want. Set a daily steps goal in \"Edit Goals\" to see it shown here and used in Trends — crossing it (via manual entry or the next automatic sync) plays a confetti burst and turns the card green with a checkmark, a persistent \"done\" state you'll still see on your next visit, not just the animation.",
+          "Today's step count, synced automatically via the Apple Shortcuts automation. Tap the big number directly to correct it — type the new value and tap away or hit Enter to save, no separate field needed. The \"Once/day\" tag is a reminder that this is a single daily number, not something you add to repeatedly like water. Set a daily steps goal in \"Edit Goals\" to see it shown here and used in Trends — crossing it (via manual entry or the next automatic sync) plays a confetti burst and turns the card green with a checkmark, a persistent \"done\" state you'll still see on your next visit, not just the animation.",
       },
     ],
   },
@@ -75,7 +75,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       {
         name: "Weight",
         description:
-          "Log your weight once a day — the \"Once/day\" tag is just a reminder of that, you can still update it whenever. The trend line compares your recent weigh-ins to your goal weight, with how far you have left to go. Set a starting weight in \"Edit Goals\" to see a second, dotted reference line and how much you've moved from it.",
+          "Tap the big number directly to log or correct today's weight — type it and tap away or hit Enter to save, no separate field needed. The \"Once/day\" tag is just a reminder that this is a single daily number, not something you add to repeatedly. The trend line compares your recent weigh-ins to your goal weight, with how far you have left to go. Set a starting weight in \"Edit Goals\" to see a second, dotted reference line and how much you've moved from it.",
       },
     ],
   },
