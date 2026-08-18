@@ -22,6 +22,11 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         description:
           "Type what you ate in plain words (e.g. \"two eggs and toast\") or tap the camera to photograph a meal — AI estimates calories and macros for you to add. Prefer not to use AI, or hit its daily limit? Tap \"Or log it manually\" below the input to enter a name, calories, and macros directly, no AI involved.",
       },
+      {
+        name: "Recent & Favorites (in manual entry)",
+        description:
+          "Opening \"Log it manually\" shows your recently-logged meals and any saved favorites right above the form — tap one to log it instantly with its saved numbers, no retyping. Check \"Save as favorite\" while adding something to add it to the favorites menu. Favorites are shared between Jaimy and Lisa (one household menu), while \"Recent\" only reflects your own recent logging.",
+      },
     ],
   },
   {

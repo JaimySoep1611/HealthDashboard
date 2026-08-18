@@ -238,6 +238,27 @@ export default async function DashboardPage() {
     streak++;
   }
 
+  // Recent meals for the manual-entry shortcut — most-recently-logged
+  // distinct name wins when the same meal was logged more than once in the
+  // last 30 days, so re-logging a regular doesn't create duplicate entries.
+  const recentMeals = Array.from(
+    [...monthFoodEntries]
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .reduce((byName, entry) => {
+        if (!byName.has(entry.name)) {
+          byName.set(entry.name, {
+            name: entry.name,
+            calories: entry.calories,
+            proteinG: entry.proteinG,
+            carbsG: entry.carbsG,
+            fatG: entry.fatG,
+          });
+        }
+        return byName;
+      }, new Map<string, { name: string; calories: number; proteinG: number; carbsG: number; fatG: number }>())
+      .values()
+  ).slice(0, 8);
+
   return (
     <FoodEntriesProvider initialEntries={todayFoodEntries}>
       <div className="flex flex-col gap-8">
@@ -292,6 +313,7 @@ export default async function DashboardPage() {
               trendDays={TREND_DAYS}
               weekTotalExcludingToday={weekTotalExcludingToday}
               daysElapsed={daysElapsed}
+              recentMeals={recentMeals}
             />
           )}
         </section>

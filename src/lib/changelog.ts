@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Recent meals + a shared favorites menu",
+    description:
+      "\"Log it manually\" now shows your recently-logged meals and a favorites menu right above the form — tap one to log it instantly with its saved numbers. Add a \"★ Save as favorite\" checkbox while manually logging something to add it to the favorites menu, which both Jaimy and Lisa see and pick from (one shared list). Recent meals stay per-profile, since they reflect your own logging history.",
+  },
+  {
+    date: "2026-08-17",
     title: "Fun background: moving otters & dogs",
     description:
       "New toggle in \"Edit Goals\" — turn it on for small otters and dogs drifting slowly across the background behind the whole app, just for fun. Off by default, and it's a per-profile setting.",

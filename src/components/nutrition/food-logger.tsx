@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CloseIcon } from "@/components/icons";
 
 type AiFoodItem = {
@@ -10,6 +10,8 @@ type AiFoodItem = {
   carbsG: number;
   fatG: number;
 };
+
+type FavoriteMeal = AiFoodItem & { id: string };
 
 const MAX_UPLOAD_DIMENSION = 1024;
 const UPLOAD_JPEG_QUALITY = 0.82;
@@ -41,7 +43,13 @@ async function resizeImageForUpload(dataUrl: string): Promise<{ base64: string; 
   return { base64, mediaType: "image/jpeg" };
 }
 
-export function FoodLogger({ onAdd }: { onAdd: (item: AiFoodItem, source: string) => void }) {
+export function FoodLogger({
+  onAdd,
+  recentMeals,
+}: {
+  onAdd: (item: AiFoodItem, source: string) => void;
+  recentMeals: AiFoodItem[];
+}) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [description, setDescription] = useState("");
@@ -167,6 +175,7 @@ export function FoodLogger({ onAdd }: { onAdd: (item: AiFoodItem, source: string
 
       {manualOpen && (
         <ManualEntryModal
+          recentMeals={recentMeals}
           onClose={() => setManualOpen(false)}
           onSave={(item) => {
             onAdd(item, "manual");
@@ -206,9 +215,11 @@ export function FoodLogger({ onAdd }: { onAdd: (item: AiFoodItem, source: string
 }
 
 function ManualEntryModal({
+  recentMeals,
   onClose,
   onSave,
 }: {
+  recentMeals: AiFoodItem[];
   onClose: () => void;
   onSave: (item: AiFoodItem) => void;
 }) {
@@ -217,23 +228,47 @@ function ManualEntryModal({
   const [proteinG, setProteinG] = useState("");
   const [carbsG, setCarbsG] = useState("");
   const [fatG, setFatG] = useState("");
+  const [saveAsFavorite, setSaveAsFavorite] = useState(false);
+
+  const [favorites, setFavorites] = useState<FavoriteMeal[]>([]);
+  const [favoritesLoaded, setFavoritesLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/nutrition/favorites")
+      .then((response) => response.json())
+      .then((data) => setFavorites(data?.favorites ?? []))
+      .finally(() => setFavoritesLoaded(true));
+  }, []);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!name.trim()) return;
-    onSave({
+    const item = {
       name: name.trim(),
       calories: Number(calories) || 0,
       proteinG: Number(proteinG) || 0,
       carbsG: Number(carbsG) || 0,
       fatG: Number(fatG) || 0,
-    });
+    };
+    if (saveAsFavorite) {
+      fetch("/api/nutrition/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(item),
+      });
+    }
+    onSave(item);
+  }
+
+  function removeFavorite(id: string) {
+    setFavorites((current) => current.filter((favorite) => favorite.id !== id));
+    fetch(`/api/nutrition/favorites/${id}`, { method: "DELETE" });
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
       <div
-        className="tile flex w-full max-w-sm flex-col gap-4 p-5"
+        className="tile flex max-h-[85vh] w-full max-w-sm flex-col gap-4 overflow-y-auto p-5"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -247,7 +282,34 @@ function ManualEntryModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        {favoritesLoaded && favorites.length > 0 && (
+          <div className="flex flex-col gap-1.5">
+            <p className="text-xs text-muted">Favorites (shared)</p>
+            <div className="flex flex-col gap-1.5">
+              {favorites.map((favorite) => (
+                <QuickPickRow
+                  key={favorite.id}
+                  item={favorite}
+                  onPick={() => onSave(favorite)}
+                  onRemove={() => removeFavorite(favorite.id)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {recentMeals.length > 0 && (
+          <div className="flex flex-col gap-1.5">
+            <p className="text-xs text-muted">Recent</p>
+            <div className="flex flex-col gap-1.5">
+              {recentMeals.map((meal) => (
+                <QuickPickRow key={meal.name} item={meal} onPick={() => onSave(meal)} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 border-t border-border pt-3">
           <label className="flex flex-col gap-1 text-xs text-muted">
             Name
             <input
@@ -306,6 +368,16 @@ function ManualEntryModal({
             </label>
           </div>
 
+          <label className="flex items-center gap-2 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={saveAsFavorite}
+              onChange={(event) => setSaveAsFavorite(event.target.checked)}
+              className="h-4 w-4 rounded border-border"
+            />
+            ★ Save as favorite (shared with the other profile)
+          </label>
+
           <button
             type="submit"
             disabled={!name.trim()}
@@ -315,6 +387,47 @@ function ManualEntryModal({
           </button>
         </form>
       </div>
+    </div>
+  );
+}
+
+function QuickPickRow({
+  item,
+  onPick,
+  onRemove,
+}: {
+  item: AiFoodItem;
+  onPick: () => void;
+  onRemove?: () => void;
+}) {
+  const [added, setAdded] = useState(false);
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={() => {
+          onPick();
+          setAdded(true);
+        }}
+        disabled={added}
+        className="flex flex-1 items-center justify-between rounded-lg border border-border px-3 py-2 text-left text-sm transition hover:border-navy-light disabled:opacity-50"
+      >
+        <span className="truncate">{item.name}</span>
+        <span className="flex-none pl-2 text-xs text-muted">
+          {added ? "Added" : `${Math.round(item.calories)} kcal`}
+        </span>
+      </button>
+      {onRemove && (
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label={`Remove ${item.name} from favorites`}
+          className="flex-none text-xs text-muted hover:text-red-400"
+        >
+          <CloseIcon size={14} />
+        </button>
+      )}
     </div>
   );
 }

@@ -26,7 +26,6 @@ model Profile {
   trainingExercises TrainingExercise[]
   stepEntries       StepEntry[]
   foodEntries       FoodEntry[]
-  customFoods       CustomFood[]
   waterEntries      WaterEntry[]
   weightEntries     WeightEntry[]
   pushSubscriptions PushSubscription[]
@@ -127,13 +126,15 @@ model FoodEntry {
   createdAt DateTime @default(now())
 }
 
-model CustomFood {
-  id        String  @id @default(cuid())
-  profile   Profile @relation(fields: [profileId], references: [id])
-  profileId String
+// Not profile-scoped on purpose — a shared "go-to meals" menu both
+// household profiles see and pick from, same as the household shares one
+// fridge. Distinct from FoodEntry (an actual logged meal on a given day).
+model FavoriteMeal {
+  id        String   @id @default(cuid())
   name      String
   calories  Float
   proteinG  Float
   carbsG    Float
   fatG      Float
+  createdAt DateTime @default(now())
 }

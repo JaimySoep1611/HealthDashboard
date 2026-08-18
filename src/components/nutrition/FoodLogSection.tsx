@@ -95,12 +95,14 @@ export function FoodLogSection({
   trendDays,
   weekTotalExcludingToday,
   daysElapsed,
+  recentMeals,
 }: {
   target: Target;
   calorieTrend: number[];
   trendDays: number;
   weekTotalExcludingToday: number;
   daysElapsed: number;
+  recentMeals: AiFoodItem[];
 }) {
   const router = useRouter();
   const { entries, setEntries } = useFoodEntries();
@@ -236,7 +238,7 @@ export function FoodLogSection({
 
       <div className="tile p-5 sm:p-6">
         <h3 className="mb-3 font-medium">Log food</h3>
-        <FoodLogger onAdd={addEntry} />
+        <FoodLogger onAdd={addEntry} recentMeals={recentMeals} />
         {addError && <p className="mt-2 text-sm text-red-400">{addError}</p>}
       </div>
 

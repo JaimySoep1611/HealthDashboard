@@ -15,8 +15,7 @@ export async function POST(request: NextRequest) {
   const profile = await getCurrentProfile();
   if (!profile) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-  const { name, calories, proteinG, carbsG, fatG, source, sourceRef, saveAsCustom } =
-    await request.json();
+  const { name, calories, proteinG, carbsG, fatG, source, sourceRef } = await request.json();
 
   const numericCalories = toNonNegativeNumber(calories);
   const numericProteinG = toNonNegativeNumber(proteinG);
@@ -47,19 +46,6 @@ export async function POST(request: NextRequest) {
       sourceRef: typeof sourceRef === "string" ? sourceRef : null,
     },
   });
-
-  if (saveAsCustom) {
-    await prisma.customFood.create({
-      data: {
-        profileId: profile.id,
-        name: name.trim(),
-        calories: numericCalories,
-        proteinG: numericProteinG,
-        carbsG: numericCarbsG,
-        fatG: numericFatG,
-      },
-    });
-  }
 
   return NextResponse.json(entry);
 }
