@@ -9,6 +9,12 @@ export type ChangelogEntry = {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-08-17",
+    title: "Color and icons for the training schedule",
+    description:
+      "The training schedule was looking a bit flat, so each exercise now gets an icon and color guessed from its name — push (blue), pull (teal), legs (amber), or core (pink) — and running exercises get their own distinct icon/color too. Rest days now show a small moon icon instead of just plain text.",
+  },
+  {
+    date: "2026-08-17",
     title: "Meal reminders: breakfast, lunch, and dinner",
     description:
       "Three new reminders (once daily reminders are enabled): 10:00 if nothing's logged yet today, 13:00 if nothing's logged since 11:45, and 19:00 if nothing's logged since 18:00 — nudges for breakfast, lunch, and dinner respectively. All times are Amsterdam local time, correctly adjusted for CET/CEST.",

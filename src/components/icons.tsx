@@ -169,6 +169,30 @@ export function CheckIcon({ className, size = 20 }: IconProps) {
   );
 }
 
+export function PushIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M12 19V7M7 11l5-5 5 5" />
+    </svg>
+  );
+}
+
+export function PullIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M12 5v12M7 13l5 5 5-5" />
+    </svg>
+  );
+}
+
+export function LegsIcon({ className, size = 20 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M8 4h8M9 4v9l-2 7M15 4v9l2 7" />
+    </svg>
+  );
+}
+
 export function StarIcon({ className, size = 20, filled = false }: IconProps & { filled?: boolean }) {
   return (
     <svg

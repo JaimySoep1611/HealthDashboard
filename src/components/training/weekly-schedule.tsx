@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { WEEKDAY_LABELS, WEEKDAY_SHORT } from "@/lib/weekdays";
-import { DumbbellIcon, FootprintsIcon, CloseIcon } from "@/components/icons";
+import { FootprintsIcon, CloseIcon, PushIcon, PullIcon, LegsIcon, TargetIcon, MoonIcon } from "@/components/icons";
+import { categorizeExercise, CATEGORY_COLORS, CARDIO_COLOR } from "@/lib/exerciseCategory";
 
 type Log = {
   kg: number | null;
@@ -22,6 +23,21 @@ type Exercise = {
   kind: "weight" | "cardio";
   log: Log | null;
 };
+
+const CATEGORY_ICONS = {
+  push: PushIcon,
+  pull: PullIcon,
+  legs: LegsIcon,
+  core: TargetIcon,
+} as const;
+
+function exerciseIconAndColor(exercise: Exercise) {
+  if (exercise.kind === "cardio") {
+    return { Icon: FootprintsIcon, color: CARDIO_COLOR };
+  }
+  const category = categorizeExercise(exercise.name);
+  return { Icon: CATEGORY_ICONS[category], color: CATEGORY_COLORS[category] };
+}
 
 function useTodayWeekday() {
   // Computed client-side from the browser's own clock (correct for whoever's
@@ -114,8 +130,9 @@ export function WeeklySchedule({
               </div>
 
               {dayExercises.length === 0 ? (
-                <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-border py-5 text-center text-[10px] text-muted">
-                  Rest
+                <div className="flex flex-1 flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-border py-5 text-center text-muted">
+                  <MoonIcon size={16} className="opacity-60" />
+                  <span className="text-[10px]">Rest</span>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
@@ -222,12 +239,13 @@ function ExerciseChip({ exercise, onRemove }: { exercise: Exercise; onRemove?: (
 
   const inputClass =
     "w-full min-w-0 rounded-md border border-border bg-surface-raised px-1.5 py-1 text-[10px] outline-none focus:border-navy-light";
+  const { Icon, color } = exerciseIconAndColor(exercise);
 
   return (
     <div className="rounded-lg border border-border bg-surface-raised p-2">
       <div className="mb-1.5 flex items-center gap-1">
-        <span className="flex-none text-muted">
-          {exercise.kind === "weight" ? <DumbbellIcon size={11} /> : <FootprintsIcon size={11} />}
+        <span className="flex-none" style={{ color }}>
+          <Icon size={12} />
         </span>
         <span className="min-w-0 flex-1 truncate text-[11px] font-medium">{exercise.name}</span>
         {liveLog?.stravaActivityId && (
