@@ -53,12 +53,12 @@ export function StepsCard({ steps, goal }: { steps: number; goal: number | null 
         <DailyEntryBadge color={STEPS_COLOR} />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <div
-          className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
+          className="flex h-16 w-16 flex-none items-center justify-center rounded-2xl"
           style={{ backgroundColor: `${activeColor}22`, color: activeColor }}
         >
-          {goalMet ? <CheckIcon size={20} /> : <FootprintsIcon size={20} />}
+          {goalMet ? <CheckIcon size={28} /> : <FootprintsIcon size={28} />}
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <input
@@ -72,7 +72,7 @@ export function StepsCard({ steps, goal }: { steps: number; goal: number | null 
             }}
             onBlur={save}
             aria-label="Steps today"
-            className="w-full min-w-0 bg-transparent text-2xl font-semibold tracking-tight outline-none focus:underline"
+            className="w-full min-w-0 bg-transparent text-4xl font-semibold tracking-tight outline-none focus:underline"
           />
           <span className={`truncate text-xs ${goalMet ? "font-medium text-emerald-400" : "text-muted"}`}>
             {goalMet ? "Goal reached" : goal !== null ? `Goal ${goal.toLocaleString()} steps` : "Steps today"}

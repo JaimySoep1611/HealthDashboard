@@ -63,12 +63,12 @@ export function WeightCard({
         <DailyEntryBadge color={WEIGHT_COLOR} />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <div
-          className="flex h-11 w-11 flex-none items-center justify-center rounded-2xl"
+          className="flex h-16 w-16 flex-none items-center justify-center rounded-2xl"
           style={{ backgroundColor: `${WEIGHT_COLOR}22`, color: WEIGHT_COLOR }}
         >
-          <ScaleIcon size={20} />
+          <ScaleIcon size={28} />
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-baseline gap-1">
@@ -84,9 +84,9 @@ export function WeightCard({
               onBlur={save}
               placeholder="—"
               aria-label="Weight (kg)"
-              className="w-20 min-w-0 bg-transparent text-2xl font-semibold tracking-tight outline-none focus:underline"
+              className="w-24 min-w-0 bg-transparent text-4xl font-semibold tracking-tight outline-none focus:underline"
             />
-            <span className="text-sm text-muted">kg</span>
+            <span className="text-base text-muted">kg</span>
           </div>
           <span className="truncate text-xs text-muted">
             {goalKg !== null

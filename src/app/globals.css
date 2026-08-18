@@ -49,6 +49,18 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Hide the native up/down spinner on number inputs everywhere — most
+   noticeable (and unwanted) on the directly-editable Steps/Weight numbers. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
 .tile {
   background: linear-gradient(180deg, var(--surface-raised) 0%, var(--surface) 100%);
   border: 1px solid var(--border);
